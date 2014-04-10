@@ -13,4 +13,5 @@ define('EDUCASK_WEB_ROOT', dirname($_SERVER['SCRIPT_NAME']) . '/');
 
 //Start EHQ Simple CMS
 require_once(EDUCASK_ROOT . '/includes/classes/bootstrap.php');
-new bootstrap()->run();
+$bootstrap = bootstrap::getInstance();
+$bootstrap->init();
