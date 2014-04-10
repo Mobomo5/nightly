@@ -15,7 +15,7 @@ class site {
     private $urlSecure;
     private $baseDirectory;
     private $theme;
-    private $cmsVersion;
+    private $educaskVersion;
     private $currentPage;
     private $guestRoleID;
     private $cleanURLs;
@@ -140,8 +140,8 @@ class site {
             return false;
         }
     }
-    public function getCmsVersion() {
-        return $this->cmsVersion;
+    public function getEducaskVersion() {
+        return $this->educaskVersion;
     }
     public function getCurrentPage($asArray = false) {
         if($asArray == true) {
