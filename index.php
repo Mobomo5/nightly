@@ -12,7 +12,7 @@ header('X-Frame-Options: DENY');
 define('EDUCASK_ROOT', getcwd());
 define('EDUCASK_WEB_ROOT', dirname($_SERVER['SCRIPT_NAME']) . '/');
 
-//Start EHQ Simple CMS
+//Start Educask
 require_once(EDUCASK_ROOT . '/includes/classes/bootstrap.php');
 $bootstrap = bootstrap::getInstance();
 $bootstrap->init();
