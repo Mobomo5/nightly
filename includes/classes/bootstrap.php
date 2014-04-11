@@ -55,7 +55,7 @@ class bootstrap {
         }
     }
     private function initializePlugins() {
-        foreach (glob(EHQ_SIMPLE_CMS_ROOT . '/includes/modules/*/plugins/*.php') as $plugin) {
+        foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*.php') as $plugin) {
             require_once($plugin);
         }
     }
@@ -65,18 +65,18 @@ class bootstrap {
         date_default_timezone_set($site->getTimeZone());
         $blockEngine = blockEngine::getInstance();
         $user = currentUser::getSession();
-        $blocks = $blockEngine->getBlocks($site->getTheme(), $site->getCurrentPage(),,$user->getRoleID());
+        $blocks = NULL; //@ToDo: Fix this: $blockEngine->getBlocks($site->getTheme(), $site->getCurrentPage(),,$user->getRoleID());
         $this->database->bootstrapDisconnect();
     }
     private function render() {
-        require_once(EHQ_SIMPLE_CMS_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
+        require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         Twig_Autoloader::register();
-        $theme = EHQ_SIMPLE_CMS_ROOT . '/includes/themes/' . $site->getTheme() . '/';
+        $theme = EDUCASK_ROOT . '/includes/themes/' . $site->getTheme() . '/';
         if(! is_dir($theme)) {
-            $theme = EHQ_SIMPLE_CMS_ROOT . '/includes/themes/default';
+            $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
         $loader = new Twig_Loader_Filesystem(array($theme));
-        foreach(glob(EHQ_SIMPLE_CMS_ROOT . '/includes/baseThemes/*') as $baseTheme) {
+        foreach(glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
             $name = explode('/', $baseTheme);
             $name = end($name);
             $loader->addPath($baseTheme, $name);
