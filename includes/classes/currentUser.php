@@ -34,7 +34,7 @@ class currentUser {
         //Start a guest session
         $this->isLoggedIn = false;
         $this->userID = null;
-        $this->userRole = site::getInstance()->getGuestRoleID();
+        $this->userRole = GUEST_ROLE_ID;
         $this->firstName = 'Guest';
         $this->lastName = null;
     }

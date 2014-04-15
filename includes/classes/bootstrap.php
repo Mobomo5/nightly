@@ -21,6 +21,9 @@ class bootstrap {
         return self::$instance;
     }
     private function __construct() {
+        //Do nothing
+    }
+    private function construct() {
         $this->database = database::getInstance();
         $this->site = site::getInstance();
         $this->blockEngine = blockEngine::getInstance();
@@ -29,6 +32,7 @@ class bootstrap {
     public function init() {
         $this->declareConstants();
         $this->doRequires();
+        $this->construct();
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
@@ -47,6 +51,7 @@ class bootstrap {
         define('LINK_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/link.php');
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
+        define('CURRENT_USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/currentUser.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -54,6 +59,7 @@ class bootstrap {
         require_once(VARIABLE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
+        require_once(CURRENT_USER_OBJECT_FILE);
     }
     private function connectDatabase() {
         $this->database->connect();
