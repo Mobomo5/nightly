@@ -3,67 +3,65 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(PASSWORD_FUNCTIONS_FILE);
 
-class user
-{
-
+class currentUser {
     private $isLoggedIn;
     private $userID;
     private $userRole;
     private $firstName;
     private $lastName;
-    private $guestRoleID = 4;
-
-    public function __construct()
-    {
-        //prevent overwriting of the user's session if a new user object is called when it shouldn't be
-        if (userIsInSession()) {
-            $currentUser = getUserSession();
-
-            $this->isLoggedIn = $currentUser->isLoggedIn();
-            $this->userID = $currentUser->getUserID();
-            $this->userRole = $currentUser->getUserRole();
-            $this->firstName = $currentUser->getFirstName();
-            $this->lastName = $currentUser->getLastName();
-
-            //Save the user object
-            setUserSession($this);
-
+    static function userIsInSession() {
+        if (!isset($_SESSION['educaskCurrentUser'])) {
+            return false;
+        }
+        return true;
+    }
+    static function getUserSession(){
+        //if the user's object hasn't been created yet, create it
+        if (! self::userIsInSession()) {
+            self::setUserSession(new currentUser());
+        }
+        //return the user object
+        return $_SESSION['educaskCurrentUser'];
+    }
+    static function setUserSession(currentUser $object) {
+        //verify the variable given is a user object. If it is not, get out of here.
+        if (get_class($object) != "currentUser") {
             return;
         }
-
+        $_SESSION['educaskUser'] = $object;
+    }
+    private function __construct() {
         //Start a guest session
         $this->isLoggedIn = false;
-        $this->userID = NULL;
-        $this->userRole = $this->guestRoleID;
+        $this->userID = null;
+        $this->userRole = site::getInstance()->getGuestRoleID();
         $this->firstName = 'Guest';
-        $this->lastName = NULL;
-
-        //Save the user object
-        setUserSession($this);
+        $this->lastName = null;
     }
-
-    public function isLoggedIn()
-    {
+    public function isLoggedIn() {
         return $this->isLoggedIn;
     }
-
-    public function getUserRole()
-    {
+    public function getUserRole() {
         return $this->userRole;
     }
-
-    public function getUserID()
-    {
+    public function getUserID() {
         return $this->userID;
     }
-
-    public function logIn($userName, $password)
-    {
+    public function getFullName() {
+        return $this->firstName . ' ' . $this->lastName;
+    }
+    public function getFirstName() {
+        return $this->firstName;
+    }
+    public function getLastName() {
+        return $this->lastName;
+    }
+    public function logIn($userName, $password) {
         CRYPT_BLOWFISH or die('No Blowfish Found');
         $database = new database();
         $database->connect();
 
-        if (!$database->isConnected()) {
+        if(!$database->isConnected()) {
             return false;
         }
 
@@ -76,23 +74,23 @@ class user
         $where = 'WHERE email = \'' . $userName . '\'';
 
 
-        if ($database->isConnected()) {
+        if($database->isConnected()) {
             $results = $database->getData($column, $table, $where);
         } else {
-            $results = NULL;
+            $results = null;
         }
 
         //If there weren't any accounts found or too many accounts found
-        if ($results == NULL) {
+        if($results == null) {
             return false;
         }
 
-        if (count($results) > 1) {
+        if(count($results) > 1) {
             return false;
         }
 
         $dbPassword = $results[0]['password'];
-        if (!verifyHash($password, $dbPassword)) {
+        if(!verifyHash($password, $dbPassword)) {
             return false;
         }
 
@@ -103,71 +101,24 @@ class user
         $this->lastName = $results[0]['lastName'];
 
         $database->disconnect();
-        setUserSession($this);
+        self::setUserSession($this);
         return true;
     }
 
-    public function logOut()
-    {
+    public function logOut() {
         //reset all variables to default
         $this->isLoggedIn = false;
-        $this->userID = NULL;
+        $this->userID = null;
         $this->userRole = $this->guestRoleID;
         $this->firstName = 'Guest';
-        $this->lastName = NULL;
+        $this->lastName = null;
 
         //Save the user object
-        setUserSession($this);
-    }
-
-    public function getFullName()
-    {
-        return $this->firstName . ' ' . $this->lastName;
-    }
-
-    public function getFirstName()
-    {
-        return $this->firstName;
-    }
-
-    public function getLastName()
-    {
-        return $this->lastName;
+        self::setUserSession($this);
     }
 }
 
 /** EVALUATE LATER ***************
- *
- *functions that help control the session
- *
- * function userIsInSession()
- * {
- * if (!isset($_SESSION['educaskUser'])) {
- * return false;
- * }
- * return true;
- * }
- *
- * function getUserSession()
- * {
- * //if the user's object hasn't been created yet, create it
- * if (!userIsInSession()) {
- * return new user();
- * }
- *
- * //return the user object
- * return $_SESSION['educaskUser'];
- * }
- *
- * function setUserSession(user $object)
- * {
- * //verify the variable given is a user object. If it is not, get out of here.
- * if (get_class($object) != "user") {
- * return;
- * }
- *
- * $_SESSION['educaskUser'] = $object;
- * }
  *
  * public function hasPermission($inPermissionName)
  * {

@@ -9,6 +9,10 @@
 class bootstrap {
     private static $instance;
     private $database;
+    private $site;
+    private $blockEngine;
+    private $blocks;
+    private $user;
 
     public static function getInstance() {
         if (!isset(self::$instance)) {
@@ -17,7 +21,10 @@ class bootstrap {
         return self::$instance;
     }
     private function __construct() {
-        //Do nothing.
+        $this->database = database::getInstance();
+        $this->site = site::getInstance();
+        $this->blockEngine = blockEngine::getInstance();
+        $this->user = currentUser::getUserSession();
     }
     public function init() {
         $this->declareConstants();
@@ -42,13 +49,13 @@ class bootstrap {
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
     }
     private function doRequires() {
+        require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
         require_once(VARIABLE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
     }
     private function connectDatabase() {
-        $this->database = database::getInstance();
         $this->database->connect();
         if(! $this->database->isConnected()) {
             die('<html><head><title>:( Database is a no-go | Educask</title></head><body><h1>:( The database is a no-go.</h1><p>Sorry, but I had problems connecting to the database.</p></body></html>');
@@ -60,18 +67,14 @@ class bootstrap {
         }
     }
     private function getVariables() {
-        $site = site::getInstance();
-        define('GUEST_ROLE_ID', $site->getGuestRoleID());
-        date_default_timezone_set($site->getTimeZone());
-        $blockEngine = blockEngine::getInstance();
-        $user = currentUser::getSession();
-        $blocks = NULL; //@ToDo: Fix this: $blockEngine->getBlocks($site->getTheme(), $site->getCurrentPage(),,$user->getRoleID());
+        define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
+        date_default_timezone_set($this->site->getTimeZone());
+        $blocks = NULL; //@ToDo: Fix this: $this->blockEngine->getBlocks($site->getTheme(), $site->getCurrentPage(),,$this->user->getRoleID());
         $this->database->bootstrapDisconnect();
     }
     private function render() {
-        require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         Twig_Autoloader::register();
-        $theme = EDUCASK_ROOT . '/includes/themes/' . $site->getTheme() . '/';
+        $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme() . '/';
         if(! is_dir($theme)) {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
