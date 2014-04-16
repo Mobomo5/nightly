@@ -10,3 +10,4 @@ $dbServer = 'localhost';
 $db = 'educask';
 $dbUserName = 'educaskDev';
 $dbPassword = 'jLzYawD9ERnnu9ma'; //Change password when account and database created.
+$dbType = 'mySQL';

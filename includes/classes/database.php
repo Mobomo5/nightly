@@ -1,4 +1,6 @@
 <?php
+require_once(DATABASE_INTERFACE_FILE);
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Craig
@@ -6,8 +8,7 @@
  * Time: 5:29 PM
  * To change this template use File | Settings | File Templates.
  */
-
-class database
+class database implements databaseInterface
 {
 
     /**
@@ -17,16 +18,23 @@ class database
     private $dbPassword;
     private $db;
     private $dbServer;
-    private $con;
-    private $mysqli;
-    private $resultArray;
+    private $dbObject;
+    private $dbType;
 
     public static function getInstance()
     {
 
     }
 
-    function __construct()
+    function isConnected()
+    {
+        if (empty($this->dbObject)) {
+            return false;
+        }
+        return $this->dbObject->isConnected();
+    }
+
+    function __construct($inParameters = "")
     {
 
         require_once(EDUCASK_ROOT . '/includes/config.php');
@@ -34,16 +42,23 @@ class database
         $this->dbPassword = $dbPassword;
         $this->db = 'educaskOld';
         $this->dbServer = $dbServer;
+        $this->dbType = $dbType;
 
+        // Dynamically create the new database object, if possible.
+        if (!require_once(EDUCASK_ROOT . "/includes/databases/" . $this->dbType . ".php")) {
+            // @todo: ERROR the file isn't there.
 
-        try {
-            $this->connect();
-
-        } catch (Exception $e) {
-            var_dump($e->getCode() . ' ' . $e->getMessage());
-            exit;
         }
 
+        try {
+
+            $this->dbObject = new $dbType;
+            $this->dbObject->connect($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
+
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
+        }
     }
 
     function __destruct()
@@ -51,51 +66,101 @@ class database
         $this->disconnect();
     }
 
-    /**
-     * private boolean used to connect to the db using credentials stored earlier.
-     */
-    private function connect()
+    function disconnect()
     {
-
-        if (!$this->con = mysqli_connect($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db)) {
-            throw new Exception(mysqli_error($this->con));
-        }
+        $this->dbObject->disconnect();
     }
 
-    private function disconnect()
+    function select($select, $from, $where)
     {
-        if (!isset($this->con)) {
-            throw new Exception("No database object connected.");
+        try {
+            $result = $this->dbObject->select($select, $from, $where);
+
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
         }
 
-        mysqli_close($this->con);
+        return $result;
     }
 
-    /**
-     * returns an associative array of values stored as $result[row][column]=>value
-     * @param string $select
-     * @param string $from
-     * @param mixed|string $where
-     * @throws Exception
-     * @return array
-     */
-    public function select($select, $from, $where = '1')
+    function query($inQuery)
     {
+        try {
+            $result = $this->dbObject->query($inQuery);
 
-        $select = mysqli_real_escape_string($this->con, $select);
-        $from = mysqli_real_escape_string($this->con, $from);
-        $where = mysqli_real_escape_string($this->con, $where);
-
-        $query = "SELECT $select FROM $from WHERE $where;";
-        echo $query;
-
-        if (!$results = mysqli_query($this->con, $query)) {
-            echo mysqli_error($this->con);
-            throw new Exception(mysqli_error($this->con));
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
         }
-        while ($resultArray[] = $results->fetch_assoc()) {
+
+        return $result;
+    }
+
+    function insert($into, $columns, $values)
+    {
+        // TODO: Implement insert() method.
+    }
+
+    function update($table, $set, $values)
+    {
+        // TODO: Implement update() method.
+    }
+
+    function getUserByName($firstName, $lastName)
+    {
+        try {
+            $result = $this->dbObject->getUserByName($firstName, $lastName);
+
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
         }
-        var_dump($resultArray);
-        return $resultArray;
+
+        return $result;
+    }
+
+    function getUserByNumber($studentNumber)
+    {
+        try {
+            $result = $this->dbObject->getUserByNumber($studentNumber);
+
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
+        }
+
+        return $result;
+    }
+
+    function getUserByEmail($email)
+    {
+        try {
+            $result = $this->dbObject->getUserByEmail($email);
+
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
+        }
+
+        return $result;
+    }
+
+    function getUserByUserID($userID)
+    {
+        try {
+            $result = $this->dbObject->getUserByID($userID);
+
+        } catch (Exception $e) {
+            printf("%s = %s", $e->getCode(), $e->getMessage());
+            exit;
+        }
+
+        return $result;
+    }
+
+    function connect($dbServer, $userName, $password, $db)
+    {
+        // TODO: Implement connect() method.
     }
 }
