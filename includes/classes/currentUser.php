@@ -2,6 +2,8 @@
 //This file contains function that deal with the current user viewing the site.
 require_once(DATABASE_OBJECT_FILE);
 require_once(PASSWORD_FUNCTIONS_FILE);
+require_once(HASHER_OBJECT_FILE);
+require_once(SYSTEM_LOGGER_OBJET_FILE);
 
 class currentUser {
     private $isLoggedIn;
@@ -28,15 +30,15 @@ class currentUser {
         if (get_class($object) != "currentUser") {
             return;
         }
-        $_SESSION['educaskUser'] = $object;
+        $_SESSION['educaskCurrentUser'] = $object;
     }
     private function __construct() {
         //Start a guest session
         $this->isLoggedIn = false;
         $this->userID = null;
         $this->userRole = GUEST_ROLE_ID;
-        $this->firstName = 'Guest';
-        $this->lastName = null;
+        $this->firstName = 'Anonymous';
+        $this->lastName = 'Guest';
     }
     public function isLoggedIn() {
         return $this->isLoggedIn;
@@ -57,42 +59,65 @@ class currentUser {
         return $this->lastName;
     }
     public function logIn($userName, $password) {
-        CRYPT_BLOWFISH or die('No Blowfish Found');
-        $database = new database();
-        $database->connect();
+        if ($this->isLoggedIn) {
+            return true;
+        }
+        $hookEngine = hookEngine::getInstance();
+        $hookEngine->runAction('userLoggingIn');
+        //repeated twice just in case a plugin logs the user in
+        if ($this->isLoggedIn) {
+            return true;
+        }
 
-        if(!$database->isConnected()) {
+        if((! isset($_SESSION['userCanLogIn'])) or ($_SESSION['userCanLogIn'] == false)) {
             return false;
         }
 
-        $hashedPassword = generateHash($password);
-        $userName = mysqli_real_escape_string($database->getDatabaseConnection(), $userName);
+        $database = database::getInstance();
+        $database->connect();
+
+        if (!$database->isConnected()) {
+            return false;
+        }
+
+        $userName = $database->escapeString($userName);
 
 
         $column = 'userID, roleID, password, firstName, lastName';
-        $table = 'users';
-        $where = 'WHERE email = \'' . $userName . '\'';
+        $table = 'user';
+        $where = 'WHERE ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\'))';
 
 
-        if($database->isConnected()) {
+        if ($database->isConnected()) {
             $results = $database->getData($column, $table, $where);
         } else {
-            $results = null;
+            $results = NULL;
         }
 
         //If there weren't any accounts found or too many accounts found
-        if($results == null) {
+        if ($results == NULL) {
+            $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
-
-        if(count($results) > 1) {
+        if (count($results) > 1) {
+            $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
 
         $dbPassword = $results[0]['password'];
-        if(!verifyHash($password, $dbPassword)) {
+        $hasher = new hasher();
+        if (! $hasher->verifyHash($password, $dbPassword)) {
+            $hookEngine->runAction('userFailedToLogIn');
+            unset($dbPassword);
+            unset($results);
+            unset($hasher);
             return false;
         }
+        unset($dbPassword);
+        foreach($results as $result) {
+            unset($result['password']);
+        }
+        unset($hasher);
 
         $this->isLoggedIn = true;
         $this->userID = $results[0]['userID'];
@@ -100,55 +125,26 @@ class currentUser {
         $this->firstName = $results[0]['firstName'];
         $this->lastName = $results[0]['lastName'];
 
-        $database->disconnect();
+        $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID = ' . $this->userID);
         self::setUserSession($this);
+        $logger = logger::getInstance();
+        $logger->logIt($this->userID, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.');
+        $hookEngine->runAction('userLoggedIn');
         return true;
     }
-
     public function logOut() {
+        $hookEngine = hookEngine::getInstance();
+        $hookEngine->runAction('userLoggingOut');
         //reset all variables to default
         $this->isLoggedIn = false;
-        $this->userID = null;
-        $this->userRole = $this->guestRoleID;
-        $this->firstName = 'Guest';
-        $this->lastName = null;
+        $this->userID = 0;
+        $this->userRole = GUEST_ROLE_ID;
+        $this->firstName = 'Anonymous';
+        $this->lastName = 'Guest';
 
         //Save the user object
         self::setUserSession($this);
+        $hookEngine->runAction('userLoggedOut');
+        header('Location: ' . new link(''));
     }
 }
-
-/** EVALUATE LATER ***************
- *
- * public function hasPermission($inPermissionName)
- * {
- * //make sure the user has a role
- * if ($this->userRole == NULL) {
- * return false;
- * }
- *
- * //connect to the database
- * $database = new database();
- * $database->connect();
- *
- * //prepare the Query string. the canDo column contains a 0 or a 1 indicating if a role can do that action or not.
- * $column = 'canDo';
- * $table = 'permission p, permissionSet ps';
- * $where = 'WHERE p.permissionID = ps.permissionID AND p.permissionName = \'' . $inPermissionName . '\' AND ps.roleID = \'' . $this->userRole . '\' AND ps.canDo = 1';
- *
- * //get the value from the database
- * $hasPermission = $database->getData($column, $table, $where);
- *
- * $database->disconnect();
- *
- * //If all data fields have been filtered out, the user doesn't have permission
- * if ($hasPermission == NULL) {
- * return false;
- * }
- *
- * //By process of elimination, the user has permission
- * return true;
- * }
- */
-?>
-

@@ -53,6 +53,7 @@ class bootstrap {
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
         define('CURRENT_USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/currentUser.php');
+        define('HONEYPOT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/honeypot.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
