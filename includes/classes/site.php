@@ -20,6 +20,7 @@ class site {
     private $guestRoleID;
     private $cleanURLs;
     private $timeZone;
+    private $currentNodeType;
     private static $instance;
 
     public static function getInstance() {
@@ -148,6 +149,14 @@ class site {
             return explode('/', $this->currentPage);
         }
         return $this->currentPage;
+    }
+    public function currentPageIsAlias() {
+        $database = database::getInstance();
+        $results = $database->getData('source', 'urlAlias', 'WHERE alias=\'' . $database->escapeString($this->currentPage) . '\'');
+        if(count($results) != 1) {
+            return false;
+        }
+        return $results[0]['source'];
     }
     public function getGuestRoleID() {
         return $this->guestRoleID;

@@ -41,6 +41,7 @@ class bootstrap {
     private function declareConstants() {
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
         define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/classes/databaseInterface.php');
+
         define('VARIABLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variable.php');
         define('VARIABLE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variableEngine.php');
         define('GENERAL_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/general.php');
