@@ -5,9 +5,10 @@
  * User: craig
  * Date: 4/15/14
  * Time: 1:14 PM
+ *
+ * Used when a user wants to create a new type of database connection that isn't mySQL. You can implement this interface and the database.php functions will interact properly.
  */
-interface databaseInterface
-{
+interface databaseInterface {
     public static function getInstance();
 
     public function isConnected();
@@ -18,7 +19,7 @@ interface databaseInterface
 
     function select($select, $from, $where);
 
-    function query($inQuery);
+    function makeCustomQuery($inQuery);
 
     function insert($into, $columns, $values);
 

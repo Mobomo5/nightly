@@ -28,6 +28,7 @@ class bootstrap {
         $this->site = site::getInstance();
         $this->blockEngine = blockEngine::getInstance();
         $this->user = currentUser::getUserSession();
+
     }
     public function init() {
         $this->declareConstants();
@@ -39,14 +40,15 @@ class bootstrap {
         $this->render();
     }
     private function declareConstants() {
+
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
-        define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/classes/databaseInterface.php');
+        define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
 
         define('VARIABLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variable.php');
         define('VARIABLE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variableEngine.php');
         define('GENERAL_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/general.php');
         define('GENERAL_FUNCTION_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/generalFunction.php');
-        define('VALIDATOR_OBJECT_FILE', EDUCASK_ROOT . '/includes/validator.php');
+        define('VALIDATOR_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/validator.php');
         define('VALIDATOR_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/validator.php');
         define('SYSTEM_LOGGER_OBJET_FILE', EDUCASK_ROOT . '/includes/classes/systemLog.php');
         define('SITE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/site.php');
@@ -57,14 +59,19 @@ class bootstrap {
         define('HONEYPOT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/honeypot.php');
         define('NOTICE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/notice.php');
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
+
     }
     private function doRequires() {
+
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
+
         require_once(DATABASE_OBJECT_FILE);
         require_once(VARIABLE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
+        require_once(NOTICE_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
+
     }
     private function connectDatabase() {
         $this->database->connect();

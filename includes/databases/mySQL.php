@@ -12,6 +12,11 @@ class mySQL implements databaseInterface
     private $mysqli;
     private static $instance;
 
+    /**
+     * creates a new singleton mySQL database instance
+     * @return mySQL
+     *
+     */
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new mySQL();
@@ -19,9 +24,12 @@ class mySQL implements databaseInterface
         return self::$instance;
     }
 
+    /**
+     * @bool Returns false if there are any connection errors, otherwise returns true.
+     */
     function isConnected()
     {
-        if (!$this->mysqli->get_connection_stats()) {
+        if ($this->mysqli->connect_error) {
             return false;
         }
 
@@ -74,11 +82,12 @@ class mySQL implements databaseInterface
     }
 
 
-    function query($inQuery)
-    {
+    function makeCustomQuery($inQuery) {
         $query = $this->mysqli->real_escape_string($inQuery);
 
-        $results = $this->mysqli->query($query);
+        if (!($results = $this->mysqli->query($query))) {
+            throw new Exception("There was an error in the query: " . $this->mysqli->error);
+        }
 
         $resultsArray = $this->makeAssoc($results);
 
@@ -125,6 +134,8 @@ class mySQL implements databaseInterface
     /**
      * @param $studentNumber
      * returns all columns relating to a user except password as an associative array using prepared statements
+     * @throws Exception
+     * @return
      */
     function getUserByNumber($studentNumber)
     {

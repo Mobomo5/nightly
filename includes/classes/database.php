@@ -1,5 +1,4 @@
 <?php
-echo "j";
 
 require_once(DATABASE_INTERFACE_FILE);
 
@@ -24,6 +23,10 @@ class database implements databaseInterface {
     private $dbObject;
     private $dbType;
 
+    /**
+     * will call the new constructor methods.
+     * @return database
+     */
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new database();
@@ -33,6 +36,8 @@ class database implements databaseInterface {
         return self::$instance;
     }
 
+
+    // the next two are just to block the ability to do the following.
     protected function __construct() {
         //Thou shalt not construct that which is unconstructable!
     }
@@ -41,9 +46,14 @@ class database implements databaseInterface {
         //Me not like clones! Me smash clones!
     }
 
+
+    /**
+     * Will be called when the code no longer needs the class.
+     */
     public function __destruct() {
         $this->disconnect();
     }
+
 
     public function isConnected() {
         if (empty($this->dbObject)) {
@@ -62,14 +72,16 @@ class database implements databaseInterface {
         $this->dbType = $dbType;
 
         // Dynamically create the new database object, if possible.
-        if (!require_once(EDUCASK_ROOT . "/includes/databases/" . $this->dbType . ".php")) {
-            // @todo: ERROR the file isn't there.
-
+        if (!include_once(EDUCASK_ROOT . "/includes/databases/" . $this->dbType . ".php")) { //used include because I don't want a fatal error.
+            new notice('error', 'There appears to be no ' . $this->dbType . ' database available. Please check the config.php file.');
+            echo 'There appears to be no ' . $this->dbType . ' database available. Please check the config.php file.';
         }
 
         $this->dbObject = $dbType::getInstance();
-        if (!($this->dbObject->connect($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db))) {
-            // @todo: error
+        try {
+            $this->dbObject->connect($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
+        } catch (Exception $e) {
+            new notice('error', $e->getMessage());
         }
     }
 
@@ -79,47 +91,70 @@ class database implements databaseInterface {
 
     public function select($select, $from, $where = 1) {
 
-        if (!($result = $this->dbObject->select($select, $from, $where))) {
-            // @todo: error
+        try {
+            $result = $this->dbObject->select($select, $from, $where);
+        } catch (Exception $e) {
+            new notice("error", $e->getMessage());
+            echo $e->getMessage();
         }
         return $result;
     }
 
-    public function query($inQuery) {
+    public function makeCustomQuery($inQuery) {
 
-        if (!($result = $this->dbObject->query($inQuery))) {
-            // @todo: error
+        try {
+            $result = $this->dbObject->query($inQuery);
+        } catch (Exception $e) {
+            new notice('error', $e->getMessage());
         }
+
         return $result;
     }
 
     public function insert($into, $columns, $values) {
-        // TODO: Implement insert() method.
+        try {
+            $result = $this->dbObject->insert($into, $columns, $values);
+        } catch (Exception $e) {
+            new notice('error', $e->getMessage());
+        }
+
+        return $result;
     }
 
     public function update($table, $set, $values) {
-        // TODO: Implement update() method.
+        try {
+            $result = $this->dbObject->update($table, $set, $values);
+        } catch (Exception $e) {
+            new notice('error', $e->getMessage());
+        }
+        return $result;
     }
 
     public function getUserByName($firstName, $lastName) {
-        if (!($result = $this->dbObject->getUserByName($firstName, $lastName))) {
-            // Todo: error
+        try {
+            $result = $this->dbObject->getUserByName($firstName, $lastName);
+        } catch (Exception $e) {
+            new notice("error", $e->getMessage());
         }
 
         return $result;
     }
 
     public function getUserByNumber($studentNumber) {
-        if (!($result = $this->dbObject->getUserByNumber($studentNumber))) {
-            // todo: error;
+        try {
+            $result = $this->dbObject->getUserByNumber($studentNumber);
+        } catch (Exception $e) {
+            new notice("error", $e->getMessage());
         }
 
         return $result;
     }
 
     public function getUserByEmail($email) {
-        if (!($result = $this->dbObject->getUserByEmail($email))) {
-
+        try {
+            $result = $this->dbObject->getUserByEmail($email);
+        } catch (Exception $e) {
+            new notice('error', $e->getMessage());
         }
 
         return $result;
@@ -127,8 +162,10 @@ class database implements databaseInterface {
 
     public function getUserByUserID($userID) {
 
-        if (!($result = $this->dbObject->getUserByID($userID))) {
-            // @todo: error
+        try {
+            $result = $this->dbObject->getUserByID($userID);
+        } catch (Exception $e) {
+            new notice('error', $e->getMessage());
         }
 
         return $result;

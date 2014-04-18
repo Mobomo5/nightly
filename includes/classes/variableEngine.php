@@ -8,12 +8,10 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(VARIABLE_OBJECT_FILE);
 
-class variableEngine
-{
+class variableEngine {
     private static $instance;
 
-    public static function getInstance()
-    {
+    public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new variableEngine();
         }
@@ -21,16 +19,15 @@ class variableEngine
         return self::$instance;
     }
 
-    public function getVariable($variableName)
-    {
+    public function getVariable($variableName) {
         if ($variableName == '') {
             return null;
         }
         if ($variableName == null) {
             return null;
         }
-        $database = databaseInterface::getInstance();
-        $database->connect();
+        $database = database::getInstance();
+        //$database->connect();
         if (!$database->isConnected()) {
             return null;
         }
@@ -50,12 +47,12 @@ class variableEngine
         return $toReturn;
     }
 
-    public function getVariables(array $variables = array())
-    {
+    public function getVariables(array $variables = array()) {
         if (count($variables) == 0) {
             return null;
         }
-        $where = 'WHERE ';
+        //$where = 'WHERE ';
+        $where = '';
         foreach ($variables as $variable) {
             if ($variable == null) {
                 continue;
@@ -63,7 +60,7 @@ class variableEngine
             if ($variable == '') {
                 continue;
             }
-            if ($where == 'WHERE ') {
+            if ($where == '') {
                 $where .= 'variableName = \'' . $variable . '\'';
             }
             $where .= ' OR variableName = \'' . $variable . '\'';
@@ -71,12 +68,12 @@ class variableEngine
         if ($where == 'WHERE ') {
             return null;
         }
-        $database = databaseInterface::getInstance();
-        $database->connect();
+        $database = database::getInstance();
+        //$database->connect();
         if (!$database->isConnected()) {
             return null;
         }
-        $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
+        $results = $database->select('variableName, variableValue, readOnly', 'variable', $where);
         $toReturn = array();
         foreach ($results as $result) {
             $variableName = $result['variableName'];
