@@ -40,7 +40,7 @@ class database implements databaseInterface {
     protected function __clone() {
         //Me not like clones! Me smash clones!
     }
-    
+
     public function __destruct() {
         $this->disconnect();
     }
