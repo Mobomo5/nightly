@@ -1,5 +1,8 @@
 <?php
+echo "j";
+
 require_once(DATABASE_INTERFACE_FILE);
+
 
 /**
  * Created by JetBrains PhpStorm.
@@ -8,12 +11,12 @@ require_once(DATABASE_INTERFACE_FILE);
  * Time: 5:29 PM
  * To change this template use File | Settings | File Templates.
  */
-class database implements databaseInterface
-{
+class database implements databaseInterface {
 
     /**
      * @var
      */
+    private static $instance;
     private $dbUsername;
     private $dbPassword;
     private $db;
@@ -21,21 +24,35 @@ class database implements databaseInterface
     private $dbObject;
     private $dbType;
 
-    public static function getInstance()
-    {
+    public static function getInstance() {
+        if (!isset(self::$instance)) {
+            self::$instance = new database();
+            self::$instance->construct();
+        }
 
+        return self::$instance;
     }
 
-    function isConnected()
-    {
+    protected function __construct() {
+        //Thou shalt not construct that which is unconstructable!
+    }
+
+    protected function __clone() {
+        //Me not like clones! Me smash clones!
+    }
+    
+    public function __destruct() {
+        $this->disconnect();
+    }
+
+    public function isConnected() {
         if (empty($this->dbObject)) {
             return false;
         }
         return $this->dbObject->isConnected();
     }
 
-    function __construct($inParameters = "")
-    {
+    public function construct() {
 
         require_once(EDUCASK_ROOT . '/includes/config.php');
         $this->dbUsername = $dbUserName;
@@ -50,117 +67,74 @@ class database implements databaseInterface
 
         }
 
-        try {
-
-            $this->dbObject = new $dbType;
-            $this->dbObject->connect($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
-
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
+        $this->dbObject = $dbType::getInstance();
+        if (!($this->dbObject->connect($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db))) {
+            // @todo: error
         }
     }
 
-    function __destruct()
-    {
-        $this->disconnect();
-    }
-
-    function disconnect()
-    {
+    public function disconnect() {
         $this->dbObject->disconnect();
     }
 
-    function select($select, $from, $where)
-    {
-        try {
-            $result = $this->dbObject->select($select, $from, $where);
+    public function select($select, $from, $where = 1) {
 
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
+        if (!($result = $this->dbObject->select($select, $from, $where))) {
+            // @todo: error
         }
-
         return $result;
     }
 
-    function query($inQuery)
-    {
-        try {
-            $result = $this->dbObject->query($inQuery);
+    public function query($inQuery) {
 
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
+        if (!($result = $this->dbObject->query($inQuery))) {
+            // @todo: error
         }
-
         return $result;
     }
 
-    function insert($into, $columns, $values)
-    {
+    public function insert($into, $columns, $values) {
         // TODO: Implement insert() method.
     }
 
-    function update($table, $set, $values)
-    {
+    public function update($table, $set, $values) {
         // TODO: Implement update() method.
     }
 
-    function getUserByName($firstName, $lastName)
-    {
-        try {
-            $result = $this->dbObject->getUserByName($firstName, $lastName);
-
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
+    public function getUserByName($firstName, $lastName) {
+        if (!($result = $this->dbObject->getUserByName($firstName, $lastName))) {
+            // Todo: error
         }
 
         return $result;
     }
 
-    function getUserByNumber($studentNumber)
-    {
-        try {
-            $result = $this->dbObject->getUserByNumber($studentNumber);
-
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
+    public function getUserByNumber($studentNumber) {
+        if (!($result = $this->dbObject->getUserByNumber($studentNumber))) {
+            // todo: error;
         }
 
         return $result;
     }
 
-    function getUserByEmail($email)
-    {
-        try {
-            $result = $this->dbObject->getUserByEmail($email);
+    public function getUserByEmail($email) {
+        if (!($result = $this->dbObject->getUserByEmail($email))) {
 
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
         }
 
         return $result;
     }
 
-    function getUserByUserID($userID)
-    {
-        try {
-            $result = $this->dbObject->getUserByID($userID);
+    public function getUserByUserID($userID) {
 
-        } catch (Exception $e) {
-            printf("%s = %s", $e->getCode(), $e->getMessage());
-            exit;
+        if (!($result = $this->dbObject->getUserByID($userID))) {
+            // @todo: error
         }
 
         return $result;
     }
 
-    function connect($dbServer, $userName, $password, $db)
-    {
+    public function connect($dbServer, $userName, $password, $db) {
         // TODO: Implement connect() method.
     }
 }

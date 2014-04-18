@@ -10,6 +10,14 @@ class mySQL implements databaseInterface
 {
 
     private $mysqli;
+    private static $instance;
+
+    public static function getInstance() {
+        if (!isset(self::$instance)) {
+            self::$instance = new mySQL();
+        }
+        return self::$instance;
+    }
 
     function isConnected()
     {
@@ -22,10 +30,7 @@ class mySQL implements databaseInterface
 
     function connect($dbServer, $username, $password, $db)
     {
-        $this->mysqli = new mysqli($dbServer, $username, $password, $db);
-        if (mysqli_connect_errno()) {
-            throw new Exception(mysqli_connect_error());
-        }
+        return $this->mysqli = new mysqli($dbServer, $username, $password, $db);
     }
 
     function disconnect()
@@ -63,19 +68,22 @@ class mySQL implements databaseInterface
             throw new Exception("Returned 0 rows.");
         }
 
-        $resultArray = Array($numRows);
+        $resultsArray = $this->makeAssoc($results);
 
-        for ($i = 0; $i < $numRows; $i++) {
-            $resultArray[$i] = $results->fetch_assoc();
-        }
-
-        return $resultArray;
+        return $resultsArray;
     }
 
 
     function query($inQuery)
     {
-        // TODO: Implement query() method.
+        $query = $this->mysqli->real_escape_string($inQuery);
+
+        $results = $this->mysqli->query($query);
+
+        $resultsArray = $this->makeAssoc($results);
+
+        return $resultsArray;
+
     }
 
     function insert($into, $columns, $values)
@@ -221,6 +229,19 @@ class mySQL implements databaseInterface
         $results->free();
 
         return $assoc;
+    }
+
+    private function makeAssoc($results) {
+
+        $numRows = $results->num_rows;
+
+        $resultArray = Array($numRows);
+
+        for ($i = 0; $i < $numRows; $i++) {
+            $resultArray[$i] = $results->fetch_assoc();
+        }
+
+        return $resultArray;
     }
 
 

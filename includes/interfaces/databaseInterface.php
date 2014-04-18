@@ -8,9 +8,11 @@
  */
 interface databaseInterface
 {
-    function isConnected();
+    public static function getInstance();
 
-    function connect($dbServer, $userName, $password, $db);
+    public function isConnected();
+
+    public function connect($dbServer, $userName, $password, $db);
 
     function disconnect();
 
