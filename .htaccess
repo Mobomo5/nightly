@@ -1,17 +1,16 @@
-# Make EHQ Simple CMS handle any 404 errors.
+# Make Educask handle any 404 errors.
 ErrorDocument 404 /index.php
 Options -Indexes
 Header always append X-Frame-Options DENY
 
-# Pass all requests not referring directly to files in the filesystem to
-# index.php.
+# Pass all requests not referring directly to files in the filesystem to index.php.
 <IfModule mod_rewrite.c>
-RewriteEngine on
+    RewriteEngine on
 
-#Uncomment the below line if Simple CMS is not installed in the main directory or is in a virtual subdomain and is not working properly. Change the directory to the directory that Simple CMS is installed in.
-RewriteBase /~keegan/
+    #Uncomment the below line if Educask is not installed in the main directory or is in a virtual subdomain and is not working properly. Change the directory to the directory that Simple CMS is installed in.
+    RewriteBase /~keegan/
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?p=$1 [L,QSA]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?p=$1 [L,QSA]
 </IfModule>

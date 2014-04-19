@@ -40,13 +40,12 @@ class bootstrap {
     }
     private function declareConstants() {
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
-        define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/classes/databaseInterface.php');
-
+        define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
         define('VARIABLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variable.php');
         define('VARIABLE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variableEngine.php');
         define('GENERAL_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/general.php');
         define('GENERAL_FUNCTION_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/generalFunction.php');
-        define('VALIDATOR_OBJECT_FILE', EDUCASK_ROOT . '/includes/validator.php');
+        define('VALIDATOR_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/validator.php');
         define('VALIDATOR_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/validator.php');
         define('SYSTEM_LOGGER_OBJET_FILE', EDUCASK_ROOT . '/includes/classes/systemLog.php');
         define('SITE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/site.php');
@@ -57,6 +56,8 @@ class bootstrap {
         define('HONEYPOT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/honeypot.php');
         define('NOTICE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/notice.php');
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
+        define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
+        define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -65,6 +66,7 @@ class bootstrap {
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
+        require_once(NODE_ENGINE_OBJECT_FILE);
     }
     private function connectDatabase() {
         $this->database->connect();
@@ -80,6 +82,8 @@ class bootstrap {
     private function getVariables() {
         define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
         date_default_timezone_set($this->site->getTimeZone());
+        $nodeEngine = nodeEngine::getInstance();
+
         $blocks = NULL; //@ToDo: Fix this: $this->blockEngine->getBlocks($site->getTheme(), $site->getCurrentPage(),,$this->user->getRoleID());
         $this->database->bootstrapDisconnect();
     }
