@@ -81,43 +81,35 @@ class nodeEngine {
         $moduleClass = $module::getModuleClassName();
         //See the interfaces that the module implements, and make sure it implements node. If not, return 404.
         if(! in_array('node', class_implements($moduleClass))) {
-
+            $moduleEngine->includeModule('404');
+            return new fourOhFour();
         }
+
         $module = new $moduleClass();
 
         if($module->noGUI()) {
             $link = $module->getReturnPage();
             //verify the variable given is a link object. If it is not, go to the home page.
             if (get_class($link) != 'link') {
-                $link = new link('home');
+                $past = $this->getPreviousParameters();
+                if ($past == null) {
+                    $link = new link('home');
+                } else {
+                    $link = new link($past);
+                }
             }
             header('Location: ' . $link);
-        }
-
-        $pageTitle = $module->getTitle();
-        if ($pageTitle == '404' && $moduleClass != 'fourOhFour') {
-            includeModule('404');
-            $module = new fourOhFour($parameters, $parametersAsString);
-        }
-
-        $pageContent = $module->getContent();
-        $nodeType = $module->getNodeType();
-
-        $datePublished = NULL;
-        $pageAuthor = NULL;
-        $statuses = NULL;
-        if ($module->datePagePublishedIsVisible()) {
-            $datePublished = $module->getDatePublished();
-        }
-        if ($module->pageAuthorIsVisible()) {
-            $pageAuthor = $module->getPageAuthor();
-        }
-        if ($module->statusesAreVisible()) {
-            $statuses = $module->getStatuses();
+            exit();
         }
 
         $_SESSION['educaskPreviousPage'] = self::$currentURL;
 
-        return array('title' => hook_filter("get_page_name", $pageTitle), 'content' => hook_filter("get_page_content",$pageContent), 'published' => $datePublished, 'author' => $pageAuthor, 'nodeType' => $nodeType, 'statuses' => $statuses);
+        $pageTitle = $module->getTitle();
+        if ($pageTitle == '404' && $moduleClass != 'fourOhFour') {
+            $moduleEngine->includeModule('404');
+            return new fourOhFour();
+        }
+
+        return $module;
     }
 }

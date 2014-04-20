@@ -8,11 +8,8 @@
 
 class bootstrap {
     private static $instance;
-    private $database;
-    private $site;
-    private $blockEngine;
     private $blocks;
-    private $user;
+    private $site;
 
     public static function getInstance() {
         if (!isset(self::$instance)) {
@@ -23,16 +20,9 @@ class bootstrap {
     private function __construct() {
         //Do nothing
     }
-    private function construct() {
-        $this->database = database::getInstance();
-        $this->site = site::getInstance();
-        $this->blockEngine = blockEngine::getInstance();
-        $this->user = currentUser::getUserSession();
-    }
     public function init() {
         $this->declareConstants();
         $this->doRequires();
-        $this->construct();
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
@@ -70,8 +60,9 @@ class bootstrap {
         require_once(NODE_ENGINE_OBJECT_FILE);
     }
     private function connectDatabase() {
-        $this->database->connect();
-        if(! $this->database->isConnected()) {
+        $database = database::getInstance();
+        $database->connect();
+        if(! $database->isConnected()) {
             die('<html><head><title>:( Database is a no-go | Educask</title></head><body><h1>:( The database is a no-go.</h1><p>Sorry, but I had problems connecting to the database.</p></body></html>');
         }
     }
@@ -81,16 +72,19 @@ class bootstrap {
         }
     }
     private function getVariables() {
+        $this->site = site::getInstance();
+        $blockEngine = blockEngine::getInstance();
+        $nodeEngine = nodeEngine::getInstance();
+        $user = currentUser::getUserSession();
         define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
         date_default_timezone_set($this->site->getTimeZone());
-        $nodeEngine = nodeEngine::getInstance();
-
-        $blocks = NULL; //@ToDo: Fix this: $this->blockEngine->getBlocks($site->getTheme(), $site->getCurrentPage(),,$this->user->getRoleID());
-        $this->database->bootstrapDisconnect();
+        $node = $nodeEngine->getNode();
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), $node, $user->getRoleID());
+        database::getInstance()->bootstrapDisconnect();
     }
     private function render() {
         Twig_Autoloader::register();
-        $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme() . '/';
+        $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();
         if(! is_dir($theme)) {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
@@ -101,6 +95,6 @@ class bootstrap {
             $loader->addPath($baseTheme, $name);
         }
         $twig = new Twig_Environment($loader);
-        echo $twig->render('index.twig', array('site' => $site, 'blocks' => $blocks));
+        echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
 }

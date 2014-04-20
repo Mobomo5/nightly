@@ -32,7 +32,7 @@ class moduleEngine {
         return true;
     }
     public function includeModule($moduleName) {
-        if (!moduleExists($moduleName)) {
+        if (!$this->moduleExists($moduleName)) {
             require_once(EDUCASK_ROOT . '/includes/modules/404/main.php');
             return;
         }
