@@ -8,7 +8,7 @@
 require_once(VALIDATOR_INTERFACE_FILE);
 class file implements subValidator {
     public function validate($inValue) {
-        if(! is_file(EHQ_SIMPLE_CMS_ROOT . $inValue)) {
+        if(! is_file(EDUCASK_ROOT . $inValue)) {
             return false;
         }
         return true;

@@ -6,14 +6,27 @@
  * Time: 11:05 AM
  */
 require_once(DATABASE_OBJECT_FILE);
-require_once(SITE_OBJECT_FILE);
+require_once(MODULE_ENGINE_OBJECT_FILE);
+require_once(LINK_OBJECT_FILE);
 class nodeEngine {
     private static $instance;
+    private static $currentURL;
+    private static $previousURL;
     private $sourceURL;
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new nodeEngine();
         }
+        if(isset($_SESSION['educaskPreviousPage'])) {
+            self::$previousURL = $_SESSION['educaskPreviousPage'];
+        } else {
+            self::$previousURL = null;
+        }
+        if(empty($_GET['p'])) {
+            self::$currentURL = 'home';
+            return  self::$instance;
+        }
+        self::$currentURL = $_GET['p'];
 
         return self::$instance;
     }
@@ -21,26 +34,90 @@ class nodeEngine {
         $this->actionEvents = array();
         $this->filterEvents = array();
     }
-    public function isAlias() {
+    private function determineAlias() {
         $database = database::getInstance();
-        $site = site::getInstance();
-        $results = $database->getData('source', 'urlAlias', 'WHERE alias=\'' . $database->escapeString($site->getCurrentPage()) . '\'');
+        $page = self::$currentURL;
+        $results = $database->getData('source', 'urlAlias', 'WHERE alias=\'' . $database->escapeString($page) . '\'');
+        if($results == null) {
+            $this->sourceURL =  $page;
+            return false;
+        }
         if(count($results) != 1) {
-            $this->sourceURL =  $site->getCurrentPage();
+            $this->sourceURL =  $page;
             return false;
         }
         $this->sourceURL = $results[0]['source'];
         return true;
     }
-    public function getURL() {
-        if(!isset($this->sourceURL)) {
-            return null;
+    public function getDecodedParameters($asArray = false) {
+        $this->determineAlias();
+        if($asArray == true) {
+            return explode('/', $this->sourceURL);
         }
         return $this->sourceURL;
     }
+    public function getParameters($asArray = false) {
+        if($asArray == true) {
+            return explode('/', self::$currentURL);
+        }
+        return self::$currentURL;
+    }
+    public function getPreviousParameters($asArray = false) {
+        if(self::$previousURL == null) {
+            return null;
+        }
+        if($asArray == true) {
+            return explode('/', self::$previousURL);
+        }
+        return self::$previousURL;
+    }
     public function getNode() {
-        //Determine if the URL is an alias. We don't care about the value since the URL we need is stored in $this->sourceURL
-        $this->isAlias();
-        $page = $this->sourceURL;
+        $parameters = $this->getDecodedParameters(true);
+
+        $module = $parameters[0];
+
+        $moduleEngine = moduleEngine::getInstance();
+        $moduleEngine->includeModule($module);
+        $moduleClass = $module::getModuleClassName();
+        //See the interfaces that the module implements, and make sure it implements node. If not, return 404.
+        if(! in_array('node', class_implements($moduleClass))) {
+
+        }
+        $module = new $moduleClass();
+
+        if($module->noGUI()) {
+            $link = $module->getReturnPage();
+            //verify the variable given is a link object. If it is not, go to the home page.
+            if (get_class($link) != 'link') {
+                $link = new link('home');
+            }
+            header('Location: ' . $link);
+        }
+
+        $pageTitle = $module->getTitle();
+        if ($pageTitle == '404' && $moduleClass != 'fourOhFour') {
+            includeModule('404');
+            $module = new fourOhFour($parameters, $parametersAsString);
+        }
+
+        $pageContent = $module->getContent();
+        $nodeType = $module->getNodeType();
+
+        $datePublished = NULL;
+        $pageAuthor = NULL;
+        $statuses = NULL;
+        if ($module->datePagePublishedIsVisible()) {
+            $datePublished = $module->getDatePublished();
+        }
+        if ($module->pageAuthorIsVisible()) {
+            $pageAuthor = $module->getPageAuthor();
+        }
+        if ($module->statusesAreVisible()) {
+            $statuses = $module->getStatuses();
+        }
+
+        $_SESSION['educaskPreviousPage'] = self::$currentURL;
+
+        return array('title' => hook_filter("get_page_name", $pageTitle), 'content' => hook_filter("get_page_content",$pageContent), 'published' => $datePublished, 'author' => $pageAuthor, 'nodeType' => $nodeType, 'statuses' => $statuses);
     }
 }

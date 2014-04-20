@@ -8,7 +8,7 @@
 require_once(VALIDATOR_INTERFACE_FILE);
 class dir implements subValidator {
     public function validate($inValue) {
-        if(! is_dir(EHQ_SIMPLE_CMS_ROOT . $inValue)) {
+        if(! is_dir(EDUCASK_ROOT . $inValue)) {
             return false;
         }
         return true;
