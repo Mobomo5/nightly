@@ -14,8 +14,8 @@ class noticeEngine {
 
         return $_SESSION['educaskNotices'];
     }
-    static function setInstance(noticeEngine $object) {
-        //verify the variable given is a user object. If it is not, get out of here.
+    private static function setInstance(noticeEngine $object) {
+        //verify the variable given is a notice engine. If it is not, get out of here.
         if (get_class($object) != "noticeEngine") {
             return;
         }

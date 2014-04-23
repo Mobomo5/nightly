@@ -16,19 +16,23 @@ class site {
     private $baseDirectory;
     private $theme;
     private $educaskVersion;
-    private $currentPage;
     private $guestRoleID;
     private $cleanURLs;
     private $timeZone;
-    private $currentNodeType;
-    private static $instance;
 
     public static function getInstance() {
-        if (!isset(self::$instance)) {
-            self::$instance = new site();
+        if (!isset($_SESSION['educaskSite'])) {
+            $_SESSION['educaskNotices'] = new site();
         }
 
-        return self::$instance;
+        return $_SESSION['educaskSite'];
+    }
+    private static function setInstance(site $object) {
+        //verify the variable given is a site object. If it is not, get out of here.
+        if (get_class($object) != 'site') {
+            return;
+        }
+        $_SESSION['educaskSite'] = $object;
     }
     private function __construct() {
         $variableEngine = variableEngine::getInstance();
@@ -53,11 +57,6 @@ class site {
         $this->guestRoleID = $variables['guestRoleID'];
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
-        if(! empty($_GET['p'])) {
-            $this->currentPage = $_GET['p'];
-            return;
-        }
-        $this->currentPage = 'home';
     }
     public function getTitle() {
         return $this->title;
@@ -69,6 +68,7 @@ class site {
         if(! $this->title->setValue($inTitle)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function setEmail($inEmail) {
         $validator = new validator('email');
@@ -81,6 +81,7 @@ class site {
         if(! $this->email->setValue($inEmail)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function getTheme() {
         return $this->theme;
@@ -96,6 +97,7 @@ class site {
         if(! $this->theme->setValue($inTheme)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function getWebAddress($secure = false, $withBaseDirectory = false) {
         if ($secure == true) {
@@ -120,6 +122,7 @@ class site {
         if(! $this->url->setValue($inUrl)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function setSecureWebAddress($inUrl) {
         $validator = new validator('url');
@@ -132,6 +135,7 @@ class site {
         if(! $this->urlSecure->setValue($inUrl)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function getBaseDirectory() {
         return $this->baseDirectory;
@@ -140,23 +144,10 @@ class site {
         if(! $this->baseDirectory->setValue($inDirectory)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function getEducaskVersion() {
         return $this->educaskVersion;
-    }
-    public function getCurrentPage($asArray = false) {
-        if($asArray == true) {
-            return explode('/', $this->currentPage);
-        }
-        return $this->currentPage;
-    }
-    public function currentPageIsAlias() {
-        $database = database::getInstance();
-        $results = $database->getData('source', 'urlAlias', 'WHERE alias=\'' . $database->escapeString($this->currentPage) . '\'');
-        if(count($results) != 1) {
-            return false;
-        }
-        return $results[0]['source'];
     }
     public function getGuestRoleID() {
         return $this->guestRoleID;
@@ -168,6 +159,7 @@ class site {
         if(! $this->guestRoleID->setValue($inID)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function areCleanURLsEnabled() {
         return $this->cleanURLs;
@@ -182,6 +174,7 @@ class site {
         if(! $this->cleanURLs->setValue(1)) {
             return false;
         }
+        self::setInstance($this);
     }
     public function getTimeZone() {
         return $this->timeZone;
@@ -197,5 +190,6 @@ class site {
         if(! $this->timeZone->setValue($inTimeZone)) {
             return false;
         }
+        self::setInstance($this);
     }
 }
