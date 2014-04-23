@@ -95,6 +95,6 @@ class blockEngine {
         return true;
     }
     public function getPathToBlock($blockName, $moduleName) {
-        return EHQ_SIMPLE_CMS_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
+        return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
 }

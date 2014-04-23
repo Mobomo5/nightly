@@ -7,7 +7,10 @@
  */
 require_once(VALIDATOR_INTERFACE_FILE);
 class dir implements subValidator {
-    public function validate($inValue, array $inOptions = array('removeDotDot' => true)) {
+    public function validate($inValue, array $inOptions= array()) {
+        if(empty($inOptions)) {
+            $inOptions = array('removeDotDot' => true);
+        }
         if($inOptions['removeDotDot'] == true) {
             str_replace('..', '', $inValue);
         }

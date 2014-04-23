@@ -16,8 +16,7 @@ class moduleEngine {
         return self::$instance;
     }
     private function __construct() {
-        $this->actionEvents = array();
-        $this->filterEvents = array();
+        //Do nothing.
     }
     public function moduleExists($moduleName) {
         $validator = new validator('dir');

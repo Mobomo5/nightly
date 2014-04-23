@@ -8,7 +8,6 @@
 		public function getDatePagePublished();
 		public function getPageAuthor();
 		public static function getNodeType();
-        public static function getClassName();
 		public function statusesAreVisible();
 		public function getStatuses();
         public function noGUI();
