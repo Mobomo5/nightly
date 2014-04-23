@@ -18,7 +18,8 @@ class bootstrap {
         return self::$instance;
     }
     private function __construct() {
-        //Do nothing
+        $this->blocks = null;
+        $this->site = null;
     }
     public function init() {
         $this->declareConstants();
