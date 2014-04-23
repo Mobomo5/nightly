@@ -10,6 +10,10 @@ class mySQL implements databaseInterface
 {
 
     private $mysqli;
+    private $dbServer;
+    private $dbUsername;
+    private $dbPassword;
+    private $db;
     private static $instance;
 
     /**
@@ -36,15 +40,18 @@ class mySQL implements databaseInterface
         return true;
     }
 
-    function connect($dbServer, $username, $password, $db)
-    {
-        return $this->mysqli = new mysqli($dbServer, $username, $password, $db);
+    function connect() {
+        if (empty($this->dbUsername) or empty($this->db) or empty($this->dbPassword) or empty($this->dbServer)) {
+            echo "failed";
+            return false;
+        }
+        return $this->mysqli = new mysqli($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
     }
 
     function disconnect()
     {
         if (!isset($this->mysqli)) {
-            throw new Exception("No database object connected.");
+            return false;
         }
 
         $this->mysqli->close();
@@ -68,12 +75,12 @@ class mySQL implements databaseInterface
         $query = "SELECT " . $select . " FROM " . $from . " WHERE " . $where . ";";
 
         if (!$results = $this->mysqli->query($query)) {
-            throw new Exception($this->mysqli->error);
+            return false;
         }
         $numRows = $results->num_rows;
 
         if ($numRows == 0) {
-            throw new Exception("Returned 0 rows.");
+            return false;
         }
 
         $resultsArray = $this->makeAssoc($results);
@@ -105,143 +112,6 @@ class mySQL implements databaseInterface
         // TODO: Implement update() method.
     }
 
-    function getUserByName($firstName, $lastName)
-    {
-        $firstName = $this->mysqli->real_escape_string($firstName);
-        $lastName = $this->mysqli->real_escape_string($lastName);
-
-        $query = "SELECT * FROM users WHERE upper(firstName) = upper('" . $firstName . "') AND upper(lastName) = upper('" . $lastName . "');";
-        echo $query;
-        if (!($results = $this->mysqli->query($query))) {
-            throw new Exception($this->mysqli->error);
-        }
-
-        if ($results->num_rows < 1) {
-            throw new Exception("Returned 0 rows.");
-        }
-
-        if ($results->num_rows > 1) {
-            throw new Exception("Returned too many rows.");
-        }
-
-        $assoc = $results->fetch_assoc();
-
-        $results->free();
-
-        return $assoc;
-    }
-
-    /**
-     * @param $studentNumber
-     * returns all columns relating to a user except password as an associative array using prepared statements
-     * @throws Exception
-     * @return
-     */
-    function getUserByNumber($studentNumber)
-    {
-
-        $studentNumber = $this->mysqli->real_escape_string($studentNumber);
-
-        $query = "SELECT * FROM users WHERE studentNumber = '" . $studentNumber . "';"; //@todo: Ensure this doesn't return the password
-
-        if (!($results = $this->mysqli->query($query))) {
-            throw new Exception($this->mysqli->error);
-        }
-
-        if ($results->num_rows < 1) {
-            throw new Exception("Returned 0 rows.");
-        }
-
-        if ($results->num_rows > 1) {
-            throw new Exception("Returned too many rows.");
-        }
-
-        $assoc = $results->fetch_assoc();
-
-        $results->free();
-
-        return $assoc;
-
-//        $stmt = $this->mysqli->stmt_init();
-//        echo "stmt = " . ($stmt->prepare("SELECT * FROM users WHERE studentNumber = ?"));
-//
-//
-//
-//        $userName = "";
-//        $firstName = "";
-//        $lastName = "";
-//        $accountCreationDate = "";
-//        $email = "";
-//        $studentNumber = "";
-//        $password = "";
-//        $grade = "";
-//        $userID = "";
-//        $roleID = "";
-//        $birthday = "";
-//        $lastAccess = "";
-//
-//        echo $stmt->bind_param("s", $studentNumber);
-//        echo $stmt->execute();
-//        echo $stmt->bind_result($userName, $firstName, $lastName, $accountCreationDate, $email, $studentNumber, $password, $grade, $userID, $roleID, $birthday, $lastAccess);
-//
-//
-//        echo $stmt->fetch();
-//        echo "<br>error : ";
-//        echo "<br>affected rows = " . $stmt->affected_rows;
-//        var_dump($userName);
-//        $stmt->close();
-    }
-
-    function getUserByEmail($email)
-    {
-        $email = $this->mysqli->real_escape_string($email);
-
-        $query = "SELECT * FROM users WHERE upper(email) = upper('" . $email . "');"; //@todo: Ensure this doesn't return the password
-
-        if (!($results = $this->mysqli->query($query))) {
-            throw new Exception($this->mysqli->error);
-        }
-
-        if ($results->num_rows < 1) {
-            throw new Exception("Returned 0 rows.");
-        }
-
-        if ($results->num_rows > 1) {
-            throw new Exception("Returned too many rows.");
-        }
-
-        $assoc = $results->fetch_assoc();
-
-        $results->free();
-
-        return $assoc;
-    }
-
-    function getUserByUserID($userID)
-    {
-        $userID = $this->mysqli->real_escape_string($userID);
-
-        $query = "SELECT * FROM users WHERE userID = '" . $userID . "';"; //@todo: Ensure this doesn't return the password
-
-        if (!($results = $this->mysqli->query($query))) {
-            throw new Exception($this->mysqli->error);
-        }
-
-        if ($results->num_rows < 1) {
-            throw new Exception("Returned 0 rows.");
-        }
-
-        if ($results->num_rows > 1) {
-            throw new Exception("Returned too many rows.");
-        }
-
-        $assoc = $results->fetch_assoc();
-
-        $results->free();
-
-        return $assoc;
-    }
-
     private function makeAssoc($results) {
 
         $numRows = $results->num_rows;
@@ -256,4 +126,11 @@ class mySQL implements databaseInterface
     }
 
 
+    function configure($dbServer, $userName, $password, $db) {
+        $this->db = $db;
+        $this->dbServer = $dbServer;
+        $this->dbPassword = $password;
+        $this->dbUsername = $userName;
+
+    }
 }

@@ -13,7 +13,7 @@ interface databaseInterface {
 
     public function isConnected();
 
-    public function connect($dbServer, $userName, $password, $db);
+    public function connect();
 
     function disconnect();
 
@@ -25,12 +25,6 @@ interface databaseInterface {
 
     function update($table, $set, $values);
 
-    function getUserByName($firstName, $lastName);
-
-    function getUserByNumber($studentNumber);
-
-    function getUserByEmail($email);
-
-    function getUserByUserID($userID);
+    function configure($dbServer, $userName, $password, $db);
 
 } 
