@@ -31,8 +31,7 @@ class nodeEngine {
         return self::$instance;
     }
     private function __construct() {
-        $this->actionEvents = array();
-        $this->filterEvents = array();
+        //Do nothing.
     }
     private function determineAlias() {
         $database = database::getInstance();
@@ -74,11 +73,10 @@ class nodeEngine {
     public function getNode() {
         $parameters = $this->getDecodedParameters(true);
 
-        $module = $parameters[0];
+        $moduleClass = $parameters[0];
 
         $moduleEngine = moduleEngine::getInstance();
-        $moduleEngine->includeModule($module);
-        $moduleClass = $module::getModuleClassName();
+        $moduleEngine->includeModule($moduleClass);
         //See the interfaces that the module implements, and make sure it implements node. If not, return 404.
         if(! in_array('node', class_implements($moduleClass))) {
             $moduleEngine->includeModule('404');
