@@ -17,7 +17,7 @@ interface databaseInterface {
 
     function disconnect();
 
-    function select($select, $from, $where);
+    function getData($select, $from, $where);
 
     function makeCustomQuery($inQuery);
 
@@ -26,5 +26,7 @@ interface databaseInterface {
     function update($table, $set, $values);
 
     function configure($dbServer, $userName, $password, $db);
+
+    function escape($inString);
 
 } 

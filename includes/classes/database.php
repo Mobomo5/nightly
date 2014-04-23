@@ -55,7 +55,6 @@ class database implements databaseInterface {
         }
         $this->dbObject = $dbType::getInstance();
         $this->dbObject->configure($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
-        echo 'configured';
     }
 
     private function __clone() {
@@ -82,7 +81,8 @@ class database implements databaseInterface {
         $this->dbObject->disconnect();
     }
 
-    public function select($select, $from, $where = 1) {
+    public function getData($select, $from, $where = 1)
+    {
 
 
         $result = $this->dbObject->select($select, $from, $where);
@@ -132,5 +132,11 @@ class database implements databaseInterface {
 
     function configure($dbServer, $userName, $password, $db) {
         // does nothing in the databaseCreator
+    }
+
+    function escape($inString)
+    {
+        $escapedString = $this->dbObject->escape($inString);
+        return $escapedString;
     }
 }

@@ -65,7 +65,7 @@ class mySQL implements databaseInterface
      * @throws Exception
      * @return array
      */
-    public function select($select, $from, $where = '1')
+    public function getData($select, $from, $where = '1')
     {
 
         $select = $this->mysqli->real_escape_string($select);
@@ -132,5 +132,11 @@ class mySQL implements databaseInterface
         $this->dbPassword = $password;
         $this->dbUsername = $userName;
 
+    }
+
+    function escape($inString)
+    {
+        $escapedString = $this->mysqli->real_escape_string($inString);
+        return $escapedString;
     }
 }
