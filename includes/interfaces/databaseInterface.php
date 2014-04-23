@@ -21,12 +21,14 @@ interface databaseInterface {
 
     function makeCustomQuery($inQuery);
 
-    function insert($into, $columns, $values);
+    function insertData($into, $columns, $values);
 
-    function update($table, $set, $values);
+    function updateTable($table, $set, $values);
 
     function configure($dbServer, $userName, $password, $db);
 
-    function escape($inString);
+    function escapeString($inString);
+
+    function removeData($from, $where);
 
 } 

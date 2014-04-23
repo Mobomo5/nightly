@@ -102,14 +102,23 @@ class mySQL implements databaseInterface
 
     }
 
-    function insert($into, $columns, $values)
+    function insertData($into, $columns, $values)
     {
-        // TODO: Implement insert() method.
+        $query = 'INSERT INTO ' . $into . ' (' . $columns . ') VALUES (' . $values . ');';
+        $results = $this->mysqli->query($query);
+        if (!$results) {
+            return false;
+        }
+
+        return true;
     }
 
-    function update($table, $set, $values)
+    function updateTable($table, $set, $values)
     {
-        // TODO: Implement update() method.
+        $query = 'UPDATE ' . $table . ' SET ' . $set . ' WHERE ' . $values . ';';
+        $results = $this->mysqli->query($query);
+
+        return $results;
     }
 
     private function makeAssoc($results) {
@@ -134,9 +143,17 @@ class mySQL implements databaseInterface
 
     }
 
-    function escape($inString)
+    function escapeString($inString)
     {
         $escapedString = $this->mysqli->real_escape_string($inString);
         return $escapedString;
+    }
+
+    function removeData($from, $where)
+    {
+        $query = 'DELETE FROM ' . $from . ' WHERE ' . $where . ';';
+        $results = $this->mysqli->query($query);
+
+        return $results;
     }
 }

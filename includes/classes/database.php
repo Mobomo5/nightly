@@ -37,7 +37,6 @@ class database implements databaseInterface {
     }
 
 
-    // the next two are just to block the ability to do the following.
     private function __construct() {
 
         require_once(EDUCASK_ROOT . '/includes/config.php');
@@ -70,6 +69,10 @@ class database implements databaseInterface {
     }
 
 
+    /**
+     * returns true when connection is available, false otherwise
+     * @return bool
+     */
     public function isConnected() {
         if (empty($this->dbObject)) {
             return false;
@@ -77,14 +80,28 @@ class database implements databaseInterface {
         return $this->dbObject->isConnected();
     }
 
+    /**
+     * disconnects the database
+     */
     public function disconnect() {
         $this->dbObject->disconnect();
     }
 
+    /**
+     * Calls the sub-database's getData function
+     * returns false on failure, Data Array on success
+     *
+     * @param $select
+     * @param $from
+     * @param int $where
+     * @return bool
+     */
     public function getData($select, $from, $where = 1)
     {
 
-
+        if (empty($select) OR empty($from) OR empty($where)) {
+            return false;
+        }
         $result = $this->dbObject->select($select, $from, $where);
         if (!$result) {
             new notice("error", "There was an error in the statement"); //@todo: better error messages
@@ -94,6 +111,12 @@ class database implements databaseInterface {
         return $result;
     }
 
+    /**
+     * Allows the user to make custom queries. May be removed before release
+     *
+     * @param $inQuery
+     * @return bool
+     */
     public function makeCustomQuery($inQuery) {
 
         $result = $this->dbObject->query($inQuery);
@@ -105,9 +128,21 @@ class database implements databaseInterface {
         return $result;
     }
 
-    public function insert($into, $columns, $values) {
+    /**
+     * inserts data into a table. returns true on success, false on failure
+     *
+     * @param $into
+     * @param $columns
+     * @param $values
+     * @return bool
+     */
+    public function insertData($into, $columns, $values)
+    {
 
-        $result = $this->dbObject->insert($into, $columns, $values);
+        if (empty($into) OR empty($columns) OR empty($values)) {
+            return false;
+        }
+        $result = $this->dbObject->insertData($into, $columns, $values);
         if (!$result) {
             new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
@@ -116,27 +151,75 @@ class database implements databaseInterface {
         return $result;
     }
 
-    public function update($table, $set, $values) {
+    /**
+     * updates supplied table. returns true on success, false on fail
+     *
+     * @param $table
+     * @param $set
+     * @param $values
+     * @return bool
+     */
+    public function updateTable($table, $set, $values)
+    {
 
-        $result = $this->dbObject->update($table, $set, $values);
+        if (empty($table) OR empty($set) OR empty($values)) {
+            return false;
+        }
+
+        $result = $this->dbObject->updateTable($table, $set, $values);
         if (!$result) {
-            new notice("error", "There was an error in the statement"); //@todo: better error messages
+            noticeEngine::getInstance()->addNotice(notice("error", "There was an error in the statement")); //@todo: better error messages
             return false; //@todo: link to last page.
         }
         return $result;
     }
 
+    /**
+     * calls the sub-database's connect function
+     */
     public function connect() {
         $this->dbObject->connect();
     }
 
+    /**
+     * intentionally left empty
+     *
+     * @param $dbServer
+     * @param $userName
+     * @param $password
+     * @param $db
+     */
     function configure($dbServer, $userName, $password, $db) {
         // does nothing in the databaseCreator
     }
 
-    function escape($inString)
+    /**
+     * returns an escaped string
+     *
+     * @param $inString
+     * @return bool
+     */
+    function escapeString($inString)
     {
-        $escapedString = $this->dbObject->escape($inString);
+        if (empty($inString)) {
+            return false;
+        }
+        $escapedString = $this->dbObject->escapeString($inString);
         return $escapedString;
+    }
+
+    /**
+     * delete data from the db
+     *
+     * @param $from
+     * @param $where
+     * @return bool
+     */
+    function removeData($from, $where)
+    {
+        if (empty($from) OR empty($where)) {
+            return false;
+        }
+        return $this->dbObject->removeData($from, $where);
     }
 }
