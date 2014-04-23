@@ -38,16 +38,16 @@ class statusEngine {
     public function addStatusToDatabase($inPosterID, $inParentStatus, $inSupporterCount, $inNodeID, $inStatus){
         //inserts the status into the database
         $db = database::getInstance();
-        $db->insert("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
+        $db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
 
         //Select query for getting StatusID for next insert
-        $results = $db->select("statusID", "status" ,"posterID` = $inPosterID");
-        $statusID = mysql_fetch_row($results);
+        $results = $db->getData("statusID", "status" ,"'posterID' = $inPosterID");
+        $statusID = $results[0]['statusID'];
 
         //insert into the statusRevision table
         $escapedStatus = $db->escapeString($inStatus);
         $timestamp = date("Y-m-d H:i:s");
-        $db->insert("statusRevision", "status, timePosted, statusID, isCurrent", "$escapedStatus, $timestamp, $statusID[0], 1");
+        $db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "$escapedStatus, $timestamp, $statusID, 1");
     }
 
     public function retrieveStatusFromDatabaseByUser($inUserID){
@@ -55,10 +55,12 @@ class statusEngine {
         $db = database::getInstance();
         $statusArray = array();
 
-        //TODO: Make Query for getting all the information to create the status object
-        $results = $db->select("","",""); //<----
+        $results = $db->getData("*",
+            "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
+            "'posterID' = $inUserID"); //<----
 
-        while($row = mysqli_fetch_array($results)) {
+
+        foreach($results as $row){
             $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
@@ -71,9 +73,11 @@ class statusEngine {
         $statusArray = array();
 
         //TODO: Make Query for getting all the information to create the status object from status and statusRevision DB
-        $results = $db->select("","",""); //<----
+        $results = $db->getData("*",
+            "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
+            "'nodeID' = $inNodeID");
 
-        while($row = mysqli_fetch_array($results)) {
+        foreach($results as $row){
             $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
