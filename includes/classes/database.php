@@ -1,7 +1,8 @@
 <?php
 
 require_once(DATABASE_INTERFACE_FILE);
-
+require_once(NOTICE_ENGINE_OBJECT_FILE);
+require_once(NOTICE_OBJECT_FILE);
 
 /**
  * Created by JetBrains PhpStorm.
@@ -102,7 +103,7 @@ class database implements databaseInterface {
         if (empty($select) OR empty($from) OR empty($where)) {
             return false;
         }
-        $result = $this->dbObject->selectData($select, $from, $where);
+        $result = $this->dbObject->getData($select, $from, $where);
         if (!$result) {
             new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
