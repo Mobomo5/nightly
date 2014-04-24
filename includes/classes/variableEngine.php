@@ -73,7 +73,7 @@ class variableEngine {
         if (!$database->isConnected()) {
             return null;
         }
-        $results = $database->select('variableName, variableValue, readOnly', 'variable', $where);
+        $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
         $toReturn = array();
         foreach ($results as $result) {
             $variableName = $result['variableName'];
