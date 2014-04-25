@@ -22,7 +22,7 @@ class site {
 
     public static function getInstance() {
         if (!isset($_SESSION['educaskSite'])) {
-            $_SESSION['educaskNotices'] = new site();
+            self::setInstance(new site());
         }
 
         return $_SESSION['educaskSite'];

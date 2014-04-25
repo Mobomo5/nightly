@@ -7,7 +7,8 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(VARIABLE_OBJECT_FILE);
-
+require_once(NOTICE_ENGINE_OBJECT_FILE);
+require_once(NOTICE_OBJECT_FILE);
 class variableEngine {
     private static $instance;
 
@@ -73,7 +74,11 @@ class variableEngine {
         if (!$database->isConnected()) {
             return null;
         }
-        $results = $database->select('variableName, variableValue, readOnly', 'variable', $where);
+        $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
+        if(!$results) {
+            noticeEngine::getInstance()->addNotice(new notice('warning', 'Sorry, I had problems getting the wanted variables from the database.'));
+            return false;
+        }
         $toReturn = array();
         foreach ($results as $result) {
             $variableName = $result['variableName'];

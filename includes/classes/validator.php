@@ -8,7 +8,8 @@
 class validator {
     private $subValidator;
     public function __construct($inType) {
-        $validatorFile = EHQ_SIMPLE_CMS_ROOT . '/includes/validators/' . $inType . '.php';
+        str_replace('..', '', $inType);
+        $validatorFile = EDUCASK_ROOT . '/includes/validators/' . $inType . '.php';
         if(! is_file($validatorFile)) {
             $this->subValidator = false;
             return;
@@ -19,6 +20,12 @@ class validator {
     public function validate($inValue, array $inOptions = array()) {
         if(! $this->subValidator) {
             return false;
+        }
+        if(! in_array('subValidator', class_implements($this->subValidator))) {
+            return false;
+        }
+        if(empty($inOptions)) {
+            return $this->subValidator->validate($inValue);
         }
         if($this->subValidator->hasOptions()) {
             return $this->subValidator->validate($inValue, $inOptions);
