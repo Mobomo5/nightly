@@ -50,6 +50,7 @@ class bootstrap {
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
         define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
+        define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
