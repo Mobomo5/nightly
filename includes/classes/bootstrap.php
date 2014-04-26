@@ -24,9 +24,10 @@ class bootstrap {
     public function init() {
         $this->declareConstants();
 
+
+        $this->doRequires();
         session_start();
         session_regenerate_id();
-        $this->doRequires();
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
@@ -52,6 +53,7 @@ class bootstrap {
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
         define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
+        define('NODE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/node.php');
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
         define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
         define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
@@ -87,8 +89,8 @@ class bootstrap {
         define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
         date_default_timezone_set($this->site->getTimeZone());
         $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), $node, $user->getRoleID());
-        database::getInstance()->bootstrapDisconnect();
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), get_class($node), $user->getRoleID());
+//        /database::getInstance()->bootstrapDisconnect();
     }
     private function render() {
         Twig_Autoloader::register();
