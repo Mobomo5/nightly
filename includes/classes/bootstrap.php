@@ -24,6 +24,8 @@ class bootstrap {
     public function init() {
         $this->declareConstants();
         $this->doRequires();
+        session_start();
+        session_regenerate_id();
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
@@ -50,6 +52,7 @@ class bootstrap {
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
         define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
+        define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -59,6 +62,7 @@ class bootstrap {
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
         require_once(NODE_ENGINE_OBJECT_FILE);
+        require_once(BLOCK_ENGINE_OBJECT_FILE);
     }
     private function connectDatabase() {
         $database = database::getInstance();
