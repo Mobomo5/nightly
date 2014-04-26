@@ -22,7 +22,7 @@ class blockEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        $results = $database->getData('blockID, module, blockName, themeRegion, title', 'block', 'WHERE theme = \'' . $theme . '\' AND enabled = 1 ORDER BY weight');
+        $results = $database->getData('blockID, module, blockName, themeRegion, title', 'block', 'theme = \'' . $theme . '\' AND enabled = 1 ORDER BY weight');
         $blocks = array();
         foreach ($results as $blockData) {
             if (!$this->blockExists($blockData['blockName'], $blockData['module'])) {
