@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ blocks.page.getTitle }} | {{ site.getTitle }}</title>
+    <meta name="Generator" content="Educask version {{ site.getEducaskVersion }}">
+    <meta http-equiv="X-FRAME-OPTIONS" content="DENY">
+    <script src="{{ site.getBaseDirectory }}thirdPartyLibraries/js/jQuery/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="includes/css/theme.css"/>
+    {{ script.links|raw }}
+    <script type="text/javascript">
+        /* borrowed from tinyMCE.com */
+        tinymce.init({
+            selector: "#compose-body",
+            plugins: "tabfocus",
+            tab_focus: ":prev, :next"
+        });
+
+        $(document).ready(function () {
+            $(".inline").fancybox({
+                fitToView: true,
+                autoSize: false,
+                width: "90%",
+                height: "80%",
+                closeClick: false,
+                openEffect: "elastic",
+                closeEffect: "elastic"
+            });
+        });
+        $(document).ready(function () {
+            $(".inlineRefreshOnClose").fancybox({
+                fitToView: true,
+                autoSize: false,
+                width: "90%",
+                height: "80%",
+                closeClick: false,
+                openEffect: "elastic",
+                closeEffect: "elastic",
+                afterClose: function () {
+                    parent.location.reload();
+                    ;
+                }
+            });
+        });
+        /* borrowed from http://jqueryui.com/datepicker/ */
+        $(function () {
+            $("#datepicker").datepicker({ minDate: 0});
+        });
+        {{ site.getScripts|raw }}
+    </script>
+
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+{% endblock %}
+</body>
+</html>

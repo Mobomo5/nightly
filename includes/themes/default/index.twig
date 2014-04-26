@@ -1,0 +1,38 @@
+{% extends "base.twig" %}
+{% block body %}
+
+    {% block titlebar %}
+        <div id="titlebar">
+            <ul>
+                <li><a>EDUCASKLOGO!</a></li>
+                {#iterate through the supplied blocks looking for titlebar menu items. stick them here.#}
+                <li><a href="{{ href }}">name1</a></li>
+                <li><a href="{{ href }}">name2</a></li>
+                <li><a href="{{ href }}">name3</a></li>
+                <li><a href="{{ href }}">name4</a></li>
+            </ul>
+            <form action="#" id="search-box" method="post">
+
+                <input type="submit"/>
+                <input name="text" type="text"/>
+            </form>
+        </div>
+    {% endblock %}
+    {% block sidebar %}
+        <div id="sidebar">
+            <ul>
+                <li>SIDEBAR!</li>
+                {# again, iterate through blocks to look for sidebar menu items.#}
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+            </ul>
+        </div>
+    {% endblock %}
+    <div id="mainContent">
+        {% include blocks.main.0.title ~ '.twig' %}
+    </div>
+
+{% endblock %}
