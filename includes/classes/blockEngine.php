@@ -6,6 +6,7 @@
  * Time: 12:23 PM
  */
 require_once(DATABASE_OBJECT_FILE);
+
 class blockEngine {
     private static $instance;
 
@@ -16,31 +17,33 @@ class blockEngine {
 
         return self::$instance;
     }
+
     public function getBlocks($theme, $parameters, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             return false;
         }
-        $results = $database->getData('blockID, module, blockName, themeRegion, title', 'block', 'theme = \'' . $theme . '\' AND enabled = 1 ORDER BY weight');
+        $results = $database->getData('b.blockID, m.moduleName, b.blockName, b.themeRegion, b.title', 'block b, module m', 'b.theme = \'' . $theme . '\' AND b.enabled = 1 AND m.moduleID = b.module ORDER BY weight');
         $blocks = array();
         foreach ($results as $blockData) {
-            if (!$this->blockExists($blockData['blockName'], $blockData['module'])) {
+            if (!$this->blockExists($blockData['blockName'], $blockData['moduleName'])) {
                 continue;
             }
             if (!$this->blockVisible($blockData['blockID'], $nodeType, $roleID)) {
                 continue;
             }
             if ($blockData['title'] == '') {
-                $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['module'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
+                $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
                 continue;
             }
 
-            $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['module'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
+            $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
         }
 
         return $blocks;
     }
+
     public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
         $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
         $block = new $blockName($parameters);
@@ -48,29 +51,32 @@ class blockEngine {
         if ($title != null) {
             $block->setTitle($title);
         }
-
         return $block;
     }
+
     public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
         if (!$this->blockExists($blockName, $moduleName)) {
             return;
         }
-        if (! $this->blockVisible($blockID, $nodeType, $roleID)) {
+        if (!$this->blockVisible($blockID, $nodeType, $roleID)) {
+
             return;
         }
         require_once($this->getPathToBlock($blockName, $moduleName));
     }
+
     public function blockExists($blockName, $moduleName) {
         $block = $this->getPathToBlock($blockName, $moduleName);
         return file_exists($block);
     }
+
     public function blockVisible($blockID, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
-        $results = $database->getData('visible', 'blockVisibility', 'WHERE blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'*\') OR (referenceType = \'roleID\' AND referenceID = \'*\'))');
+        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'*\') OR (referenceType = \'roleID\' AND referenceID = \'*\'))');
         //Default block is visible unless specified
-        if($results == null) {
-            $results = $database->getData('visible', 'blockVisibility', 'WHERE blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
+        if ($results == null) {
+            $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
 
             if ($results != NULL) {
                 return false;
@@ -94,6 +100,7 @@ class blockEngine {
         }
         return true;
     }
+
     public function getPathToBlock($blockName, $moduleName) {
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }

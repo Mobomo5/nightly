@@ -3,6 +3,7 @@
 require_once(DATABASE_INTERFACE_FILE);
 require_once(NOTICE_ENGINE_OBJECT_FILE);
 require_once(NOTICE_OBJECT_FILE);
+
 /**
  * Created by JetBrains PhpStorm.
  * User: Craig
@@ -21,6 +22,7 @@ class database implements databaseInterface {
     private $dbServer;
     private $dbObject;
     private $dbType;
+
     /**
      * will call the new constructor methods.
      * @return database
@@ -31,11 +33,12 @@ class database implements databaseInterface {
         }
         return self::$instance;
     }
+
     private function __construct() {
         require_once(EDUCASK_ROOT . '/includes/config.php');
         $this->dbUsername = $dbUserName;
         $this->dbPassword = $dbPassword;
-        $this->db = 'educaskOld';
+        $this->db = $db;
         $this->dbServer = $dbServer;
         $this->dbType = $dbType;
         $this->dbType = $dbType;
@@ -47,15 +50,18 @@ class database implements databaseInterface {
         $this->dbObject = $dbType::getInstance();
         $this->dbObject->configure($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
     }
+
     private function __clone() {
         //Me not like clones! Me smash clones!
     }
+
     /**
      * Will be called when the code no longer needs the class.
      */
     public function __destruct() {
         $this->disconnect();
     }
+
     /**
      * returns true when connection is available, false otherwise
      * @return bool
@@ -66,12 +72,18 @@ class database implements databaseInterface {
         }
         return $this->dbObject->isConnected();
     }
+
+    public function bootstrapDisconnect() {
+        $this->dbObject->disconnect();
+    }
+
     /**
      * disconnects the database
      */
     public function disconnect() {
         $this->dbObject->disconnect();
     }
+
     /**
      * Calls the sub-database's getData function
      * returns false on failure, Data Array on success
@@ -92,6 +104,7 @@ class database implements databaseInterface {
         }
         return $result;
     }
+
     /**
      * Allows the user to make custom queries. May be removed before release
      *
@@ -106,6 +119,7 @@ class database implements databaseInterface {
         }
         return $result;
     }
+
     /**
      * inserts data into a table. returns true on success, false on failure
      *
@@ -125,6 +139,7 @@ class database implements databaseInterface {
         }
         return $result;
     }
+
     /**
      * updates supplied table. returns true on success, false on fail
      *
@@ -144,12 +159,14 @@ class database implements databaseInterface {
         }
         return $result;
     }
+
     /**
      * calls the sub-database's connect function
      */
     public function connect() {
         $this->dbObject->connect();
     }
+
     /**
      * intentionally left empty
      *
@@ -161,6 +178,7 @@ class database implements databaseInterface {
     function configure($dbServer, $userName, $password, $db) {
         // does nothing in the databaseCreator
     }
+
     /**
      * returns an escaped string
      *
@@ -174,6 +192,7 @@ class database implements databaseInterface {
         $escapedString = $this->dbObject->escapeString($inString);
         return $escapedString;
     }
+
     /**
      * delete data from the db
      *

@@ -11,20 +11,23 @@ class currentUser {
     private $userRole;
     private $firstName;
     private $lastName;
+
     static function userIsInSession() {
         if (!isset($_SESSION['educaskCurrentUser'])) {
             return false;
         }
         return true;
     }
-    static function getUserSession(){
+
+    static function getUserSession() {
         //if the user's object hasn't been created yet, create it
-        if (! self::userIsInSession()) {
+        if (!self::userIsInSession()) {
             self::setUserSession(new currentUser());
         }
         //return the user object
         return $_SESSION['educaskCurrentUser'];
     }
+
     static function setUserSession(currentUser $object) {
         //verify the variable given is a user object. If it is not, get out of here.
         if (get_class($object) != "currentUser") {
@@ -32,6 +35,7 @@ class currentUser {
         }
         $_SESSION['educaskCurrentUser'] = $object;
     }
+
     private function __construct() {
         //Start a guest session
         $this->isLoggedIn = false;
@@ -40,24 +44,31 @@ class currentUser {
         $this->firstName = 'Anonymous';
         $this->lastName = 'Guest';
     }
+
     public function isLoggedIn() {
         return $this->isLoggedIn;
     }
+
     public function getUserRole() {
         return $this->userRole;
     }
-    public function getUserID() {
+
+    public function getRoleID() {
         return $this->userID;
     }
+
     public function getFullName() {
         return $this->firstName . ' ' . $this->lastName;
     }
+
     public function getFirstName() {
         return $this->firstName;
     }
+
     public function getLastName() {
         return $this->lastName;
     }
+
     public function logIn($userName, $password) {
         if ($this->isLoggedIn) {
             return true;
@@ -69,7 +80,7 @@ class currentUser {
             return true;
         }
 
-        if((! isset($_SESSION['userCanLogIn'])) or ($_SESSION['userCanLogIn'] == false)) {
+        if ((!isset($_SESSION['userCanLogIn'])) or ($_SESSION['userCanLogIn'] == false)) {
             return false;
         }
 
@@ -106,7 +117,7 @@ class currentUser {
 
         $dbPassword = $results[0]['password'];
         $hasher = new hasher();
-        if (! $hasher->verifyHash($password, $dbPassword)) {
+        if (!$hasher->verifyHash($password, $dbPassword)) {
             $hookEngine->runAction('userFailedToLogIn');
             unset($dbPassword);
             unset($results);
@@ -114,7 +125,7 @@ class currentUser {
             return false;
         }
         unset($dbPassword);
-        foreach($results as $result) {
+        foreach ($results as $result) {
             unset($result['password']);
         }
         unset($hasher);
@@ -132,6 +143,7 @@ class currentUser {
         $hookEngine->runAction('userLoggedIn');
         return true;
     }
+
     public function logOut() {
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('userLoggingOut');

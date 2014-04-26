@@ -1,11 +1,11 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
  * Date: 4/9/14
  * Time: 5:20 PM
  */
-
 class bootstrap {
     private static $instance;
     private $blocks;
@@ -17,10 +17,12 @@ class bootstrap {
         }
         return self::$instance;
     }
+
     private function __construct() {
         $this->blocks = null;
         $this->site = null;
     }
+
     public function init() {
         $this->declareConstants();
         $this->doRequires();
@@ -31,6 +33,7 @@ class bootstrap {
         $this->getVariables();
         $this->render();
     }
+
     private function declareConstants() {
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
         define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
@@ -55,6 +58,7 @@ class bootstrap {
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
         define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
     }
+
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
@@ -65,18 +69,21 @@ class bootstrap {
         require_once(NODE_ENGINE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
     }
+
     private function connectDatabase() {
         $database = database::getInstance();
         $database->connect();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             die('<html><head><title>:( Database is a no-go | Educask</title></head><body><h1>:( The database is a no-go.</h1><p>Sorry, but I had problems connecting to the database.</p></body></html>');
         }
     }
+
     private function initializePlugins() {
         foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*.php') as $plugin) {
             require_once($plugin);
         }
     }
+
     private function getVariables() {
         $this->site = site::getInstance();
         $blockEngine = blockEngine::getInstance();
@@ -85,17 +92,18 @@ class bootstrap {
         define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
         date_default_timezone_set($this->site->getTimeZone());
         $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), $node, $user->getRoleID());
-        database::getInstance()->bootstrapDisconnect();
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), get_class($node), $user->getRoleID());
+        //database::getInstance()->bootstrapDisconnect();
     }
+
     private function render() {
         Twig_Autoloader::register();
         $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();
-        if(! is_dir($theme)) {
+        if (!is_dir($theme)) {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
         $loader = new Twig_Loader_Filesystem(array($theme));
-        foreach(glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
+        foreach (glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
             $name = explode('/', $baseTheme);
             $name = end($name);
             $loader->addPath($baseTheme, $name);

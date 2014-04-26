@@ -192,4 +192,9 @@ class site {
         }
         self::setInstance($this);
     }
+
+    public function getCurrentPage() {
+        //@todo: this thing.
+        return;
+    }
 }
