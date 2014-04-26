@@ -7,19 +7,14 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(VARIABLE_OBJECT_FILE);
-require_once(NOTICE_ENGINE_OBJECT_FILE);
-require_once(NOTICE_OBJECT_FILE);
 class variableEngine {
     private static $instance;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new variableEngine();
         }
-
         return self::$instance;
     }
-
     public function getVariable($variableName) {
         if ($variableName == '') {
             return null;
@@ -28,13 +23,12 @@ class variableEngine {
             return null;
         }
         $database = database::getInstance();
-        //$database->connect();
         if (!$database->isConnected()) {
             return null;
         }
         $variableName = $database->escapeString($variableName);
         $variableValue = $database->getData('variableValue, readOnly', 'variable', 'WHERE variableName=\'' . $variableName . '\'');
-        if ($variableValue == null) {
+        if ($variableValue == false) {
             return null;
         }
         if (count($variableValue) > 1) {
@@ -47,12 +41,10 @@ class variableEngine {
         $toReturn = new variable($variableName, $variableValue);
         return $toReturn;
     }
-
     public function getVariables(array $variables = array()) {
         if (count($variables) == 0) {
             return null;
         }
-        //$where = 'WHERE ';
         $where = '';
         foreach ($variables as $variable) {
             if ($variable == null) {
@@ -66,18 +58,16 @@ class variableEngine {
             }
             $where .= ' OR variableName = \'' . $variable . '\'';
         }
-        if ($where == 'WHERE ') {
+        if ($where == '') {
             return null;
         }
         $database = database::getInstance();
-        //$database->connect();
         if (!$database->isConnected()) {
             return null;
         }
         $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
-        if(!$results) {
-            noticeEngine::getInstance()->addNotice(new notice('warning', 'Sorry, I had problems getting the wanted variables from the database.'));
-            return false;
+        if ($results == false) {
+            return null;
         }
         $toReturn = array();
         foreach ($results as $result) {

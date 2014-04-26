@@ -23,8 +23,6 @@ class bootstrap {
     }
     public function init() {
         $this->declareConstants();
-
-
         $this->doRequires();
         session_start();
         session_regenerate_id();

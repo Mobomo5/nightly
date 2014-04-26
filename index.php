@@ -6,8 +6,6 @@
  * Time: 12:52 PM
  */
 error_reporting(E_ALL);
-session_start();
-session_regenerate_id();
 
 header('X-Powered-By: Educask 3.0');
 header('X-Generator: Educask 3.0 (http://www.educask.com)');

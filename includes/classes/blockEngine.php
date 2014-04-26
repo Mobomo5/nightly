@@ -6,25 +6,27 @@
  * Time: 12:23 PM
  */
 require_once(DATABASE_OBJECT_FILE);
-
 class blockEngine {
     private static $instance;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new blockEngine();
         }
-
         return self::$instance;
     }
-
     public function getBlocks($theme, $parameters, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
         if (!$database->isConnected()) {
-            return false;
+            return null;
         }
         $results = $database->getData('b.blockID, m.moduleName, b.blockName, b.themeRegion, b.title', 'block b, module m', 'b.theme = \'' . $theme . '\' AND b.enabled = 1 AND m.moduleID = b.module ORDER BY weight');
+        if($results == false) {
+            return null;
+        }
+        if($results == null) {
+            return null;
+        }
         $blocks = array();
         foreach ($results as $blockData) {
             if (!$this->blockExists($blockData['blockName'], $blockData['moduleName'])) {
@@ -37,39 +39,31 @@ class blockEngine {
                 $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
                 continue;
             }
-
             $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
         }
-
         return $blocks;
     }
-
     public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
         $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
         $block = new $blockName($parameters);
-
         if ($title != null) {
             $block->setTitle($title);
         }
         return $block;
     }
-
     public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
         if (!$this->blockExists($blockName, $moduleName)) {
             return;
         }
         if (!$this->blockVisible($blockID, $nodeType, $roleID)) {
-
             return;
         }
         require_once($this->getPathToBlock($blockName, $moduleName));
     }
-
     public function blockExists($blockName, $moduleName) {
         $block = $this->getPathToBlock($blockName, $moduleName);
         return file_exists($block);
     }
-
     public function blockVisible($blockID, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
@@ -77,11 +71,9 @@ class blockEngine {
         //Default block is visible unless specified
         if ($results == null) {
             $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
-
-            if ($results != NULL) {
+            if ($results != null) {
                 return false;
             }
-
             return true;
         }
         //Block is visible everywhere
@@ -91,16 +83,13 @@ class blockEngine {
         //Block is only visible on specified pages
         if ($results[0]['visible'] == 0) {
             $results = $database->getData('*', 'blockVisibility', 'WHERE blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 1');
-
-            if ($results == NULL) {
+            if ($results == false) {
                 return false;
             }
-
             return true;
         }
         return true;
     }
-
     public function getPathToBlock($blockName, $moduleName) {
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
