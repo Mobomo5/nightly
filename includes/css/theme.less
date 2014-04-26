@@ -4,6 +4,11 @@
 @box4color: #CD5C5C;
 @box5color: #9370DB;
 @box6color: #FFC0CB;
+@background: #ffedf2;
+@homepagebackground: #6495ED;
+@titlebarcolor: #8a8a9e;
+@sidebarwidth: 10%;
+@titlebarheight: 30px;
 
 * {
   font-family: consolas;
@@ -11,31 +16,43 @@
   padding: 0;
   height: 100%;
   width: 100%;
+
 }
 
-#homepage-background {
-  a {
-    white-space: nowrap;
-
-    display: inline-block;
-    width: 28%;
-    height: 38%;
-    margin: 4% 2% 0 2%;
-    box-shadow: 4px 4px 4px #366097;
-    text-align: center;
-  }
+body {
+  background-color: @background;
 }
 
 #homepage-background {
   width: 100%;
   height: 100%;
-  background-color: cornflowerblue;
+  background-color: @homepagebackground;
+
+  a {
+    white-space: nowrap;
+    display: inline-block;
+    width: 26%;
+    height: 31%;
+    margin: 4% 3% 0 3%;
+    box-shadow: 4px 4px 4px #366097;
+    text-align: center;
+    text-decoration: none;
+    h2 {
+      font-weight: normal;
+    }
+
+  }
+}
+
+#homepage-background {
+
 }
 
 .box {
   display: inline-block;
   width: 100%;
   height: 100%;
+  padding: 5%;
 }
 
 #box-1 {
@@ -67,3 +84,82 @@
   width: 100%;
 }
 
+// index.twig
+
+#titlebar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+
+  height: @titlebarheight;
+  background-color: @titlebarcolor;
+  ul {
+    display: inline;
+    list-style: none;
+    float: left;
+    width: 50%;
+
+    li {
+      display: inline;
+      a {
+        display: inline;
+        height: 100%;
+        text-decoration: none;
+        text-align: center;
+
+      }
+      a:hover {
+        background-color: @titlebarcolor + #101010;
+      }
+    }
+  }
+  #search-box {
+    width: 30%;
+    float: right;
+    input {
+      float: right;
+      display: inline-block;
+      width: 15em;
+
+    }
+    input[type=submit] {
+      width: 4em;
+    }
+  }
+}
+
+#sidebar {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  text-align: center;
+  float: left;
+  height: convert(100pc,'px') - @titlebarheight;
+  margin-top: @titlebarheight;
+  background-color: @titlebarcolor;
+  width: @sidebarwidth;
+  ul {
+    position: relative;
+    list-style: none;
+    li {
+      height: 2em;
+      a {
+        display: block;
+        text-decoration: none;
+      }
+      a:hover {
+        background-color: @titlebarcolor + #111;
+      }
+    }
+  }
+}
+
+#mainContent {
+  box-sizing: border-box;
+  padding-top: @titlebarheight;
+  display: block;
+  float: right;
+  width: 100% - @sidebarwidth;
+  height: 100%;
+}
