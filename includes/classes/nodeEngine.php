@@ -36,7 +36,7 @@ class nodeEngine {
     private function determineAlias() {
         $database = database::getInstance();
         $page = self::$currentURL;
-        $results = $database->getData('source', 'urlAlias', 'WHERE alias=\'' . $database->escapeString($page) . '\'');
+        $results = $database->getData('source', 'urlAlias', 'alias=\'' . $database->escapeString($page) . '\'');
         if($results == null) {
             $this->sourceURL =  $page;
             return false;
