@@ -14,6 +14,9 @@ class blockEngine {
         }
         return self::$instance;
     }
+    private function __construct(){
+        //Do nothing;
+    }
     public function getBlocks($theme, $parameters, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();

@@ -55,7 +55,11 @@ class bootstrap {
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
         define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
         define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
-
+        define('BLOCK_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/block.php');
+        define('STATUS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/status.php');
+        define('STATUS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/statusEngine.php');
+        define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
+        define('PERMISSION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permissionEngine.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -81,11 +85,11 @@ class bootstrap {
     }
     private function getVariables() {
         $this->site = site::getInstance();
+        define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
+        date_default_timezone_set($this->site->getTimeZone());
         $blockEngine = blockEngine::getInstance();
         $nodeEngine = nodeEngine::getInstance();
         $user = currentUser::getUserSession();
-        define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
-        date_default_timezone_set($this->site->getTimeZone());
         $node = $nodeEngine->getNode();
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), get_class($node), $user->getRoleID());
 //        /database::getInstance()->bootstrapDisconnect();
@@ -93,6 +97,7 @@ class bootstrap {
     private function render() {
         Twig_Autoloader::register();
         $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();
+        str_replace('..', '', $theme);
         if(! is_dir($theme)) {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
