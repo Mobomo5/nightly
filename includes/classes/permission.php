@@ -42,7 +42,8 @@ class permission {
         if(! $database->isConnected()) {
             return false;
         }
-        if(! $database->updateTable('permission', 'permissionName = \'' . $database->escapeString(htmlspecialchars($inName)) .'\'', 'permissionID = ' . $this->id)) {
+        $inName = $database->escapeString(htmlspecialchars($inName));
+        if(! $database->updateTable('permission', 'permissionName = \'' . $inName .'\'', 'permissionID = ' . $this->id)) {
             return false;
         }
         return true;
@@ -58,7 +59,8 @@ class permission {
         if(! $database->isConnected()) {
             return false;
         }
-        if(! $database->updateTable('permission', 'humanName = \'' . $database->escapeString(htmlspecialchars($inName)) . '\'', 'permissionID = ' . $this->id)) {
+        $inName = $database->escapeString(htmlspecialchars($inName));
+        if(! $database->updateTable('permission', 'humanName = \'' . $inName . '\'', 'permissionID = ' . $this->id)) {
             return false;
         }
         return true;
@@ -71,7 +73,8 @@ class permission {
         if(! $database->isConnected()) {
             return false;
         }
-        if(! $database->updateTable('permission', 'permissionDescription = \'' . $database->escapeString(htmlspecialchars($inDescription)) . '\'', 'permissionID = ' . $this->id)) {
+        $inDescription = $database->escapeString(htmlspecialchars($inDescription));
+        if(! $database->updateTable('permission', 'permissionDescription = \'' . $inDescription . '\'', 'permissionID = ' . $this->id)) {
             return false;
         }
         return true;

@@ -30,7 +30,8 @@ class permissionEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        $results = $database->getData('permissionID, permissionName, humanName, permissionDescription', 'permission', 'permissionName = \'' . $database->escapeString(htmlspecialchars($inPermissionName)) . '\'');
+        $inPermissionName = $database->escapeString(htmlspecialchars($inPermissionName));
+        $results = $database->getData('permissionID, permissionName, humanName, permissionDescription', 'permission', 'permissionName = \'' . $inPermissionName . '\'');
         if($results == false) {
             return false;
         }
@@ -62,7 +63,10 @@ class permissionEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        if(! $database->insertData('permission', 'permissionName, humanName, permissionDescription', $database->escapeString(htmlspecialchars($inName) . ', ' . ', ' . $database->escapeString(htmlspecialchars($inHumanName)) . ', ' . $database->escapeString(htmlspecialchars($inDescription))))) {
+        $inName = $database->escapeString(htmlspecialchars($inName));
+        $inHumanName = $database->escapeString(htmlspecialchars($inHumanName));
+        $inDescription = $database->escapeString(htmlspecialchars($inDescription));
+        if(! $database->insertData('permission', 'permissionName, humanName, permissionDescription', $inName . ', ' . $inHumanName . ', ' . $inDescription)) {
             return false;
         }
         return true;
