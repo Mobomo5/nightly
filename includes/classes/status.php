@@ -26,23 +26,6 @@ class status {
         $this->voterArray = array();
     }
 
-
-    public function getStatusID() {
-        return $this->statusID;
-    }
-
-    public function getStatus(){
-        return $this->statusMsg;
-    }
-
-    public function getUpvotes(){
-        return $this->votes;
-    }
-
-    public function getNodeID(){
-        return $this->nodeID;
-    }
-
     public function addChildStatusTo(status $inChildStatus){
         $this->childStatus[] += $inChildStatus;
     }
@@ -88,8 +71,22 @@ class status {
         }
     }
 
-    public function editStatus($inString){
-        //TODO: Check for permission before allowing
-        $this->statusMsg = $inString;
+    /*
+     * Getters, no setters due to object not being allowed to be edited
+     */
+    public function getStatusID() {
+        return $this->statusID;
+    }
+
+    public function getStatus(){
+        return $this->statusMsg;
+    }
+
+    public function getUpvotes(){
+        return $this->votes;
+    }
+
+    public function getNodeID(){
+        return $this->nodeID;
     }
 }
