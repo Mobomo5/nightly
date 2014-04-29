@@ -53,7 +53,6 @@ class bootstrap {
         define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
         define('NODE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/node.php');
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
-        define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
         define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
         define('BLOCK_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/block.php');
         define('STATUS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/status.php');
