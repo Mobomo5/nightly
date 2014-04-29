@@ -12,7 +12,6 @@ class permission {
     private $name;
     private $humanName;
     private $description;
-    private $canDo;
 
     public function __construct($inID, $inName, $inHumanName, $inDescription) {
         if(! is_int($inID)) {
@@ -28,7 +27,6 @@ class permission {
         $this->name = $inName;
         $this->humanName = $inHumanName;
         $this->description = $inDescription;
-        $this->canDo = null;
     }
     public function getID(){
         return $this->id;
@@ -78,13 +76,7 @@ class permission {
         }
         return true;
     }
-    public function getRoleID() {
-        return $this->roleID;
-    }
     public function canDo() {
-        if($this->canDo != null) {
-            return $this->canDo;
-        }
         $user = currentUser::getUserSession();
         $database = database::getInstance();
         if(! $database->isConnected()) {
@@ -101,10 +93,8 @@ class permission {
             return false;
         }
         if($results[0]['canDo'] == 0) {
-            $this->canDo = false;
             return false;
         }
-        $this->canDo = true;
         return true;
     }
     public function setCanDo($roleID, $inValue = false) {
@@ -126,10 +116,42 @@ class permission {
         } else {
             $canDo = 0;
         }
+        //Make sure that an entry exist for this permission and the specified role.
+        $results = $database->getData('canDo', 'permissionSet', 'permissionID = ' . $this->id . ' AND roleID = ' . $roleID);
+        if($results == false) {
+            return false;
+        }
+        if($results == null) {
+            return $this->insertNewCanDo($roleID, $inValue);
+        }
         if(! $database->updateTable('permissionSet', 'canDo = ' . $canDo, 'permissionID = ' . $this->id . ' AND roleID = ' . $roleID)) {
             return false;
         }
         $this->canDo = $inValue;
+        return true;
+    }
+    private function insertNewCanDo($roleID, $canDo = false) {
+        if(! is_bool($canDo)) {
+            return false;
+        }
+        if(! is_int($roleID)) {
+            return false;
+        }
+        if($roleID < 1) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if($canDo == true) {
+            $canDo = 1;
+        } else {
+            $canDo = 0;
+        }
+        if(! $database->insertData('permissionSet', 'canDo, roleID, permissionID', '' . $canDo . ', ' . $roleID . ', ' . $this->id)) {
+            return false;
+        }
         return true;
     }
 }

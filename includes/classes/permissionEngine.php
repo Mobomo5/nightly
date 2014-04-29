@@ -54,7 +54,17 @@ class permissionEngine {
         }
         return $permission->canDo();
     }
-    public function addPermission(permission $inPermission) {
-
+    public function addPermission($inName, $inHumanName, $inDescription) {
+        if(preg_match('/\s/', $inName)) {
+            return;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if(! $database->insertData('permission', 'permissionName, humanName, permissionDescription', $database->escapeString(htmlspecialchars($inName) . ', ' . ', ' . $database->escapeString(htmlspecialchars($inHumanName)) . ', ' . $database->escapeString(htmlspecialchars($inDescription))))) {
+            return false;
+        }
+        return true;
     }
 }
