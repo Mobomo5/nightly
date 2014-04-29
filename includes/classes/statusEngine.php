@@ -85,8 +85,7 @@ class statusEngine {
      */
 
     public function retrieveStatusByUser($inUserID){
-        //Create status objects
-        $this->db = database::getInstance();
+        //get statuses by user ID.
         $statusArray = array();
 
         $results = $this->db->getData("*",
@@ -102,8 +101,7 @@ class statusEngine {
     }
 
     public function retrieveStatusByNode($inNodeID){
-        //Create status objects
-        $this->db = database::getInstance();
+        //get statuses based off of NodeID
         $statusArray = array();
 
         $results = $this->db->getData("*",
