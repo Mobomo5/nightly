@@ -7,6 +7,7 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
+require_once(PERMISSION_ENGINE_OBJECT_FILE);
 class permission {
     private $id;
     private $name;
@@ -108,6 +109,11 @@ class permission {
             return false;
         }
         if($roleID < 1) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        $canChangePermissions = $permissionEngine->checkPermission('canChangePermissions');
+        if(! $canChangePermissions) {
             return false;
         }
         $database = database::getInstance();
