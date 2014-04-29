@@ -15,6 +15,8 @@
  * nodeID         INT   revisorID      INT
  *                      isCurrent       INT
  */
+
+//TODO: supporterCount addressed...
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
