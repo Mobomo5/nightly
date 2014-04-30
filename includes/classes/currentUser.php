@@ -4,13 +4,17 @@ require_once(DATABASE_OBJECT_FILE);
 require_once(PASSWORD_FUNCTIONS_FILE);
 require_once(HASHER_OBJECT_FILE);
 require_once(SYSTEM_LOGGER_OBJET_FILE);
+require_once(LINK_OBJECT_FILE);
 
 class currentUser {
     private $isLoggedIn;
     private $userID;
     private $userRole;
+    private $givenIdentifier;
+    private $userName;
     private $firstName;
     private $lastName;
+    private $email;
 
     static function userIsInSession() {
         if (!isset($_SESSION['educaskCurrentUser'])) {
@@ -18,7 +22,6 @@ class currentUser {
         }
         return true;
     }
-
     static function getUserSession() {
         //if the user's object hasn't been created yet, create it
         if (!self::userIsInSession()) {
@@ -27,13 +30,15 @@ class currentUser {
         //return the user object
         return $_SESSION['educaskCurrentUser'];
     }
-
     static function setUserSession(currentUser $object) {
         //verify the variable given is a user object. If it is not, get out of here.
         if (get_class($object) != "currentUser") {
             return;
         }
         $_SESSION['educaskCurrentUser'] = $object;
+    }
+    private static function destroySession() {
+        unset($_SESSION['educaskCurrentUser']);
     }
 
     private function __construct() {
@@ -80,7 +85,10 @@ class currentUser {
             return true;
         }
 
-        if ((!isset($_SESSION['userCanLogIn'])) or ($_SESSION['userCanLogIn'] == false)) {
+        if (!isset($_SESSION['userCanLogIn'])) {
+            return false;
+        }
+        if($_SESSION['userCanLogIn'] == false) {
             return false;
         }
 
@@ -94,9 +102,9 @@ class currentUser {
         $userName = $database->escapeString($userName);
 
 
-        $column = 'userID, roleID, password, firstName, lastName';
+        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, givenIdentifier, email';
         $table = 'user';
-        $where = 'WHERE ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\'))';
+        $where = 'WHERE ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
 
 
         if ($database->isConnected()) {
@@ -147,15 +155,10 @@ class currentUser {
     public function logOut() {
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('userLoggingOut');
-        //reset all variables to default
-        $this->isLoggedIn = false;
-        $this->userID = 0;
-        $this->userRole = GUEST_ROLE_ID;
-        $this->firstName = 'Anonymous';
-        $this->lastName = 'Guest';
 
-        //Save the user object
-        self::setUserSession($this);
+        //Destroy the current user session and create a new user object.
+        self::destroySession();
+        self::setUserSession(new currentUser());
         $hookEngine->runAction('userLoggedOut');
         header('Location: ' . new link(''));
     }
