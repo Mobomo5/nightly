@@ -21,6 +21,9 @@ class validator {
         if(! $this->subValidator) {
             return false;
         }
+        if(! is_object($this->subValidator)) {
+            return false;
+        }
         if(! in_array('subValidator', class_implements($this->subValidator))) {
             return false;
         }
