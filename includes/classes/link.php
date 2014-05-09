@@ -32,10 +32,10 @@ class link {
             return $this->href;
         }
         if (! $this->cleanURLEnabled) {
-            return EDUCASK_WEB_ROOT . '?p=' .$this->href;
+            return EDUCASK_WEB_ROOT . '/?p=' .$this->href;
         }
 
-        return EDUCASK_WEB_ROOT . $this->href;
+        return EDUCASK_WEB_ROOT . '/' . $this->href;
     }
 
     public function __toString()

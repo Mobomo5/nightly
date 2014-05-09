@@ -18,12 +18,21 @@ class bootstrap {
         return self::$instance;
     }
     private function __construct() {
+        if(! is_file(EDUCASK_ROOT . '/includes/config.php')) {
+            header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
+            exit();
+        }
+        if(is_file(EDUCASK_WEB_ROOT . '/update.php')) {
+            header('Location: ' . EDUCASK_WEB_ROOT . '/update.php');
+            exit();
+        }
         $this->blocks = null;
         $this->site = null;
     }
     public function init() {
         $this->declareConstants();
         $this->doRequires();
+        session_name('educaskSession');
         session_start();
         session_regenerate_id();
         $this->connectDatabase();
@@ -46,7 +55,6 @@ class bootstrap {
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
         define('CURRENT_USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/currentUser.php');
-        define('HONEYPOT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/honeypot.php');
         define('NOTICE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/notice.php');
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
@@ -78,8 +86,15 @@ class bootstrap {
         }
     }
     private function initializePlugins() {
-        foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*.php') as $plugin) {
-            require_once($plugin);
+        foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*/*.inc.php') as $toInclude) {
+            require_once($toInclude);
+            $pluginPath = explode('/', $toInclude);
+            //Get the name of the PHP file (the last element in the path array).
+            $plugin = end($pluginPath);
+            //Remove the .inc.php to get the class name.
+            $plugin = str_replace('.inc.php', '', $plugin);
+            //Initialize the plugin.
+            $plugin::init();
         }
     }
     private function getVariables() {
@@ -90,8 +105,8 @@ class bootstrap {
         $nodeEngine = nodeEngine::getInstance();
         $user = currentUser::getUserSession();
         $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), get_class($node), $user->getRoleID());
-//        /database::getInstance()->bootstrapDisconnect();
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
+        database::getInstance()->bootstrapDisconnect();
     }
     private function render() {
         Twig_Autoloader::register();
