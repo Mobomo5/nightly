@@ -38,6 +38,7 @@ class bootstrap {
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
+        //@TODO: Add Cron Stuff
         $this->render();
     }
     private function declareConstants() {
@@ -96,6 +97,8 @@ class bootstrap {
             //Initialize the plugin.
             $plugin::init();
         }
+        $hookEngine = hookEngine::getInstance();
+        $hookEngine->runAction('defineConstants');
     }
     private function getVariables() {
         $this->site = site::getInstance();
@@ -108,6 +111,7 @@ class bootstrap {
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
         database::getInstance()->bootstrapDisconnect();
     }
+    //@TODO: Add Cron Stuff
     private function render() {
         Twig_Autoloader::register();
         $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();

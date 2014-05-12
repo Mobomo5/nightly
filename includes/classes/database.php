@@ -41,7 +41,6 @@ class database implements databaseInterface {
         $this->db = $db;
         $this->dbServer = $dbServer;
         $this->dbType = $dbType;
-        $this->dbType = $dbType;
         // Dynamically create the new database object, if possible.
         if (!include_once(EDUCASK_ROOT . "/includes/databases/" . $this->dbType . ".php")) { //used include because I don't want a fatal error.
             new notice('error', 'There appears to be no ' . $this->dbType . ' database available. Please check the config.php file.');
