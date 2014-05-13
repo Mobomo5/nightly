@@ -21,12 +21,18 @@ require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
 
 class menuItem {
-    //Constructor Start -- Get database and permissions engine.
-    private $db;
-    private $permissionObject;
 
-    private function __construct() {
-        $this->permissionObject = permissionEngine::getInstance();
-        $this->db = database::getInstance();
+    private $id;
+    private $menuID;
+    private $linkText;
+    private $href;
+    private $weight;
+    private $hasChildren;
+    private $enabled;
+    private $parent;
+    private $children;
+
+    private function __construct($id,$menuID,$linkText,$href,$weight,$hasChildren,$enabled,$parent,$children) {
+
     }
 }

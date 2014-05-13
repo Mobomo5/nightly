@@ -37,10 +37,10 @@ class menuItem {
         //setup the menu by the menuID
         $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
 
-        $this->menuID = $results['menuID'];
-        $this->menuName = $results['menuName'];
-        $this->themeRegion = $results['themeRegion'];
-        $this->enabled = $results['enabled'];
+        $this->menuID = $results[0]['menuID'];
+        $this->menuName = $results[0]['menuName'];
+        $this->themeRegion = $results[0]['themeRegion'];
+        $this->enabled = $results[0]['enabled'];
     }
 
     public function setMenuByName($inMenuName){
