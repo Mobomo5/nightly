@@ -20,6 +20,6 @@ class menuEngine {
 
     //Constructor Start
     private function __construct() {
-        
+
     }
 }
