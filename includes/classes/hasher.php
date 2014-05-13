@@ -8,11 +8,11 @@
 require_once(EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
 class hasher {
     public function generateHash($thingToHash) {
-        $thingToHash = md5(urlencode($thingToHash));
+        $thingToHash = sha1(sha1(md5($thingToHash)) . md5(urlencode($thingToHash)));
         return password_hash($thingToHash, PASSWORD_BCRYPT);
     }
     public function verifyHash($nonHashed, $hashed) {
-        $nonHashed = md5(urlencode($nonHashed));
+        $nonHashed = sha1(sha1(md5($nonHashed)) . md5(urlencode($nonHashed)));
         if(! password_verify($nonHashed, $hashed)) {
             return false;
         }
