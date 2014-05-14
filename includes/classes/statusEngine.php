@@ -50,6 +50,7 @@ class statusEngine {
         $db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "$escapedStatus, $timestamp, $statusID, 1");
     }
 
+    //Get statuses from Database and create an array of status objects
     public function retrieveStatusFromDatabaseByUser($inUserID){
         //Create status objects
         $db = database::getInstance();
@@ -67,12 +68,12 @@ class statusEngine {
         return $statusArray;
     }
 
+    //Get statuses from Database and create an array of status objects
     public function retrieveStatusFromDatabaseByNode($inNodeID){
         //Create status objects
         $db = database::getInstance();
         $statusArray = array();
 
-        //TODO: Make Query for getting all the information to create the status object from status and statusRevision DB
         $results = $db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "'nodeID' = $inNodeID");
@@ -82,5 +83,18 @@ class statusEngine {
         }
 
         return $statusArray;
+    }
+
+    //Editing status's
+    public function editStatusInDatabaseByID($inStatusID, $inUpdatedStatus){
+        $db = database::getInstance();
+
+        $results = $db->getData("*",
+            "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
+            "'statusID' = $inStatusID");
+
+        //update statusRevision table
+        $db->updateTable("statusRevision", "isCurrent = 0", "statusID = $inStatusID");
+
     }
 }
