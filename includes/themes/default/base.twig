@@ -53,6 +53,12 @@
 </head>
 <body>
 {% block body %}
+    {{ dump(blocks) }}
+    {% if blocks|keys[0] == "home" %}
+        {% include "homepage.twig" %}
+    {% else %}
+        {% include "index.twig" %}
+    {% endif %}
 {% endblock %}
 </body>
 </html>

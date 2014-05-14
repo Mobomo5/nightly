@@ -42,7 +42,7 @@ class currentUser extends user{
         unset($_SESSION['educaskCurrentUser']);
     }
 
-    private function __construct() {
+    public function __construct() {
         //Start a guest session
         $this->isLoggedIn = false;
         $this->userID = null;

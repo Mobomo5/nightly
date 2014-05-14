@@ -44,6 +44,7 @@ class blockEngine {
             }
             $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
         }
+
         return $blocks;
     }
     public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
@@ -70,9 +71,10 @@ class blockEngine {
     public function blockVisible($blockID, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
-        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'*\') OR (referenceType = \'roleID\' AND referenceID = \'*\'))');
+
+        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\') OR (referenceType = \'roleID\'))');
         //Default block is visible unless specified
-        if ($results == null) {
+        if ($results == false) {
             $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
             if ($results != null) {
                 return false;
@@ -85,7 +87,7 @@ class blockEngine {
         }
         //Block is only visible on specified pages
         if ($results[0]['visible'] == 0) {
-            $results = $database->getData('*', 'blockVisibility', 'WHERE blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 1');
+            $results = $database->getData('*', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 1');
             if ($results == false) {
                 return false;
             }

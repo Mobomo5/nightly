@@ -1,0 +1,17 @@
+{% block body %}
+    <div id="homepage-background">
+        {% for item in homepagemenu %}
+            <a href="{{ item.href }}">
+                <span class="box" id="box-{{ loop.index }}">
+                    <h2>{{ item.title|title }}</h2>
+                </span>
+            </a>
+        {% endfor %}
+        <div id="homepage-footer">
+            <div id="homepage-logo">
+                {% block logo %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
