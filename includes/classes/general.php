@@ -24,12 +24,15 @@ class general {
         if(! in_array('generalFunction', class_implements($this->function))) {
             return false;
         }
+        if(empty($inOptions)) {
+            return $this->function->run();
+        }
         if($this->function->hasOptions()) {
             return $this->function->run($inOptions);
         }
         return $this->function->run();
     }
-    public function validatorExists() {
+    public function functionExists() {
         if(! $this->function) {
             return false;
         }

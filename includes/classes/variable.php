@@ -32,59 +32,23 @@ class variable {
 
     public function setName($inName) {
         if($this->readOnly) {
-            return false;
+            return;
         }
-        $database = databaseInterface::getInstance();
-        $database->connect();
-        if(!$database->isConnected()) {
-            return false;
-        }
-        $name = $database->escapeString($inName);
-        if(!$database->updateTable('variable', 'variableName = \'' . $name . '\'', 'variableName = \'' . $this->name . '\'')) {
-            return false;
-        }
-        $this->name = $name;
+        $this->name = $inName;
     }
 
     public function setValue($inValue) {
         if($this->readOnly) {
-            return false;
+            return;
         }
-        $database = databaseInterface::getInstance();
-        $database->connect();
-        if(!$database->isConnected()) {
-            return false;
-        }
-        $value = $database->escapeString($inValue);
-        if(!$database->updateTable('variable', 'variableValue = \'' . $value . '\'', 'variableName = \'' . $this->name . '\'')) {
-            return false;
-        }
-        $this->value = $value;
-
-        return true;
+        $this->value = $inValue;
     }
 
     public function setReadOnly($inReadOnly = true) {
-        $database = databaseInterface::getInstance();
-        $database->connect();
-        if(!$database->isConnected()) {
-            return false;
+        if(! is_bool($inReadOnly)) {
+            return;
         }
-        if($inReadOnly == true) {
-            if(!$database->updateTable('variable', 'readOnly = \'1\'', 'variableName = \'' . $this->name . '\'')) {
-                return false;
-            }
-            $this->readOnly = true;
-            return true;
-        }
-        if($inReadOnly == false) {
-            if(!$database->updateTable('variable', 'readOnly = \'0\'', 'variableName = \'' . $this->name . '\'')) {
-                return false;
-            }
-            $this->readOnly = false;
-            return true;
-        }
-        return false;
+        $this->readOnly = $inReadOnly;
     }
 
     public function __toString() {
@@ -92,15 +56,6 @@ class variable {
     }
 
     public function save() {
-        if(!$this->setName($this->name)) {
-            return false;
-        }
-        if(!$this->setValue($this->value)) {
-            return false;
-        }
-        if(!$this->setReadOnly($this->readOnly)) {
-            return false;
-        }
-        return true;
+        return variableEngine::getInstance()->saveVariable($this);
     }
 }

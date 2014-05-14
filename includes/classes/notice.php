@@ -29,4 +29,10 @@ class notice {
     public function removeOnceDisplayed() {
         return $this->removeOnceDisplayed;
     }
+    public function __toString() {
+        $noticeHTML = '<div class=" . $this->style . ">';
+            $noticeHTML .= "<p>{$this->message}</p>";
+        $noticeHTML .= '</div>';
+        return $noticeHTML;
+    }
 }

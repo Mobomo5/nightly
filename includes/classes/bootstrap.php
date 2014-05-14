@@ -18,15 +18,27 @@ class bootstrap {
         return self::$instance;
     }
     private function __construct() {
+        if(! is_file(EDUCASK_ROOT . '/includes/config.php')) {
+            header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
+            exit();
+        }
+        if(is_file(EDUCASK_WEB_ROOT . '/update.php')) {
+            header('Location: ' . EDUCASK_WEB_ROOT . '/update.php');
+            exit();
+        }
         $this->blocks = null;
         $this->site = null;
     }
     public function init() {
         $this->declareConstants();
         $this->doRequires();
+        session_name('educaskSession');
+        session_start();
+        session_regenerate_id();
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
+        //@TODO: Add Cron Stuff
         $this->render();
     }
     private function declareConstants() {
@@ -44,17 +56,24 @@ class bootstrap {
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
         define('CURRENT_USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/currentUser.php');
-        define('HONEYPOT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/honeypot.php');
         define('NOTICE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/notice.php');
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
         define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
+        define('NODE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/node.php');
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
+        define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
+        define('BLOCK_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/block.php');
+        define('STATUS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/status.php');
+        define('STATUS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/statusEngine.php');
+        define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
+        define('PERMISSION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permissionEngine.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
         require_once(VARIABLE_OBJECT_FILE);
+        require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
@@ -68,24 +87,35 @@ class bootstrap {
         }
     }
     private function initializePlugins() {
-        foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*.php') as $plugin) {
-            require_once($plugin);
+        foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*/*.inc.php') as $toInclude) {
+            require_once($toInclude);
+            $pluginPath = explode('/', $toInclude);
+            //Get the name of the PHP file (the last element in the path array).
+            $plugin = end($pluginPath);
+            //Remove the .inc.php to get the class name.
+            $plugin = str_replace('.inc.php', '', $plugin);
+            //Initialize the plugin.
+            $plugin::init();
         }
+        $hookEngine = hookEngine::getInstance();
+        $hookEngine->runAction('defineConstants');
     }
     private function getVariables() {
         $this->site = site::getInstance();
+        define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
+        date_default_timezone_set($this->site->getTimeZone());
         $blockEngine = blockEngine::getInstance();
         $nodeEngine = nodeEngine::getInstance();
         $user = currentUser::getUserSession();
-        define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
-        date_default_timezone_set($this->site->getTimeZone());
         $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $this->site->getCurrentPage(), $node, $user->getRoleID());
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
         database::getInstance()->bootstrapDisconnect();
     }
+    //@TODO: Add Cron Stuff
     private function render() {
         Twig_Autoloader::register();
         $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();
+        str_replace('..', '', $theme);
         if(! is_dir($theme)) {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }

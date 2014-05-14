@@ -26,32 +26,16 @@ class status {
         $this->voterArray = array();
     }
 
-
-    public function getStatusID() {
-        return $this->statusID;
-    }
-
-    public function getStatus(){
-        return $this->statusMsg;
-    }
-
-    public function getUpvotes(){
-        return $this->votes;
-    }
-
-    public function getNodeID(){
-        return $this->nodeID;
-    }
-
     public function addChildStatusTo(status $inChildStatus){
         $this->childStatus[] += $inChildStatus;
     }
 
-    public function removeChildStatusTo(status $inChildStatus){
+    public function removeChildStatusFrom(status $inChildStatus){
         //Look for the child status in the array and remove it.
         foreach($this->childStatus as $child){
             if($child->getStatusID() == $inChildStatus->getStatusID()){
-                $this->childStatus[] = null;
+                $child = null;
+                unset($child);
             }
         }
     }
@@ -60,7 +44,7 @@ class status {
      * on this status. If he has, do nothing, and if he has not, then
      * allow the vote and add his ID to the array of voters
      */
-    public function upvote($inUserID){
+    public function upVote($inUserID){
         $alreadyVoted = false;
         foreach($this->voterArray as $user){
             if($user == $inUserID){
@@ -74,7 +58,7 @@ class status {
         }
     }
 
-    public function downvote($inUserID){
+    public function downVote($inUserID){
         $alreadyVoted = false;
         foreach($this->voterArray as $user){
             if($user == $inUserID){
@@ -88,8 +72,22 @@ class status {
         }
     }
 
-    public function editStatus($inString){
-        //TODO: Check for permission before allowing
-        $this->statusMsg = $inString;
+    /*
+     * Getters, no setters due to object not being allowed to be edited
+     */
+    public function getStatusID() {
+        return $this->statusID;
+    }
+
+    public function getStatus(){
+        return $this->statusMsg;
+    }
+
+    public function getUpVotes(){
+        return $this->votes;
+    }
+
+    public function getNodeID(){
+        return $this->nodeID;
     }
 }

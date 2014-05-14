@@ -19,51 +19,72 @@ class hookEngine {
     private function __construct() {
         $this->actionEvents = array();
         $this->filterEvents = array();
+        $this->failed = array();
+    }
+    public function addAction($inEventName, $plugin){
+        if (!is_object($plugin)) {
+            return false;
+        }
+        if(! in_array('plugin', class_implements($plugin))) {
+            return false;
+        }
+        $this->actionEvents[$inEventName][] = $plugin;
     }
     public function runAction($inEventName) {
         if(! isset($this->actionEvents[$inEventName])) {
             return;
         }
-        foreach ($this->actionEvents[$inEventName] as $function) {
-            if (!function_exists($function)) {
-                //@ToDo: add notification that event didn't work
-                continue;
-            }
-            call_user_func($function);
+        foreach ($this->actionEvents[$inEventName] as $plugin) {
+            $plugin::run();
         }
     }
-    public function addAction($inEventName, $inFunctionName){
-        $this->actionEvents[$inEventName][] = $inFunctionName;
+    public function  addFilter($inEventName, $plugin) {
+        if (!is_object($plugin)) {
+            return false;
+        }
+        if(! in_array('plugin', class_implements($plugin))) {
+            return false;
+        }
+        $this->filterEvents[$inEventName][] = $plugin;
     }
     public function runFilter($inEventName, $inContent) {
         if(! isset($this->filterEvents[$inEventName])) {
-            return false;
+            return;
         }
-        $content = '';
-        foreach ($this->actionEvents[$inEventName] as $function) {
-            if (!function_exists($function)) {
-                //@ToDo: add notification that event didn't work
-                continue;
-            }
-            $content = call_user_func($function, $inContent);
+        $content = array();
+        foreach ($this->filterEvents[$inEventName] as $plugin) {
+            $content[] = $plugin::run($inContent);
         }
         return $content;
     }
     public function runAddToFilter($inEventName, $inContent) {
         if(! isset($this->filterEvents[$inEventName])) {
-            return false;
+            return;
         }
         $content = '';
-        foreach ($this->actionEvents[$inEventName] as $function) {
-            if (!function_exists($function)) {
-                //@ToDo: add notification that event didn't work
-                continue;
-            }
-            $content .= call_user_func($function, $inContent);
+        foreach ($this->filterEvents[$inEventName] as $plugin) {
+            $content .= $plugin::run($inContent);
         }
         return $content;
     }
-    public function  addFilter($inEventName, $inFunctionName) {
-        $this->filterEvents[$inEventName][] = $inFunctionName;
+    private function pluginSort(array $plugins) {
+        //I know this is bad, but it's the best way to do it so far without letting the plugins decide their priority.
+        //Sort the array. The function is the comparison.
+        if(! uasort($plugins, function ($a, $b) {
+            //If the two plugins priority is the same, return 0;
+            if($a::getPriority() == $b::getPriority()) {
+                return 0;
+            }
+            //If the first plugin has a lesser priority, return -1
+            if($a::getPriority() < $b::getPriority()) {
+                return -1;
+            }
+            //The first plugin has a larger priority.
+            return 1;
+        })) {
+            //If the sorting failed, return false;
+            return false;
+        }
+        return $plugins;
     }
 }

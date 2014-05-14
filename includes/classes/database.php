@@ -12,7 +12,6 @@ require_once(NOTICE_OBJECT_FILE);
  * To change this template use File | Settings | File Templates.
  */
 class database implements databaseInterface {
-
     /**
      * @var
      */
@@ -31,23 +30,17 @@ class database implements databaseInterface {
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new database();
-
         }
-
         return self::$instance;
     }
 
-
     private function __construct() {
-
         require_once(EDUCASK_ROOT . '/includes/config.php');
         $this->dbUsername = $dbUserName;
         $this->dbPassword = $dbPassword;
-        $this->db = 'educaskOld';
+        $this->db = $db;
         $this->dbServer = $dbServer;
         $this->dbType = $dbType;
-        $this->dbType = $dbType;
-
         // Dynamically create the new database object, if possible.
         if (!include_once(EDUCASK_ROOT . "/includes/databases/" . $this->dbType . ".php")) { //used include because I don't want a fatal error.
             new notice('error', 'There appears to be no ' . $this->dbType . ' database available. Please check the config.php file.');
@@ -61,14 +54,12 @@ class database implements databaseInterface {
         //Me not like clones! Me smash clones!
     }
 
-
     /**
      * Will be called when the code no longer needs the class.
      */
     public function __destruct() {
         $this->disconnect();
     }
-
 
     /**
      * returns true when connection is available, false otherwise
@@ -79,6 +70,10 @@ class database implements databaseInterface {
             return false;
         }
         return $this->dbObject->isConnected();
+    }
+
+    public function bootstrapDisconnect() {
+        $this->dbObject->disconnect();
     }
 
     /**
@@ -97,9 +92,7 @@ class database implements databaseInterface {
      * @param int $where
      * @return bool
      */
-    public function getData($select, $from, $where = 1)
-    {
-
+    public function getData($select, $from, $where = 1) {
         if (empty($select) OR empty($from) OR empty($where)) {
             return false;
         }
@@ -108,7 +101,6 @@ class database implements databaseInterface {
             new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
         }
-
         return $result;
     }
 
@@ -119,13 +111,11 @@ class database implements databaseInterface {
      * @return bool
      */
     public function makeCustomQuery($inQuery) {
-
         $result = $this->dbObject->query($inQuery);
         if (!$result) {
             new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
         }
-
         return $result;
     }
 
@@ -137,9 +127,7 @@ class database implements databaseInterface {
      * @param $values
      * @return bool
      */
-    public function insertData($into, $columns, $values)
-    {
-
+    public function insertData($into, $columns, $values) {
         if (empty($into) OR empty($columns) OR empty($values)) {
             return false;
         }
@@ -148,7 +136,6 @@ class database implements databaseInterface {
             new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
         }
-
         return $result;
     }
 
@@ -160,13 +147,10 @@ class database implements databaseInterface {
      * @param $values
      * @return bool
      */
-    public function updateTable($table, $set, $values)
-    {
-
+    public function updateTable($table, $set, $values) {
         if (empty($table) OR empty($set) OR empty($values)) {
             return false;
         }
-
         $result = $this->dbObject->updateTable($table, $set, $values);
         if (!$result) {
             noticeEngine::getInstance()->addNotice(notice("error", "There was an error in the statement")); //@todo: better error messages
@@ -200,8 +184,7 @@ class database implements databaseInterface {
      * @param $inString
      * @return bool
      */
-    function escapeString($inString)
-    {
+    function escapeString($inString) {
         if (empty($inString)) {
             return false;
         }
@@ -216,8 +199,7 @@ class database implements databaseInterface {
      * @param $where
      * @return bool
      */
-    function removeData($from, $where)
-    {
+    function removeData($from, $where) {
         if (empty($from) OR empty($where)) {
             return false;
         }
