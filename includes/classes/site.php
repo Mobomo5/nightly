@@ -19,6 +19,8 @@ class site {
     private $guestRoleID;
     private $cleanURLs;
     private $timeZone;
+    //@TODO: Add Cron Stuff
+    //@TODO: Add logo and favicon.
 
     public static function getInstance() {
         if (!isset($_SESSION['educaskSite'])) {
@@ -46,6 +48,7 @@ class site {
         $variablesWanted[] = 'guestRoleID';
         $variablesWanted[] = 'cleanURLsEnabled';
         $variablesWanted[] = 'siteTimeZone';
+        //@TODO: Add Cron Stuff
         $variables = $variableEngine->getVariables($variablesWanted);
         $this->title = $variables['siteTitle'];
         $this->email = $variables['siteEmail'];
@@ -57,6 +60,7 @@ class site {
         $this->guestRoleID = $variables['guestRoleID'];
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
+        //@TODO: Add Cron Stuff
     }
     public function getTitle() {
         return $this->title;
@@ -192,9 +196,5 @@ class site {
         }
         self::setInstance($this);
     }
-
-    public function getCurrentPage() {
-        //@todo: this thing.
-        return;
-    }
+    //@TODO: Add Cron Stuff
 }

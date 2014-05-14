@@ -6,7 +6,7 @@ require_once(HASHER_OBJECT_FILE);
 require_once(SYSTEM_LOGGER_OBJET_FILE);
 require_once(LINK_OBJECT_FILE);
 
-class currentUser {
+class currentUser extends user{
     private $isLoggedIn;
     private $userID;
     private $userRole;
@@ -38,6 +38,7 @@ class currentUser {
         $_SESSION['educaskCurrentUser'] = $object;
     }
     private static function destroySession() {
+        $_SESSION['educaskCurrentUser'] = new user();
         unset($_SESSION['educaskCurrentUser']);
     }
 

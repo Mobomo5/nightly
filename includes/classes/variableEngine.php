@@ -26,7 +26,7 @@ class variableEngine {
         if (!$database->isConnected()) {
             return null;
         }
-        $variableName = $database->escapeString($variableName);
+        $variableName = $database->escapeString(htmlspecialchars($variableName));
         $variableValue = $database->getData('variableValue, readOnly', 'variable', 'WHERE variableName=\'' . $variableName . '\'');
         if ($variableValue == false) {
             return null;
@@ -45,6 +45,10 @@ class variableEngine {
         if (count($variables) == 0) {
             return null;
         }
+        $database = database::getInstance();
+        if (!$database->isConnected()) {
+            return null;
+        }
         $where = '';
         foreach ($variables as $variable) {
             if ($variable == null) {
@@ -53,16 +57,13 @@ class variableEngine {
             if ($variable == '') {
                 continue;
             }
+            $variable = $database->escapeString(htmlspecialchars($variable));
             if ($where == '') {
                 $where .= 'variableName = \'' . $variable . '\'';
             }
             $where .= ' OR variableName = \'' . $variable . '\'';
         }
         if ($where == '') {
-            return null;
-        }
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
             return null;
         }
         $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
@@ -83,5 +84,44 @@ class variableEngine {
             $toReturn[$variableName] = $variable;
         }
         return $toReturn;
+    }
+    public function saveVariable(variable $variableToSave) {
+        $database = database::getInstance();
+        $variableName = $database->escapeString(htmlspecialchars($variableToSave->getName()));
+        $variableValue = $database->escapeString(htmlspecialchars($variableToSave->getValue()));
+        $isReadOnly = $database->escapeString(htmlspecialchars($variableToSave->isReadOnly()));
+        if($isReadOnly == true) {
+            $isReadOnly = 1;
+        } else {
+            $isReadOnly = 0;
+        }
+        if(! $database->updateTable('variable', 'variableName, variableValue, readOnly', "{$variableName}, {$variableValue}, {$isReadOnly}")) {
+            return false;
+        }
+        return true;
+    }
+    public function addVariable(variable $variableToAdd) {
+        $database = database::getInstance();
+        $variableName = $database->escapeString(htmlspecialchars($variableToAdd->getName()));
+        $variableValue = $database->escapeString(htmlspecialchars($variableToAdd->getValue()));
+        $isReadOnly = $variableToAdd->isReadOnly();
+        if($isReadOnly == true) {
+            $isReadOnly = 1;
+        } else {
+            $isReadOnly = 0;
+        }
+        if(! $database->insertData('variable', 'variableName, variableValue, readOnly', "{$variableName}, {$variableValue}, {$isReadOnly}")) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteVariable(variable $variableToDelete) {
+        if(! $variableToDelete->isReadOnly()) {
+            return false;
+        }
+        $database = database::getInstance();
+        $variableName = $database->escapeString(htmlspecialchars($variableToDelete->getName()));
+        $variableValue = $database->escapeString(htmlspecialchars($variableToDelete->getValue()));
+        $database->removeData('variable', "variableName = {$variableName} AND variableValue = {$variableValue}");
     }
 }

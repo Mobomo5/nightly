@@ -32,7 +32,7 @@ class general {
         }
         return $this->function->run();
     }
-    public function validatorExists() {
+    public function functionExists() {
         if(! $this->function) {
             return false;
         }
