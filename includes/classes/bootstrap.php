@@ -56,6 +56,7 @@ class bootstrap {
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
         define('CURRENT_USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/currentUser.php');
+        define('USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/user.php');
         define('NOTICE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/notice.php');
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
@@ -76,6 +77,7 @@ class bootstrap {
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
+        require_once(USER_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
         require_once(NODE_ENGINE_OBJECT_FILE);
     }
@@ -102,7 +104,7 @@ class bootstrap {
     }
     private function getVariables() {
         $this->site = site::getInstance();
-        define('GUEST_ROLE_ID', $this->site->getGuestRoleID());
+        define('GUEST_ROLE_ID',(int) $this->site->getGuestRoleID()->getValue());
         date_default_timezone_set($this->site->getTimeZone());
         $blockEngine = blockEngine::getInstance();
         $nodeEngine = nodeEngine::getInstance();

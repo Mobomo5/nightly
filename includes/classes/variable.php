@@ -5,8 +5,6 @@
  * Date: 17/12/13
  * Time: 8:12 PM
  */
-require_once(DATABASE_OBJECT_FILE);
-
 class variable {
     private $name;
     private $value;
@@ -32,6 +30,9 @@ class variable {
 
     public function setName($inName) {
         if($this->readOnly) {
+            return;
+        }
+        if(preg_match('/\s/', $inName)) {
             return;
         }
         $this->name = $inName;
