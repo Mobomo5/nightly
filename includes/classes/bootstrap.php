@@ -69,6 +69,9 @@ class bootstrap {
         define('STATUS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/statusEngine.php');
         define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
         define('PERMISSION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permissionEngine.php');
+        define('MENU_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menu.php');
+        define('MENU_ITEM_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuItem.php');
+        define('MENU_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');

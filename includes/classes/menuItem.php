@@ -35,15 +35,15 @@ class menuItem {
     private function __construct($inID, $inMenuID, $inLinkText, $inHref, $inWeight,
                                  $inHasChildren, $inEnabled, $inParent, $inChildren) {
 
-        if(!is_numeric((int) $inID)) return false;
-        if(!is_numeric((int) $inMenuID)) return false;
-        if(!is_string($inLinkText)) return false;
-        if(!is_string($inHref)) return false;
-        if(!is_numeric((int) $inWeight)) return false;
-        if(!is_numeric((int) $inHasChildren)) return false;
-        if(!is_numeric((int) $inEnabled)) return false;
-        if(!is_numeric((int) $inParent)) return false;
-        if(!is_numeric((int) $inChildren)) return false;
+        if(!is_numeric((int) $inID)) return;
+        if(!is_numeric((int) $inMenuID)) return;
+        if(!is_string($inLinkText)) return;
+        if(!is_string($inHref)) return;
+        if(!is_numeric((int) $inWeight)) return;
+        if(!is_numeric((int) $inHasChildren)) return;
+        if(!is_numeric((int) $inEnabled)) return;
+        if(!is_numeric((int) $inParent)) return;
+        if(!is_numeric((int) $inChildren)) return;
 
         $this->id = (int) $inID;
         $this->menuID =  (int) $inMenuID;
@@ -54,8 +54,6 @@ class menuItem {
         $this->enabled = (int) $inEnabled;
         $this->parent = (int) $inParent;
         $this->children += (int) $inChildren;
-
-        return true;
     }
 
     public function getID(){
