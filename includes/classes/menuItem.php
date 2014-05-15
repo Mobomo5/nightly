@@ -147,8 +147,10 @@ class menuItem {
     public function removeChild($inChild){
         foreach($this->children as $child){
             if($child == $inChild){
-                $this->children -= $child;
-                return;
+                $i = array_search($child,$this->children);
+                if($i!==false){
+                    unset($$this->children[$i]);
+                }
             }
         }
     }
