@@ -137,6 +137,7 @@ class mail {
 
         return $sent;
     }
-
-
+    public function doReplacement($emailForReplacement) {
+        
+    }
 }

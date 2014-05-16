@@ -144,14 +144,14 @@ class database implements databaseInterface {
      *
      * @param $table
      * @param $set
-     * @param $values
+     * @param $where
      * @return bool
      */
-    public function updateTable($table, $set, $values) {
-        if (empty($table) OR empty($set) OR empty($values)) {
+    public function updateTable($table, $set, $where) {
+        if (empty($table) OR empty($set) OR empty($where)) {
             return false;
         }
-        $result = $this->dbObject->updateTable($table, $set, $values);
+        $result = $this->dbObject->updateTable($table, $set, $where);
         if (!$result) {
             noticeEngine::getInstance()->addNotice(notice("error", "There was an error in the statement")); //@todo: better error messages
             return false; //@todo: link to last page.

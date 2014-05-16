@@ -127,7 +127,7 @@ class currentUser extends user{
         $this->setGivenIdentifier($results[0]['givenIdentifier']);
         $this->setUserName($results[0]['userName']);
 
-        $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID = ' . $this->tempID);
+        $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID=' . $this->tempID);
         self::setUserSession($this);
         $logger = logger::getInstance();
         $logger->logIt($this->tempID, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.');

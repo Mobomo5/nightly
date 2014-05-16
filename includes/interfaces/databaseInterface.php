@@ -23,7 +23,7 @@ interface databaseInterface {
 
     function insertData($into, $columns, $values);
 
-    function updateTable($table, $set, $values);
+    function updateTable($table, $set, $where);
 
     function configure($dbServer, $userName, $password, $db);
 

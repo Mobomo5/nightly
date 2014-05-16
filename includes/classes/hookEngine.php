@@ -29,11 +29,13 @@ class hookEngine {
             return false;
         }
         $this->actionEvents[$inEventName][] = $plugin;
+        return true;
     }
     public function runAction($inEventName) {
         if(! isset($this->actionEvents[$inEventName])) {
-            return;
+            return null;
         }
+        $this->pluginSort($this->actionEvents[$inEventName]);
         foreach ($this->actionEvents[$inEventName] as $plugin) {
             $plugin::run();
         }
@@ -46,12 +48,14 @@ class hookEngine {
             return false;
         }
         $this->filterEvents[$inEventName][] = $plugin;
+        return true;
     }
     public function runFilter($inEventName, $inContent) {
         if(! isset($this->filterEvents[$inEventName])) {
-            return;
+            return null;
         }
         $content = array();
+        $this->pluginSort($this->filterEvents[$inEventName]);
         foreach ($this->filterEvents[$inEventName] as $plugin) {
             $content[] = $plugin::run($inContent);
         }
@@ -59,32 +63,45 @@ class hookEngine {
     }
     public function runAddToFilter($inEventName, $inContent) {
         if(! isset($this->filterEvents[$inEventName])) {
-            return;
+            return null;
         }
         $content = '';
+        $this->pluginSort($this->filterEvents[$inEventName]);
         foreach ($this->filterEvents[$inEventName] as $plugin) {
             $content .= $plugin::run($inContent);
         }
         return $content;
     }
     private function pluginSort(array $plugins) {
-        //I know this is bad, but it's the best way to do it so far without letting the plugins decide their priority.
         //Sort the array. The function is the comparison.
-        if(! uasort($plugins, function ($a, $b) {
-            //If the two plugins priority is the same, return 0;
-            if($a::getPriority() == $b::getPriority()) {
-                return 0;
-            }
-            //If the first plugin has a lesser priority, return -1
-            if($a::getPriority() < $b::getPriority()) {
-                return -1;
-            }
-            //The first plugin has a larger priority.
-            return 1;
-        })) {
+        if(! uasort($plugins, 'comparePlugins')) {
             //If the sorting failed, return false;
             return false;
         }
         return $plugins;
+    }
+    public function comparePlugins($a, $b) {
+        if (!is_object($a)) {
+            return false;
+        }
+        if(! in_array('plugin', class_implements($a))) {
+            return false;
+        }
+        if (!is_object($b)) {
+            return false;
+        }
+        if(! in_array('plugin', class_implements($b))) {
+            return false;
+        }
+        //If the two plugins priority is the same, return 0;
+        if($a::getPriority() == $b::getPriority()) {
+            return 0;
+        }
+        //If the first plugin has a lesser priority, return -1
+        if($a::getPriority() < $b::getPriority()) {
+            return -1;
+        }
+        //The first plugin has a larger priority.
+        return 1;
     }
 }

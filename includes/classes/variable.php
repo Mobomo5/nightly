@@ -9,11 +9,13 @@ class variable {
     private $name;
     private $value;
     private $readOnly;
+    private $oldName;
 
     public function __construct($inName, $inValue, $inReadOnly = false) {
         $this->name = $inName;
         $this->value = $inValue;
         $this->readOnly = $inReadOnly;
+        $this->oldName = null;
     }
 
     public function getName() {
@@ -35,7 +37,13 @@ class variable {
         if(preg_match('/\s/', $inName)) {
             return;
         }
+        if($this->oldName == null) {
+            $this->oldName = $this->name;
+        }
         $this->name = $inName;
+    }
+    public function getOldName() {
+        return $this->oldName;
     }
 
     public function setValue($inValue) {
