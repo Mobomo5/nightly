@@ -25,7 +25,8 @@ class menuItem {
     private $enabled;
     private $parent;
     private $children = array();
-    private function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, menuItem $inParent = null, array $inChildren = array()) {
+
+    public function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, menuItem $inParent = null, array $inChildren = array()) {
         if (!is_numeric($inID)) {
             return;
         }
@@ -50,6 +51,7 @@ class menuItem {
         if (!is_bool($inEnabled)) {
             return;
         }
+
         $this->id = $inID;
         $this->menuID = $inMenuID;
         $this->linkText = trim(htmlspecialchars($inLinkText));
