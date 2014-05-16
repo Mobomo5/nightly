@@ -65,6 +65,8 @@ class menuItem {
     }
 
     public function setMenuID($inMenuID){
+        if(!is_numeric($inMenuID)) return;
+
         $this->menuID = $inMenuID;
     }
 
@@ -73,6 +75,8 @@ class menuItem {
     }
 
     public function setLinkText($inLinkText){
+        if(!is_string($inLinkText)) return;
+
         $this->linkText = $inLinkText;
     }
 
@@ -133,6 +137,8 @@ class menuItem {
     }
 
     public function setParent($inParent){
+        if(!is_object($inParent)) return;
+
         $this->parent = $inParent;
     }
 
@@ -140,17 +146,17 @@ class menuItem {
         return $this->children;
     }
 
-    public function addChild($inChild){
-        $this->children += $inChild;
+    public function addChild(menuItem $inChild){
+        $this->children[] += $inChild;
     }
 
-    public function removeChild($inChild){
-        foreach($this->children as $child){
-            if($child == $inChild){
-                $i = array_search($child,$this->children);
-                if($i!==false){
-                    unset($$this->children[$i]);
-                }
+    public function removeChild($inChildID){
+        if(!is_numeric($inChildID)) return;
+
+        for($i = 0; $i < count($this->children); $i++){
+            if($this->children[$i]->getID() == $inChildID )
+            {
+                unset($this->children[$i]);
             }
         }
     }
