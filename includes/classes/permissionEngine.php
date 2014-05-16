@@ -103,7 +103,7 @@ class permissionEngine {
         $inName = $database->escapeString(htmlspecialchars($inPermission->getName()));
         $inHumanName = $database->escapeString(htmlspecialchars($inPermission->getHumanName()));
         $inDescription = $database->escapeString(htmlspecialchars($inPermission->getDescription()));
-        if(! $database->updateTable('permission', 'permissionName, humanName, permissionDescription', $inName . ', ' . $inHumanName . ', ' . $inDescription)) {
+        if(! $database->updateTable('permission', "permissionName='{$inName}', humanName='{$inHumanName}', permissionDescription='{$inDescription}'", "permissionID={$inPermission->getID()}")) {
             return false;
         }
         return true;
@@ -139,7 +139,7 @@ class permissionEngine {
         if($results == null) {
             return $this->insertNewCanDo($roleID, $canDo);
         }
-        if(! $database->updateTable('permissionSet', 'canDo = ' . $canDo, 'permissionID = ' . $this->id . ' AND roleID = ' . $roleID)) {
+        if(! $database->updateTable('permissionSet', 'canDo = ' . $canDo, 'permissionID = ' . $permissionToSet->getID() . ' AND roleID = ' . $roleID)) {
             return false;
         }
         return true;

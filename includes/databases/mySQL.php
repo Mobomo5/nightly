@@ -81,8 +81,8 @@ class mySQL implements databaseInterface {
         }
         return true;
     }
-    function updateTable($table, $set, $values) {
-        $query = 'UPDATE ' . $table . ' SET ' . $set . ' WHERE ' . $values . ';';
+    function updateTable($table, $set, $where) {
+        $query = 'UPDATE ' . $table . ' SET ' . $set . ' WHERE ' . $where . ';';
         $results = $this->mysqli->query($query);
         return $results;
     }

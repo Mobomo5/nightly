@@ -95,7 +95,13 @@ class variableEngine {
         } else {
             $isReadOnly = 0;
         }
-        if(! $database->updateTable('variable', 'variableName, variableValue, readOnly', "'{$variableName}', '{$variableValue}', {$isReadOnly}")) {
+        $originalName = $variableToSave->getOldName();
+        if($originalName != null) {
+            $originalName = $database->escapeString(htmlspecialchars($originalName));
+        } else {
+            $originalName = $variableName;
+        }
+        if(! $database->updateTable('variable', "variableName='{$variableName}', variableValue='{$variableValue}', readOnly={$isReadOnly}", "variableName='{$originalName}'")) {
             return false;
         }
         return true;
