@@ -120,7 +120,7 @@ class bootstrap {
         $user = currentUser::getUserSession();
         $node = $nodeEngine->getNode();
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
-        database::getInstance()->bootstrapDisconnect();
+//        /database::getInstance()->bootstrapDisconnect();
     }
     //@TODO: Add Cron Stuff
     private function render() {
@@ -136,7 +136,10 @@ class bootstrap {
             $name = end($name);
             $loader->addPath($baseTheme, $name);
         }
-        $twig = new Twig_Environment($loader);
-        echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
+        $twig = new Twig_Environment($loader, array(
+            'debug' => true,
+        ));
+        $twig->addExtension(new Twig_Extension_Debug());
+        echo $twig->render('base.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
 }

@@ -32,7 +32,9 @@
         </div>
     {% endblock %}
     <div id="mainContent">
-        {% include blocks.main.0.title ~ '.twig' %}
+        <h2>{{ blocks.main.0.title }}</h2>
+
+        <p>{{ blocks.main.0.content }}</p>
     </div>
 
 {% endblock %}

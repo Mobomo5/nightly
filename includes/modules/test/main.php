@@ -1,20 +1,24 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: craig
- * Date: 4/23/14
- * Time: 2:52 PM
+ * User: Craig
+ * Date: 4/25/14
+ * Time: 11:09 PM
  */
 require_once(NODE_INTERFACE_FILE);
 
-class fourOhFour implements node {
+class test implements node {
 
     public function __construct() {
         // TODO: Implement __construct() method.
     }
 
     public function getTitle() {
-        // TODO: Implement getTitle() method.
+        return "BLA!";
+    }
+
+    public function setTitle($inTitle) {
+        // TODO: Implement setTitle() method.
     }
 
     public function getContent() {
@@ -55,9 +59,5 @@ class fourOhFour implements node {
 
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
-    }
-
-    public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
     }
 }

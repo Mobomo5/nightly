@@ -1,6 +1,6 @@
 {% block body %}
     <div id="homepage-background">
-        {% for item in homepagemenu %}
+        {% for item in blocks.menu %}
             <a href="{{ item.href }}">
                 <span class="box" id="box-{{ loop.index }}">
                     <h2>{{ item.title|title }}</h2>

@@ -28,12 +28,14 @@ class blockEngine {
             return null;
         }
         if($results == null) {
+
             return null;
         }
         $blocks = array();
         foreach ($results as $blockData) {
             if (!$this->blockExists($blockData['blockName'], $blockData['moduleName'])) {
                 continue;
+
             }
             if (!$this->blockVisible($blockData['blockID'], $nodeType, $roleID)) {
                 continue;
@@ -48,6 +50,7 @@ class blockEngine {
         return $blocks;
     }
     public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
+
         $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
         $block = new $blockName($parameters);
         if ($title != null) {
@@ -56,15 +59,18 @@ class blockEngine {
         return $block;
     }
     public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
+
         if (!$this->blockExists($blockName, $moduleName)) {
             return;
         }
         if (!$this->blockVisible($blockID, $nodeType, $roleID)) {
             return;
         }
+
         require_once($this->getPathToBlock($blockName, $moduleName));
     }
     public function blockExists($blockName, $moduleName) {
+
         $block = $this->getPathToBlock($blockName, $moduleName);
         return file_exists($block);
     }
@@ -72,9 +78,11 @@ class blockEngine {
         $database = database::getInstance();
         $database->connect();
 
-        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\') OR (referenceType = \'roleID\'))');
-        //Default block is visible unless specified
+
+        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\'))');
+//Default block is visible unless specified
         if ($results == false) {
+            return false;
             $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
             if ($results != null) {
                 return false;
