@@ -15,13 +15,7 @@
  * enabled INT
  * parent INT
  */
-
-require_once(DATABASE_OBJECT_FILE);
-require_once(CURRENT_USER_OBJECT_FILE);
-require_once(PERMISSION_ENGINE_OBJECT_FILE);
-
 class menuItem {
-
     private $id;
     private $menuID;
     private $linkText;
@@ -31,131 +25,119 @@ class menuItem {
     private $enabled;
     private $parent;
     private $children = array();
-
-    private function __construct($inID, $inMenuID, $inLinkText, $inHref, $inWeight,
-                                 $inHasChildren, $inEnabled, $inParent, $inChildren) {
-
-        if(!is_numeric((int) $inID)) return;
-        if(!is_numeric((int) $inMenuID)) return;
-        if(!is_string($inLinkText)) return;
-        if(!is_string($inHref)) return;
-        if(!is_numeric((int) $inWeight)) return;
-        if(!is_numeric((int) $inHasChildren)) return;
-        if(!is_numeric((int) $inEnabled)) return;
-        if(!is_numeric((int) $inParent)) return;
-        if(!is_numeric((int) $inChildren)) return;
-
-        $this->id = (int) $inID;
-        $this->menuID =  (int) $inMenuID;
-        $this->linkText = $inLinkText;
+    private function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, menuItem $inParent = null, array $inChildren = array()) {
+        if (!is_numeric($inID)) {
+            return;
+        }
+        if($inID < 1) {
+            return;
+        }
+        if (!is_numeric($inMenuID)) {
+            return;
+        }
+        if($inMenuID < 1) {
+            return;
+        }
+        if (!is_string($inLinkText)) {
+            return;
+        }
+        if (!is_numeric($inWeight)) {
+            return;
+        }
+        if (!is_bool($inHasChildren)) {
+            return;
+        }
+        if (!is_bool($inEnabled)) {
+            return;
+        }
+        $this->id = $inID;
+        $this->menuID = $inMenuID;
+        $this->linkText = trim(htmlspecialchars($inLinkText));
         $this->href = $inHref;
-        $this->weight = (int) $inWeight;
-        $this->hasChildren = (int) $inHasChildren;
-        $this->enabled = (int) $inEnabled;
-        $this->parent = (int) $inParent;
-        $this->children += (int) $inChildren;
+        $this->weight = $inWeight;
+        $this->hasChildren = $inHasChildren;
+        $this->enabled = $inEnabled;
+        $this->parent = $inParent;
+        $this->children = $inChildren;
     }
-
-    public function getID(){
+    public function getID() {
         return $this->id;
     }
-
-    public function getMenuID(){
+    public function getMenuID() {
         return $this->menuID;
     }
-
-    public function setMenuID($inMenuID){
-        if(!is_numeric($inMenuID)) return;
-
+    public function setMenuID($inMenuID) {
+        if (!is_numeric($inMenuID)) {
+            return;
+        }
+        if($inMenuID < 1) {
+            return;
+        }
         $this->menuID = $inMenuID;
     }
-
-    public function getLinkText(){
+    public function getLinkText() {
         return $this->linkText;
     }
-
-    public function setLinkText($inLinkText){
-        if(!is_string($inLinkText)) return;
-
-        $this->linkText = $inLinkText;
+    public function setLinkText($inLinkText) {
+        if (!is_string($inLinkText)) {
+            return;
+        }
+        $this->linkText = trim(htmlspecialchars($inLinkText));
     }
-
-    public function getHref(){
+    public function getHref() {
         return $this->href;
     }
-
-    public function setHref($inHref){
-        if(!is_string($inHref)) return;
+    public function setHref(link $inHref) {
         $this->href = $inHref;
     }
-
-    public function getWeight(){
+    public function getWeight() {
         return $this->weight;
     }
-
-    public function setWeight($inWeight){
+    public function setWeight($inWeight) {
+        if(! is_numeric($inWeight)) {
+            return;
+        }
         $this->weight = $inWeight;
     }
-
-    public function hasChildren(){
-        if($this->hasChildren == 0){
-            return false;
-        }
-        return true;
+    public function hasChildren() {
+        return $this->hasChildren;
     }
-
-    public function setHasChildren($inHasChildren){
-        if($inHasChildren == false || $inHasChildren == 0){
-            $this->hasChildren = 0;
-        } else if($inHasChildren == true || $inHasChildren == 1){
-            $this->hasChildren = 1;
-        } else {
+    public function setHasChildren($inHasChildren) {
+        if(! is_bool($inHasChildren)) {
             return;
         }
+        $this->hasChildren = $inHasChildren;
     }
-
-    public function isEnabled(){
-        if($this->enabled == 0){
-            return false;
-        }
-
-        return true;
+    public function isEnabled() {
+        return $this->enabled;
     }
-
-    public function setEnabled($inSetEnabled){
-        if($inSetEnabled == false || $inSetEnabled == 0){
-            $this->enabled = 0;
-        } else if($inSetEnabled == true || $inSetEnabled == 1){
-            $this->enabled = 1;
-        } else {
+    public function setEnabled($inSetEnabled) {
+        if(! is_bool($inSetEnabled)) {
             return;
         }
+        $this->enabled = $inSetEnabled;
     }
-
-    public function getParent(){
+    public function getParent() {
         return $this->parent;
     }
-
-    public function setParent($inParent){
-        if(!is_object($inParent)) return;
-
+    public function setParent(menuItem $inParent) {
         $this->parent = $inParent;
     }
-
-    public function getChildren(){
+    public function getChildren() {
         return $this->children;
     }
-
-    public function addChild(menuItem $inChild){
-        $this->children[] += $inChild;
+    public function addChild(menuItem $inChild) {
+        $this->children[] = $inChild;
     }
-
-    public function removeChild($inChildID){
-        if(!is_numeric($inChildID)) return;
-
-        for($i = 0; $i < count($this->children); $i++){
-            if($this->children[$i]->getID() == $inChildID )
-            {
+    public function removeChild($inChildID) {
+        if (!is_numeric($inChildID)) {
+            return;
+        }
+        if($inChildID < 1) {
+            return;
+        }
+        for ($i = 0; $i < count($this->children); $i++) {
+            if ($this->children[$i]->getID() == $inChildID) {
                 unset($this->children[$i]);
             }
         }
