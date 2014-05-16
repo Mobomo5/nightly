@@ -77,6 +77,10 @@ class nodeEngine {
 
         $moduleEngine = moduleEngine::getInstance();
         $moduleEngine->includeModule($moduleClass);
+        if(! is_object($moduleClass)) {
+            $moduleEngine->includeModule('404');
+            return new fourOhFour();
+        }
         //See the interfaces that the module implements, and make sure it implements node. If not, return 404.
 
         if (!class_exists($moduleClass)) {

@@ -5,16 +5,11 @@ require_once(PASSWORD_FUNCTIONS_FILE);
 require_once(HASHER_OBJECT_FILE);
 require_once(SYSTEM_LOGGER_OBJET_FILE);
 require_once(LINK_OBJECT_FILE);
+require_once(USER_OBJECT_FILE);
 
 class currentUser extends user{
     private $isLoggedIn;
-    private $userID;
-    private $userRole;
-    private $givenIdentifier;
-    private $userName;
-    private $firstName;
-    private $lastName;
-    private $email;
+    private $tempID;
 
     static function userIsInSession() {
         if (!isset($_SESSION['educaskCurrentUser'])) {
@@ -32,49 +27,35 @@ class currentUser extends user{
     }
     static function setUserSession(currentUser $object) {
         //verify the variable given is a user object. If it is not, get out of here.
-        if (get_class($object) != "currentUser") {
+        if (get_class($object) != 'currentUser') {
             return;
         }
         $_SESSION['educaskCurrentUser'] = $object;
     }
     private static function destroySession() {
-        $_SESSION['educaskCurrentUser'] = new user();
         unset($_SESSION['educaskCurrentUser']);
+        $_SESSION['educaskCurrentUser'] = new currentUser();
     }
-
     public function __construct() {
+        if(self::userIsInSession()) {
+            self::getUserSession();
+        }
         //Start a guest session
         $this->isLoggedIn = false;
-        $this->userID = null;
-        $this->userRole = GUEST_ROLE_ID;
-        $this->firstName = 'Anonymous';
-        $this->lastName = 'Guest';
+        $this->tempID = NULL;
+        $this->setRoleID(GUEST_ROLE_ID);
+        $this->setGivenIdentifier(NULL);
+        $this->setUserName(NULL);
+        $this->setFirstName('Anonymous');
+        $this->setLastName('Guest');
+        $this->setEmail('anon@anon.ca');
     }
-
+    public function getUserID() {
+        return $this->tempID;
+    }
     public function isLoggedIn() {
         return $this->isLoggedIn;
     }
-
-    public function getUserRole() {
-        return $this->userRole;
-    }
-
-    public function getRoleID() {
-        return $this->userID;
-    }
-
-    public function getFullName() {
-        return $this->firstName . ' ' . $this->lastName;
-    }
-
-    public function getFirstName() {
-        return $this->firstName;
-    }
-
-    public function getLastName() {
-        return $this->lastName;
-    }
-
     public function logIn($userName, $password) {
         if ($this->isLoggedIn) {
             return true;
@@ -102,11 +83,9 @@ class currentUser extends user{
 
         $userName = $database->escapeString($userName);
 
-
-        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, givenIdentifier, email';
+        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email';
         $table = 'user';
         $where = 'WHERE ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
-
 
         if ($database->isConnected()) {
             $results = $database->getData($column, $table, $where);
@@ -140,27 +119,35 @@ class currentUser extends user{
         unset($hasher);
 
         $this->isLoggedIn = true;
-        $this->userID = $results[0]['userID'];
-        $this->userRole = $results[0]['roleID'];
-        $this->firstName = $results[0]['firstName'];
-        $this->lastName = $results[0]['lastName'];
+        $this->tempID = $results[0]['userID'];
+        $this->setRoleID($results[0]['roleID']);
+        $this->setFirstName($results[0]['firstName']);
+        $this->setLastName($results[0]['lastName']);
+        $this->setEmail($results[0]['email']);
+        $this->setGivenIdentifier($results[0]['givenIdentifier']);
+        $this->setUserName($results[0]['userName']);
 
-        $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID = ' . $this->userID);
+        $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID = ' . $this->tempID);
         self::setUserSession($this);
         $logger = logger::getInstance();
-        $logger->logIt($this->userID, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.');
+        $logger->logIt($this->tempID, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.');
         $hookEngine->runAction('userLoggedIn');
         return true;
     }
-
     public function logOut() {
         $hookEngine = hookEngine::getInstance();
-        $hookEngine->runAction('userLoggingOut');
+        $hookEngine->runAction('userIsLoggingOut');
 
         //Destroy the current user session and create a new user object.
         self::destroySession();
         self::setUserSession(new currentUser());
         $hookEngine->runAction('userLoggedOut');
         header('Location: ' . new link(''));
+    }
+    public function toUser() {
+        if(! $this->isLoggedIn) {
+            return new user(1, GUEST_ROLE_ID, $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail());
+        }
+        return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail());
     }
 }

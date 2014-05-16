@@ -95,7 +95,7 @@ class variableEngine {
         } else {
             $isReadOnly = 0;
         }
-        if(! $database->updateTable('variable', 'variableName, variableValue, readOnly', "{$variableName}, {$variableValue}, {$isReadOnly}")) {
+        if(! $database->updateTable('variable', 'variableName, variableValue, readOnly', "'{$variableName}', '{$variableValue}', {$isReadOnly}")) {
             return false;
         }
         return true;
@@ -110,7 +110,7 @@ class variableEngine {
         } else {
             $isReadOnly = 0;
         }
-        if(! $database->insertData('variable', 'variableName, variableValue, readOnly', "{$variableName}, {$variableValue}, {$isReadOnly}")) {
+        if(! $database->insertData('variable', 'variableName, variableValue, readOnly', "'{$variableName}', '{$variableValue}', {$isReadOnly}")) {
             return false;
         }
         return true;
@@ -122,6 +122,6 @@ class variableEngine {
         $database = database::getInstance();
         $variableName = $database->escapeString(htmlspecialchars($variableToDelete->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToDelete->getValue()));
-        $database->removeData('variable', "variableName = {$variableName} AND variableValue = {$variableValue}");
+        $database->removeData('variable', "variableName = '{$variableName}' AND variableValue = '{$variableValue}'");
     }
 }

@@ -5,7 +5,6 @@
  * Date: 4/25/14
  * Time: 3:47 PM
  */
-require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
 class permission {
@@ -37,34 +36,18 @@ class permission {
     }
     public function setName($inName) {
         if(preg_match('/\s/', $inName)) {
-            return false;
+            return;
         }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $inName = $database->escapeString(htmlspecialchars($inName));
-        if(! $database->updateTable('permission', 'permissionName = \'' . $inName .'\'', 'permissionID = ' . $this->id)) {
-            return false;
-        }
-        return true;
+        $this->name = $inName;
     }
     public function getHumanName() {
         return $this->humanName;
     }
     public function setHumanName($inName) {
         if(preg_match('/\s/', $inName)) {
-            return false;
+            return;
         }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $inName = $database->escapeString(htmlspecialchars($inName));
-        if(! $database->updateTable('permission', 'humanName = \'' . $inName . '\'', 'permissionID = ' . $this->id)) {
-            return false;
-        }
-        return true;
+        $this->humanName = $inName;
     }
     public function getDescription() {
         return $this->description;
@@ -72,95 +55,21 @@ class permission {
     public function setDescription($inDescription) {
         $database = database::getInstance();
         if(! $database->isConnected()) {
-            return false;
+            return;
         }
-        $inDescription = $database->escapeString(htmlspecialchars($inDescription));
-        if(! $database->updateTable('permission', 'permissionDescription = \'' . $inDescription . '\'', 'permissionID = ' . $this->id)) {
-            return false;
-        }
-        return true;
+        $this->description = $inDescription;
     }
     public function canDo() {
         $user = currentUser::getUserSession();
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $results = $database->getData('canDo', 'permissionSet', 'permissionID = ' . $this->id . ' AND roleID = ' . $user->getRoleID());
-        if($results == false) {
-            return false;
-        }
-        if($results == null) {
-            return false;
-        }
-        if(count($results) > 1) {
-            return false;
-        }
-        if($results[0]['canDo'] == 0) {
-            return false;
-        }
-        return true;
+        $permissionEngine = permissionEngine::getInstance();
+        return $permissionEngine->checkPermission($this, $user->getRoleID());
     }
-    public function setCanDo($roleID, $inValue = false) {
+    public function setCanDo($inValue = false) {
         if(! is_bool($inValue)) {
             return false;
         }
-        if(! is_int($roleID)) {
-            return false;
-        }
-        if($roleID < 1) {
-            return false;
-        }
+        $user = currentUser::getUserSession();
         $permissionEngine = permissionEngine::getInstance();
-        $canChangePermissions = $permissionEngine->checkPermission('canChangePermissions');
-        if(! $canChangePermissions) {
-            return false;
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        if($inValue == true) {
-            $canDo = 1;
-        } else {
-            $canDo = 0;
-        }
-        //Make sure that an entry exist for this permission and the specified role.
-        $results = $database->getData('canDo', 'permissionSet', 'permissionID = ' . $this->id . ' AND roleID = ' . $roleID);
-        if($results == false) {
-            return false;
-        }
-        if($results == null) {
-            return $this->insertNewCanDo($roleID, $inValue);
-        }
-        if(! $database->updateTable('permissionSet', 'canDo = ' . $canDo, 'permissionID = ' . $this->id . ' AND roleID = ' . $roleID)) {
-            return false;
-        }
-        $this->canDo = $inValue;
-        return true;
-    }
-    private function insertNewCanDo($roleID, $canDo = false) {
-        if(! is_bool($canDo)) {
-            return false;
-        }
-        if(! is_int($roleID)) {
-            return false;
-        }
-        if($roleID < 1) {
-            return false;
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        if($canDo == true) {
-            $canDo = 1;
-        } else {
-            $canDo = 0;
-        }
-        if(! $database->insertData('permissionSet', 'canDo, roleID, permissionID', '' . $canDo . ', ' . $roleID . ', ' . $this->id)) {
-            return false;
-        }
-        return true;
+        return $permissionEngine->toggleCanDo($this, $user->getRoleID(), $inValue);
     }
 }
