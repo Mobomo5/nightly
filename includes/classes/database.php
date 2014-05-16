@@ -52,6 +52,7 @@ class database implements databaseInterface {
         }
         $this->dbObject = $dbType::getInstance();
         $this->dbObject->configure($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
+        $this->dbObject->connect();
     }
 
     private function __clone() {

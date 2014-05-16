@@ -122,7 +122,7 @@ class menuItem {
     public function getParent() {
         return $this->parent;
     }
-    public function setParent(menuItem $inParent) {
+    public function setParent($inParent) {
         $this->parent = $inParent;
     }
     public function getChildren() {

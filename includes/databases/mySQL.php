@@ -38,8 +38,10 @@ class mySQL implements databaseInterface {
 
     function connect() {
         if (empty($this->dbUsername) or empty($this->db) or empty($this->dbPassword) or empty($this->dbServer)) {
-            echo "failed";
             return false;
+        }
+        if (!empty($this->mysqli)) {
+            return $this->mysqli;
         }
         return $this->mysqli = new mysqli($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
     }
