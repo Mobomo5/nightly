@@ -72,6 +72,7 @@ class bootstrap {
         define('MENU_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menu.php');
         define('MENU_ITEM_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuItem.php');
         define('MENU_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
+        define('MAIL_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mail.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -108,6 +109,8 @@ class bootstrap {
     private function getVariables() {
         $this->site = site::getInstance();
         define('GUEST_ROLE_ID',(int) $this->site->getGuestRoleID()->getValue());
+        define('SITE_EMAIL', $this->site->getEmail());
+        define('SITE_TITLE', $this->site->getTitle());
         date_default_timezone_set($this->site->getTimeZone());
         $blockEngine = blockEngine::getInstance();
         $nodeEngine = nodeEngine::getInstance();
