@@ -31,6 +31,10 @@ class database implements databaseInterface {
         if (!isset(self::$instance)) {
             self::$instance = new database();
         }
+        if (!self::$instance->isConnected()) {
+            echo "The database broke! :(";
+            exit;
+        }
         return self::$instance;
     }
 
@@ -87,18 +91,17 @@ class database implements databaseInterface {
      * Calls the sub-database's getData function
      * returns false on failure, Data Array on success
      *
-     * @param $select
-     * @param $from
-     * @param int $where
+     * @param string $select
+     * @param string $from
+     * @param string $where
      * @return bool
      */
-    public function getData($select, $from, $where = 1) {
+    public function getData($select, $from, $where = '1') {
         if (empty($select) OR empty($from) OR empty($where)) {
             return false;
         }
         $result = $this->dbObject->getData($select, $from, $where);
         if (!$result) {
-            new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
         }
         return $result;
@@ -153,8 +156,7 @@ class database implements databaseInterface {
         }
         $result = $this->dbObject->updateTable($table, $set, $where);
         if (!$result) {
-            noticeEngine::getInstance()->addNotice(notice("error", "There was an error in the statement")); //@todo: better error messages
-            return false; //@todo: link to last page.
+            return false;
         }
         return $result;
     }
