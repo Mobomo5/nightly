@@ -27,6 +27,8 @@ class menuEngine {
     private $db;
     private $permissionObject;
 
+
+
     private function __construct() {
         $this->permissionObject = permissionEngine::getInstance();
         $this->db = database::getInstance();
@@ -34,28 +36,69 @@ class menuEngine {
 
     public function getMenu($inMenuID){
         //get a single menu from the database based off of ID
-        $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
+        try{
 
-        $menu = new menu($results[0]['menuID'],$results[0]['menuName'], $results[0]['themeRegion'] , $this->getMenuItem() ,  $results[0]['enabled']);
+            $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
 
+            $menu = new menu($results[0]['menuID'],
+                            $results[0]['menuName'],
+                            $results[0]['themeRegion'],
+                            $this->getMenuItem($results[0]['menuID']),
+                            $results[0]['enabled']);
 
-
+            return $menu;
+        } catch(exception $ex) {
+            return $ex;
+        }
     }
 
-    public function getMenuItem(){
+    public function getMenuItem($inMenuID){
         //get a single menuItem from DB based off of ID
+        try {
+            $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuID");
 
-        return 0;
+            $menuItem = new menuItem($results[0]['menuID'],
+                                    $results[0]['menuItemID'],
+                                    $results[0]['linkText'],
+                                    $results[0]['href'],
+                                    $results[0]['weight'],
+                                    $results[0]['hasChildren'],
+                                    $results[0]['enabled'],
+                                    $results[0]['parent']);
+
+            return $menuItem;
+        } catch(exception $ex) {
+            return $ex;
+        }
     }
 
-    public function setMenu(){
+    public function setMenu(menu $inMenu){
         //takes in a menu object and updates DB
+        if(!is_object($inMenu)) return;
+
 
     }
 
-    public function setMenuItem(){
+    public function setMenuItem(menuItem $inMenuItem, $inMenuItemID){
         //take sin a menuItem object and updates DB
+        if(!is_object($inMenuItem)) return;
 
+        try{
+
+            $results = $this->db->updateTable("menuItem",
+                "'menuID' = " . $inMenuItem->getMenuID() . ", " .
+                "'linkText' = " . $inMenuItem->getLinkText() . ", " .
+                "'href' = " . $inMenuItem->getHref() . ", " .
+                "'weight' = " . $inMenuItem->getWeight() . ", " .
+                "'hasChildren'" . $inMenuItem->getChildren() . ", " .
+                "'enabled'" . $inMenuItem->isEnabled() . ", ",
+                "'menuItemID' = $inMenuItemID");
+
+            return;
+
+        } catch(exception $ex){
+            return;
+        }
     }
 
     public function addMenu(){
@@ -63,7 +106,7 @@ class menuEngine {
     }
 
     public function addMenuItem(){
-        //Adds a new meneItem to the database
+        //Adds a new menuItem to the database
     }
 
     public function deleteMenu(){
