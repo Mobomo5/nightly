@@ -32,13 +32,20 @@ class menuEngine {
         $this->db = database::getInstance();
     }
 
-    public function getMenu(){
+    public function getMenu($inMenuID){
         //get a single menu from the database based off of ID
+        $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
+
+        $menu = new menu($results[0]['menuID'],$results[0]['menuName'], $results[0]['themeRegion'] , $this->getMenuItem() ,  $results[0]['enabled']);
+
+
+
     }
 
     public function getMenuItem(){
         //get a single menuItem from DB based off of ID
 
+        return 0;
     }
 
     public function setMenu(){

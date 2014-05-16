@@ -27,7 +27,7 @@ class menu {
     private $enabled;
     private $menuItems;
 
-    private function __construct($inID, $inName, $inThemeRegion, $inMenuItems, $inEnabled) {
+    public function __construct($inID, $inName, $inThemeRegion, $inMenuItems, $inEnabled) {
 
         $this->menuID = $inID;
         $this->menuName = $inName;
