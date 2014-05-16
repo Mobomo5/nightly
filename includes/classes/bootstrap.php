@@ -73,11 +73,14 @@ class bootstrap {
         define('MENU_ITEM_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuItem.php');
         define('MENU_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
         define('MAIL_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mail.php');
+        define('USER_OPTION_ENGINE_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/userOptionEngine.php');
+        define('USER_OPTION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOption.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
         require_once(VARIABLE_OBJECT_FILE);
+        require_once(USER_OPTION_ENGINE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
