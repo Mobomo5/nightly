@@ -12,7 +12,7 @@ class mail {
     private $subject;
     private $body;
     private $isBulkMail;
-    private $allowedTags = '';//"<p><a><img><ul><li>";
+    private $allowedTags = "<p><a><img><ul><li>";
 
     public function __construct($inSenderEmail = SITE_EMAIL, $inSenderName = SITE_TITLE, array $inRecipients = array(), $inSubject = 'Email', $inBody = '<p>This is an email.</p>', $isBulkMail = false) {
         if(! is_bool($isBulkMail)) {
