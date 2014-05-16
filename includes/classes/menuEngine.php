@@ -27,6 +27,9 @@ class menuEngine {
     private $db;
     private $permissionObject;
 
+    private $menu;
+    private $menuItem;
+
     private function __construct() {
         $this->permissionObject = permissionEngine::getInstance();
         $this->db = database::getInstance();
@@ -36,26 +39,41 @@ class menuEngine {
         //get a single menu from the database based off of ID
         $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
 
-        $menu = new menu($results[0]['menuID'],$results[0]['menuName'], $results[0]['themeRegion'] , $this->getMenuItem() ,  $results[0]['enabled']);
+        $menu = new menu($results[0]['menuID'],
+                        $results[0]['menuName'],
+                        $results[0]['themeRegion'],
+                        $this->getMenuItem($results[0]['menuID']),
+                        $results[0]['enabled']);
 
-
+        return $menu;
 
     }
 
-    public function getMenuItem(){
+    public function getMenuItem($inMenuID){
         //get a single menuItem from DB based off of ID
+        $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuID");
 
-        return 0;
+        $menuItem = new menuItem($results[0]['menuID'],
+                                $results[0]['menuItemID'],
+                                $results[0]['linkText'],
+                                $results[0]['href'],
+                                $results[0]['weight'],
+                                $results[0]['hasChildren'],
+                                $results[0]['enabled'],
+                                $results[0]['parent']);
+
+
+        return $menuItem;
     }
 
-    public function setMenu(){
+    public function setMenu($inMenu){
         //takes in a menu object and updates DB
-
+        $this->menu = $inMenu;
     }
 
-    public function setMenuItem(){
+    public function setMenuItem($inMenuItem){
         //take sin a menuItem object and updates DB
-
+        $this->menuItem  = $inMenuItem;
     }
 
     public function addMenu(){
