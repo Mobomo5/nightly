@@ -11,38 +11,44 @@ class userOption {
     private $computerName;
     private $humanName;
     private $description;
-    private $value;
 
     /**
      * @param int $inId
      * @param string $inComputerName
      * @param string $inHumanName
      * @param string $inDescription
-     * @param bool $inValue
+     * @internal param bool $inValue
      */
-    public function __construct($inId, $inComputerName = null, $inHumanName = null, $inDescription = null, $inValue = null) {
-        if (!empty($inId)) {
-            $this->id = $inId;
+    public function __construct($inId, $inComputerName, $inHumanName, $inDescription) {
+
+        if (!is_numeric($inId)) {
+            return false;
         }
-        if (!empty($inComputerName)) {
-            $this->computerName = $inComputerName;
+        $nameVal = new validator('optionName');
+        if (!$nameVal->validate($inComputerName)) {
+            return false;
         }
-        if (!empty($inHumanName)) {
-            $this->humanName = $inHumanName;
-        }
-        if (!empty($inDescription)) {
-            $this->description = $inDescription;
-        }
-        if (!empty($inValue)) {
-            $this->value = $inValue;
-        }
+
+        $this->id = $inId;
+        $this->computerName = $inComputerName;
+        $this->humanName = $inHumanName;
+        $this->description = $inDescription;
+
+
     }
 
     /**
      * @param string $computerName
+     * @return bool
      */
     public function setComputerName($computerName) {
+        $nameVal = new validator('optionName');
+        if (!$nameVal->validate($computerName)) {
+            return false;
+        }
+
         $this->computerName = $computerName;
+        return true;
     }
 
     /**
