@@ -94,10 +94,10 @@ class menuEngine {
                 "'enabled'" . $inMenuItem->isEnabled() . ", ",
                 "'menuItemID' = $inMenuItemID");
 
-            return $results;
+            return;
 
         } catch(exception $ex){
-            return $ex;
+            return;
         }
     }
 
