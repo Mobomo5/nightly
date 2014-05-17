@@ -5,7 +5,6 @@
  * Time: 9:53 AM
  */
 
-
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
@@ -26,8 +25,6 @@ class menuEngine {
     //Constructor Start -- Get database and permissions engine.
     private $db;
     private $permissionObject;
-
-
 
     private function __construct() {
         $this->permissionObject = permissionEngine::getInstance();
@@ -101,19 +98,19 @@ class menuEngine {
         }
     }
 
-    public function addMenu(){
+    public function addMenu($inName, $inThemeRegion, $inMenuItems, $inEnabled){
         //Adds a new menu to the database
     }
 
-    public function addMenuItem(){
+    public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent, $inChildren){
         //Adds a new menuItem to the database
     }
 
-    public function deleteMenu(){
+    public function deleteMenu($inMenuID){
         //deletes a menu from the DB
     }
 
-    public function deleteMenuItem(){
+    public function deleteMenuItem($inMenuItemID){
         //deletes a menuItem from database
     }
 }
