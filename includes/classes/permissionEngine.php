@@ -10,6 +10,7 @@ require_once(PERMISSION_OBJECT_FILE);
 class permissionEngine {
     private static $instance;
     private $permissionsChecked;
+    private $retrievedPermissions;
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new permissionEngine();
@@ -18,13 +19,14 @@ class permissionEngine {
     }
     private function __construct() {
         $this->permissionsChecked = array();
+        $this->retrievedPermissions = array();
     }
     public function getPermission($inPermissionName) {
         if(preg_match('/\s/', $inPermissionName)) {
             return false;
         }
-        if(!empty($this->permissionsChecked[$inPermissionName])) {
-            return $this->permissionsChecked[$inPermissionName];
+        if(!empty($this->retrievedPermissions[$inPermissionName])) {
+            return $this->retrievedPermissions[$inPermissionName];
         }
         $database = database::getInstance();
         if(! $database->isConnected()) {
@@ -42,7 +44,7 @@ class permissionEngine {
             return false;
         }
         $permission = new permission($results[0]['permissionID'], $results[0]['permissionName'], $results[0]['humanName'], $results[0]['permissionDescription']);
-        $this->permissionsChecked[$inPermissionName] = $permission;
+        $this->retrievedPermissions[$inPermissionName] = $permission;
         return $permission;
     }
     public function checkPermission(permission $inPermission, $inRoleID = GUEST_ROLE_ID) {

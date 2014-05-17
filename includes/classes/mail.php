@@ -13,6 +13,7 @@ class mail {
     private $body;
     private $isBulkMail;
     private $allowedTags = "<p><a><img><ul><li>";
+    private $replacements;
 
     public function __construct($inSenderEmail = SITE_EMAIL, $inSenderName = SITE_TITLE, array $inRecipients = array(), $inSubject = 'Email', $inBody = '<p>This is an email.</p>', $isBulkMail = false) {
         if(! is_bool($isBulkMail)) {
@@ -41,6 +42,7 @@ class mail {
         $this->subject = trim(htmlspecialchars($inSubject));
         $this->body = strip_tags(trim($inBody), $this->allowedTags);
         $this->isBulkMail = $isBulkMail;
+        $this->replacements = array();
     }
 
     public function addRecipient($inRecipient) {
@@ -130,7 +132,8 @@ class mail {
         $sent = true;
 
         foreach ($this->recipients as $recipient) {
-            if (!mail($recipient, $this->subject, $this->body, $headers)) {
+            $body = $this->doReplacement($recipient);
+            if (!mail($recipient, $this->subject, $body, $headers)) {
                 $sent = false;
             }
         }
@@ -138,6 +141,45 @@ class mail {
         return $sent;
     }
     public function doReplacement($emailForReplacement) {
-        
+        if($this->replacements == null) {
+            return $this->body;
+        }
+        if(! filter_var($emailForReplacement, FILTER_VALIDATE_EMAIL)) {
+            return $this->body;
+        }
+        $body = $this->body;
+        foreach($this->replacements as $pattern => $email) {
+            $body = str_replace($pattern, $email[$emailForReplacement], $body);
+        }
+        return $body;
+    }
+    public function addReplacementValue($replacementPattern, $email, $replacement) {
+        $firstChars = substr($replacementPattern, 0, 1);
+        if($firstChars != '[[') {
+            return;
+        }
+        $lastChars = substr($replacementPattern, -2);
+        if($lastChars != ']]') {
+            return;
+        }
+        if(! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+        $replacement = strip_tags(trim($replacement), $this->allowedTags);
+        $this->replacements[$replacementPattern][$email] = $replacement;
+    }
+    public function removeReplacementValue($replacementPattern, $email) {
+        $firstChars = substr($replacementPattern, 0, 1);
+        if($firstChars != '[[') {
+            return;
+        }
+        $lastChars = substr($replacementPattern, -2);
+        if($lastChars != ']]') {
+            return;
+        }
+        if(! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+        unset($this->replacements[$replacementPattern][$email]);
     }
 }
