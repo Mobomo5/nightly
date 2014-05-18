@@ -73,6 +73,8 @@ class bootstrap {
         define('MENU_ITEM_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuItem.php');
         define('MENU_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
         define('MAIL_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mail.php');
+        define('MAIL_TEMPLATE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mailTemplate.php');
+        define('MAIL_TEMPLATE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mailTemplateEngine.php');
         define('USER_OPTION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOptionEngine.php');
         define('USER_OPTION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOption.php');
     }

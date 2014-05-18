@@ -70,6 +70,9 @@ class variableEngine {
         if ($results == false) {
             return null;
         }
+        if($results == null) {
+            return null;
+        }
         $toReturn = array();
         foreach ($results as $result) {
             $variableName = $result['variableName'];
@@ -87,9 +90,12 @@ class variableEngine {
     }
     public function saveVariable(variable $variableToSave) {
         $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
         $variableName = $database->escapeString(htmlspecialchars($variableToSave->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToSave->getValue()));
-        $isReadOnly = $database->escapeString(htmlspecialchars($variableToSave->isReadOnly()));
+        $isReadOnly = $variableToSave->isReadOnly();
         if($isReadOnly == true) {
             $isReadOnly = 1;
         } else {
@@ -108,6 +114,9 @@ class variableEngine {
     }
     public function addVariable(variable $variableToAdd) {
         $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
         $variableName = $database->escapeString(htmlspecialchars($variableToAdd->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToAdd->getValue()));
         $isReadOnly = $variableToAdd->isReadOnly();
@@ -126,8 +135,14 @@ class variableEngine {
             return false;
         }
         $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
         $variableName = $database->escapeString(htmlspecialchars($variableToDelete->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToDelete->getValue()));
-        $database->removeData('variable', "variableName = '{$variableName}' AND variableValue = '{$variableValue}'");
+        if(! $database->removeData('variable', "variableName = '{$variableName}' AND variableValue = '{$variableValue}'")) {
+            return false;
+        }
+        return true;
     }
 }

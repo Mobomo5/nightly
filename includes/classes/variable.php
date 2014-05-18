@@ -10,34 +10,29 @@ class variable {
     private $value;
     private $readOnly;
     private $oldName;
-
     public function __construct($inName, $inValue, $inReadOnly = false) {
         $this->name = $inName;
         $this->value = $inValue;
         $this->readOnly = $inReadOnly;
         $this->oldName = null;
     }
-
     public function getName() {
         return $this->name;
     }
-
     public function getValue() {
         return $this->value;
     }
-
     public function isReadOnly() {
         return $this->readOnly;
     }
-
     public function setName($inName) {
-        if($this->readOnly) {
+        if ($this->readOnly) {
             return;
         }
-        if(preg_match('/\s/', $inName)) {
+        if (preg_match('/\s/', $inName)) {
             return;
         }
-        if($this->oldName == null) {
+        if ($this->oldName == null) {
             $this->oldName = $this->name;
         }
         $this->name = $inName;
@@ -45,25 +40,21 @@ class variable {
     public function getOldName() {
         return $this->oldName;
     }
-
     public function setValue($inValue) {
-        if($this->readOnly) {
+        if ($this->readOnly) {
             return;
         }
         $this->value = $inValue;
     }
-
     public function setReadOnly($inReadOnly = true) {
-        if(! is_bool($inReadOnly)) {
+        if (!is_bool($inReadOnly)) {
             return;
         }
         $this->readOnly = $inReadOnly;
     }
-
     public function __toString() {
         return $this->value;
     }
-
     public function save() {
         return variableEngine::getInstance()->saveVariable($this);
     }
