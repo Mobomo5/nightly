@@ -7,6 +7,7 @@
  */
 require_once(USER_OPTION_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
+require_once(PERMISSION_ENGINE_OBJECT_FILE);
 
 /**
  * Class userOptionEngine

@@ -6,8 +6,10 @@
  * Time: 4:15 PM
  */
 require_once(VALIDATOR_OBJECT_FILE);
+
 class moduleEngine {
     private static $instance;
+
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new moduleEngine();
@@ -15,12 +17,14 @@ class moduleEngine {
 
         return self::$instance;
     }
+
     private function __construct() {
         //Do nothing.
     }
+
     public function moduleExists($moduleName) {
         $validator = new validator('dir');
-        if(! $validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
         $module = '/includes/modules/' . $moduleName;
@@ -30,13 +34,45 @@ class moduleEngine {
 
         return true;
     }
+
     public function includeModule($moduleName) {
         if (!$this->moduleExists($moduleName)) {
             require_once(EDUCASK_ROOT . '/includes/modules/404/main.php');
             return;
         }
 
-        //The module's main.php must contain a function that will give the name of the page
+        //  The module's main.php must contain a function that will give the name of the page
         require_once(EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/main.php');
+    }
+
+    public function addModule($name, $humanName, $enabled = 1) {
+
+        // check permissions
+        $permEng = permissionEngine::getInstance();
+        $perm = $permEng->getPermission('canAddModule');
+        if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+            noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
+            return false;
+        }
+
+        // validate
+        $nameVal = new validator('optionName');
+        if (!$nameVal->validate($name)) {
+            return false;
+        }
+
+        //get db
+        $db = database::getInstance();
+
+        // escape
+        $name = $db->escapeString($name);
+        $humanName = $db->escapeString($humanName);
+
+
+        $results = $db->insertData('modules', 'moduleName, humanName, enabled', '\'' . $name . '\',\'' . $humanName . '\',\'' . $enabled . '\'');
+        if (!$results) {
+            return false;
+        }
+        return true;
     }
 }
