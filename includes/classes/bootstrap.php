@@ -77,6 +77,7 @@ class bootstrap {
         define('MAIL_TEMPLATE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mailTemplateEngine.php');
         define('USER_OPTION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOptionEngine.php');
         define('USER_OPTION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOption.php');
+        define('ROUTER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/router.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -89,6 +90,7 @@ class bootstrap {
         require_once(USER_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
         require_once(NODE_ENGINE_OBJECT_FILE);
+        require_once(ROUTER_OBJECT_FILE);
     }
     private function connectDatabase() {
         $database = database::getInstance();
