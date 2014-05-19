@@ -41,10 +41,10 @@ class blockEngine {
                 continue;
             }
             if ($blockData['title'] == '') {
-                $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
+                $blocks[$blockData['themeRegion']] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
                 continue;
             }
-            $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
+            $blocks[$blockData['themeRegion']] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
         }
 
         return $blocks;
@@ -105,5 +105,9 @@ class blockEngine {
     }
     public function getPathToBlock($blockName, $moduleName) {
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
+    }
+
+    public function addBlock($blockName, $title = '', $theme = 'default', $themeRegion, $weight = 1, $enabled = 1, $module = 1) {
+
     }
 }
