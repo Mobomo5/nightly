@@ -122,9 +122,10 @@ class bootstrap {
         $blockEngine = blockEngine::getInstance();
         $nodeEngine = nodeEngine::getInstance();
         $user = currentUser::getUserSession();
+        $router = router::getInstance();
         $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
-//        /database::getInstance()->bootstrapDisconnect();
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), get_class($node), $user->getRoleID());
+        database::getInstance()->bootstrapDisconnect();
     }
     //@TODO: Add Cron Stuff
     private function render() {

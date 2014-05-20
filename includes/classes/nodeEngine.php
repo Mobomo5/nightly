@@ -8,6 +8,7 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(MODULE_ENGINE_OBJECT_FILE);
 require_once(LINK_OBJECT_FILE);
+require_once(ROUTER_OBJECT_FILE);
 
 class nodeEngine {
     private static $instance;
@@ -26,21 +27,15 @@ class nodeEngine {
         //Do nothing.
     }
     public function getNode() {
-        $parameters = $this->getDecodedParameters(true);
+        $router = router::getInstance();
+        $parameters = $router->getDecodedParameters(true);
 
         $moduleClass = $parameters[0];
         $moduleEngine = moduleEngine::getInstance();
         $moduleEngine->includeModule($moduleClass);
-//        if(! is_object($moduleClass)) {
-//
-//            $moduleEngine->includeModule('404');
-//            return new fourOhFour();
-//        }
-//
-//See the interfaces that the module implements, and make sure it implements node. If not, return 404.
+        //See the interfaces that the module implements, and make sure it implements node. If not, return 404.
 
         if (!class_exists($moduleClass)) {
-
             $moduleEngine->includeModule('404');
             return new fourOhFour();
         }
@@ -62,7 +57,7 @@ class nodeEngine {
             $link = $module->getReturnPage();
             //verify the variable given is a link object. If it is not, go to the home page.
             if (get_class($link) != 'link') {
-                $past = $this->getPreviousParameters();
+                $past = $router->getPreviousParameters();
                 if ($past == null) {
                     $link = new link('home');
                 } else {

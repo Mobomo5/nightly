@@ -12,10 +12,13 @@ class router {
     private static $previousURL;
     private $sourceURL;
     public static function getInstance() {
+        if(! isset(self::$instance)) {
+            self::$instance = new router();
+        }
         if (isset($_SESSION['educaskPreviousPage'])) {
             self::$previousURL = $_SESSION['educaskPreviousPage'];
         } else {
-            self::$previousURL = null;
+            self::$previousURL = '';
         }
         if (empty($_GET['p'])) {
             self::$currentURL = 'home';
