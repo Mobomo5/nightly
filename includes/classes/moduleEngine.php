@@ -50,7 +50,7 @@ class moduleEngine {
         // check permissions
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canAddModule');
-        if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+        if (!$perm->canDo()) {
             noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
             return false;
         }
