@@ -31,10 +31,6 @@ class database implements databaseInterface {
         if (!isset(self::$instance)) {
             self::$instance = new database();
         }
-        if (!self::$instance->isConnected()) {
-            echo "The database broke! :(";
-            exit;
-        }
         return self::$instance;
     }
 
@@ -47,7 +43,6 @@ class database implements databaseInterface {
         $this->dbType = $dbType;
         // Dynamically create the new database object, if possible.
         if (!include_once(EDUCASK_ROOT . "/includes/databases/" . $this->dbType . ".php")) { //used include because I don't want a fatal error.
-            new notice('error', 'There appears to be no ' . $this->dbType . ' database available. Please check the config.php file.');
             echo 'There appears to be no ' . $this->dbType . ' database available. Please check the config.php file.';
         }
         $this->dbObject = $dbType::getInstance();
@@ -117,7 +112,6 @@ class database implements databaseInterface {
     public function makeCustomQuery($inQuery) {
         $result = $this->dbObject->query($inQuery);
         if (!$result) {
-            new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
         }
         return $result;
@@ -137,7 +131,6 @@ class database implements databaseInterface {
         }
         $result = $this->dbObject->insertData($into, $columns, $values);
         if (!$result) {
-            new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false; //@todo: link to last page.
         }
         return $result;
