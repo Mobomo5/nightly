@@ -69,11 +69,9 @@ class userOptionEngine {
 
         $results = $db->getData('*', 'userOptions', 'optionName = \'' . $inOptionName . '\'');
         if (!$results) {
-            new notice("error", "There was an error in the statement"); //@todo: better error messages
             return false;
         }
         if (sizeof($results) == 0) {
-            new notice("error", "The query returned no rows"); //@todo: better error messages
             return false;
         }
 
@@ -98,7 +96,6 @@ class userOptionEngine {
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canCheckOption');
         if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
-            noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
             return false;
         }
         // check the input
@@ -146,7 +143,6 @@ class userOptionEngine {
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canSetOption');
         if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
-            noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
             return false;
         }
         // check the input
@@ -188,7 +184,6 @@ class userOptionEngine {
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canAddOption');
         if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
-            noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
             return false;
         }
 
@@ -232,7 +227,6 @@ class userOptionEngine {
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canDeleteOption');
         if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
-            noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
             return false;
         }
 
