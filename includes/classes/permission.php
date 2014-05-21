@@ -14,7 +14,7 @@ class permission {
     private $description;
 
     public function __construct($inID, $inName, $inHumanName, $inDescription) {
-        if(! is_int($inID)) {
+        if (!is_numeric($inID)) {
             return;
         }
         if($inID < 1) {

@@ -14,6 +14,7 @@
                         <input name="text" type="text"/><input type="submit"/>
                     </form>
                 </li>
+                <li><a id="login" href="">Log in</a></li>
             </ul>
 
         </div>
@@ -31,10 +32,35 @@
             </ul>
         </div>
     {% endblock %}
-    <div id="mainContent">
-        <h2>{{ blocks.main.0.title }}</h2>
 
-        <p>{{ blocks.main.0.content }}</p>
+    <div id="mainContent">
+        <h2>{{ blocks.main.title| raw }}</h2>
+
+        <p>{{ blocks.main.content|raw }}</p>
+
+    </div>
+    <div id="modal1" style="display: none;">
+        <div id="login-form-background">
+            <h2>Please log in</h2>
+
+            <form method="post" action="login">
+                Username: <input type="text" name="username"/><br/>
+                Password: <input type="password" name="password"/><br/>
+                <input type="submit"/><a id="login-form-cancel" href="">Cancel</a>
+            </form>
+        </div>
     </div>
 
+
+    {# check for notices. If there are any, print them into a modal, with a close button#}
+    {% if blocks.notices.0 is defined %}
+
+        <div id="notices-modal" style="display: none;">
+            <h2>Notice</h2>
+            {% for notice in blocks.notices %}
+                <div class="{{ notice.style }}">{{ notice.message|capitalize }}</div>
+            {% endfor %}
+            <a id="notices-close" href="">Close</a>
+        </div>
+    {% endif %}
 {% endblock %}

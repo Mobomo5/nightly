@@ -1,28 +1,44 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Craig
- * Date: 4/25/14
- * Time: 11:09 PM
+ * User: craig
+ * Date: 4/23/14
+ * Time: 2:52 PM
  */
 require_once(NODE_INTERFACE_FILE);
 
-class test implements node {
+class login implements node {
+    private $noGui;
 
     public function __construct() {
-        // TODO: Implement __construct() method.
+        $this->noGUI = true;
+
+        $user = currentUser::getUserSession();
+        if ($user->isLoggedIn()) {
+            echo "LOGGED IN";
+            exit;
+        }
+        if (empty($_POST['username']) OR empty($_POST['password'])) {
+            noticeEngine::getInstance()->addNotice(new notice('error', 'Please enter a username and a password'));
+            return;
+        }
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        if (!$user->logIn($username, $password)) {
+            noticeEngine::getInstance()->addNotice(new notice('error', 'Wrong credentials')); //@todo: better error
+            return;
+        }
+
+
     }
 
     public function getTitle() {
-        return "BLA!";
-    }
-
-    public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
+        // TODO: Implement getTitle() method.
     }
 
     public function getContent() {
-        return 'shdgljsdhgl';
+        // TODO: Implement getContent() method.
     }
 
     public function pageAuthorIsVisible() {
@@ -54,10 +70,14 @@ class test implements node {
     }
 
     public function noGUI() {
-        // TODO: Implement noGUI() method.
+        return $this->noGUI;
     }
 
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
+    }
+
+    public function setTitle($inTitle) {
+        // TODO: Implement setTitle() method.
     }
 }

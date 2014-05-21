@@ -121,7 +121,7 @@ body {
 }
 
 #titlebar ul li #logo {
-    background-image: url("../images/educasklogo.png");
+    background-image: url("../../../images/educasklogo.png");
     background-size: contain;
     padding: 0 auto;
     min-height: 25px;
@@ -214,4 +214,31 @@ body {
     width: 79%;
     height: 92%;
     z-index: 1
+}
+
+#login-form-background {
+    padding: 40px;
+    background-color: #ddd;
+    border-radius: 6px;
+    border: solid 2px #c4c4c4
+}
+
+#login-form-background h2 {
+    margin-bottom: 20px
+}
+
+#notices-modal {
+    padding: 40px;
+    background-color: #ddd;
+    border-radius: 6px;
+    border: solid 2px #c4c4c4;
+    text-align: center
+}
+
+#notices-modal h2 {
+    margin-bottom: 20px
+}
+
+#notices-modal .error {
+    color: #bd0000
 }

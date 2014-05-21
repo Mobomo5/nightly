@@ -7,7 +7,7 @@ require_once(SYSTEM_LOGGER_OBJET_FILE);
 require_once(LINK_OBJECT_FILE);
 require_once(USER_OBJECT_FILE);
 
-class currentUser extends user{
+class currentUser extends user {
     private $isLoggedIn;
     private $tempID;
 
@@ -17,6 +17,7 @@ class currentUser extends user{
         }
         return true;
     }
+
     static function getUserSession() {
         //if the user's object hasn't been created yet, create it
         if (!self::userIsInSession()) {
@@ -25,6 +26,7 @@ class currentUser extends user{
         //return the user object
         return $_SESSION['educaskCurrentUser'];
     }
+
     static function setUserSession(currentUser $object) {
         //verify the variable given is a user object. If it is not, get out of here.
         if (get_class($object) != 'currentUser') {
@@ -32,12 +34,14 @@ class currentUser extends user{
         }
         $_SESSION['educaskCurrentUser'] = $object;
     }
+
     private static function destroySession() {
         unset($_SESSION['educaskCurrentUser']);
         $_SESSION['educaskCurrentUser'] = new currentUser();
     }
+
     public function __construct() {
-        if(self::userIsInSession()) {
+        if (self::userIsInSession()) {
             self::getUserSession();
         }
         //Start a guest session
@@ -50,12 +54,15 @@ class currentUser extends user{
         $this->setLastName('Guest');
         $this->setEmail('anon@anon.ca');
     }
+
     public function getUserID() {
         return $this->tempID;
     }
+
     public function isLoggedIn() {
         return $this->isLoggedIn;
     }
+
     public function logIn($userName, $password) {
         if ($this->isLoggedIn) {
             return true;
@@ -67,12 +74,16 @@ class currentUser extends user{
             return true;
         }
 
-        if (!isset($_SESSION['userCanLogIn'])) {
+        $perm = permissionEngine::getInstance()->getPermission('userCanLogIn');
+        var_dump($perm);
+        if (!permissionEngine::getInstance()->checkPermission($perm, $this->getRoleID())) {
             return false;
         }
-        if($_SESSION['userCanLogIn'] == false) {
-            return false;
-        }
+
+//        if($_SESSION['userCanLogIn'] == false) {
+//            return false;
+//        }
+
 
         $database = database::getInstance();
         $database->connect();
@@ -85,13 +96,14 @@ class currentUser extends user{
 
         $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email';
         $table = 'user';
-        $where = 'WHERE ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
+        $where = '((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
 
         if ($database->isConnected()) {
             $results = $database->getData($column, $table, $where);
         } else {
             $results = NULL;
         }
+
 
         //If there weren't any accounts found or too many accounts found
         if ($results == NULL) {
@@ -102,6 +114,7 @@ class currentUser extends user{
             $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
+
 
         $dbPassword = $results[0]['password'];
         $hasher = new hasher();
@@ -134,6 +147,7 @@ class currentUser extends user{
         $hookEngine->runAction('userLoggedIn');
         return true;
     }
+
     public function logOut() {
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('userIsLoggingOut');
@@ -144,8 +158,9 @@ class currentUser extends user{
         $hookEngine->runAction('userLoggedOut');
         header('Location: ' . new link(''));
     }
+
     public function toUser() {
-        if(! $this->isLoggedIn) {
+        if (!$this->isLoggedIn) {
             return new user(1, GUEST_ROLE_ID, $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail());
         }
         return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail());

@@ -1,50 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ blocks.page.getTitle }} | {{ site.getTitle }}</title>
+    <title>{{ blocks.main.getTitle }} | {{ site.getTitle }}</title>
     <meta name="Generator" content="Educask version {{ site.getEducaskVersion }}">
     <meta http-equiv="X-FRAME-OPTIONS" content="DENY">
-    <script src="{{ site.getBaseDirectory }}thirdPartyLibraries/js/jQuery/jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="includes/themes/default/css/theme.css"/>
-    {{ script.links|raw }}
-    <script type="text/javascript">
-        /* borrowed from tinyMCE.com */
-        tinymce.init({
-            selector: "#compose-body",
-            plugins: "tabfocus",
-            tab_focus: ":prev, :next"
-        });
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/lib/jquery-1.10.1.min.js"></script>
 
-        $(document).ready(function () {
-            $(".inline").fancybox({
-                fitToView: true,
-                autoSize: false,
-                width: "90%",
-                height: "80%",
-                closeClick: false,
-                openEffect: "elastic",
-                closeEffect: "elastic"
-            });
-        });
-        $(document).ready(function () {
-            $(".inlineRefreshOnClose").fancybox({
-                fitToView: true,
-                autoSize: false,
-                width: "90%",
-                height: "80%",
-                closeClick: false,
-                openEffect: "elastic",
-                closeEffect: "elastic",
-                afterClose: function () {
-                    parent.location.reload();
-                    ;
-                }
-            });
-        });
-        /* borrowed from http://jqueryui.com/datepicker/ */
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/theme.css"/>
+    <link rel="stylesheet" type="text/css"
+          src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.css"/>
+
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.js"></script>
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/easyModal/jquery.easyModal.js"></script>
+
+    {{ script.links|raw }}
+
+
+    <script type="text/javascript">
+
         $(function () {
-            $("#datepicker").datepicker({ minDate: 0});
+            $("#modal1").easyModal({
+                        top: 100,
+                        overlay: 0.4,
+                        overlayClose: false}
+            );
+            $("#notices-modal").easyModal({
+                        top: 100,
+                        overlay: 0.4,
+                        overlayClose: false}
+            );
+
+            $("#login").click(function (e) {
+                $("#modal1").trigger("openModal");
+                e.preventDefault();
+            });
+            $("#login-form-cancel").click(function (e) {
+                $("#modal1").trigger("closeModal");
+                e.preventDefault();
+            });
+            $("#notices-close").click(function (e) {
+                $("#notices-modal").trigger("closeModal");
+                e.preventDefault();
+            });
         });
+        $('document').ready(function (e) {
+            $("#notices-modal").trigger("openModal");
+
+        })
+
         {{ site.getScripts|raw }}
     </script>
 
