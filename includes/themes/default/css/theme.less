@@ -6,6 +6,8 @@
 @box6color: #FFC0CB;
 
 @homepagebackground: #6495ED;
+@loginformbackground: #dddddd;
+@loginformbackgroundborder: darken(@loginformbackground, 10%);
 @titlebarcolor: rgba(41, 39, 150, 0.97);
 @background: lighten(@titlebarcolor, 93%);
 @contentbackground: lighten(@titlebarcolor, 69%);
@@ -142,7 +144,7 @@ body {
       flex-grow: 1;
       #logo {
         //flex-grow: 2;
-        background-image: url("../images/educasklogo.png");
+        background-image: url("../../../images/educasklogo.png");
         background-size: contain;
         padding: 0 auto;
         min-height: 25px;
@@ -238,4 +240,28 @@ body {
   width: 99% - (@sidebarwidth * 2);
   height: 100% - (@titlebarheight * 2);
   z-index: 1;
+}
+
+#login-form-background {
+  padding: 40px;
+  background-color: @loginformbackground;
+  border-radius: 6px;
+  border: solid 2px @loginformbackgroundborder;
+  h2 {
+    margin-bottom: 20px;
+  }
+}
+
+#notices-modal {
+  padding: 40px;
+  background-color: @loginformbackground;
+  border-radius: 6px;
+  border: solid 2px @loginformbackgroundborder;
+  text-align: center;
+  h2 {
+    margin-bottom: 20px;
+  }
+  .error {
+    color: #bd0000;
+  }
 }

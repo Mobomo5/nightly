@@ -1,28 +1,31 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Craig
  * Date: 4/25/14
- * Time: 11:09 PM
+ * Time: 11:11 PM
  */
-require_once(NODE_INTERFACE_FILE);
+class main implements node {
+    private $title;
+    private $content;
 
-class test implements node {
 
     public function __construct() {
-        // TODO: Implement __construct() method.
+        $this->content = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum';
     }
 
     public function getTitle() {
-        return "BLA!";
+        return $this->title;
     }
 
     public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
+
+        $this->title = $inTitle;
     }
 
     public function getContent() {
-        return 'shdgljsdhgl';
+        return $this->content;
     }
 
     public function pageAuthorIsVisible() {
