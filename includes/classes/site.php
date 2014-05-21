@@ -44,7 +44,7 @@ class site {
         $variablesWanted[] = 'siteWebAddress';
         $variablesWanted[] = 'siteWebAddressSecure';
         $variablesWanted[] = 'siteWebDirectory';
-        $variablesWanted[] = 'cmsVersion';
+        $variablesWanted[] = 'educaskVersion';
         $variablesWanted[] = 'guestRoleID';
         $variablesWanted[] = 'cleanURLsEnabled';
         $variablesWanted[] = 'siteTimeZone';
@@ -56,7 +56,7 @@ class site {
         $this->urlSecure = $variables['siteWebAddressSecure'];
         $this->baseDirectory = $variables['siteWebDirectory'];
         $this->theme = $variables['siteTheme'];
-        $this->cmsVersion = $variables['cmsVersion'];
+        $this->educaskVersion = $variables['educaskVersion'];
         $this->guestRoleID = $variables['guestRoleID'];
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
@@ -151,6 +151,7 @@ class site {
         self::setInstance($this);
     }
     public function getEducaskVersion() {
+
         return $this->educaskVersion;
     }
     public function getGuestRoleID() {
