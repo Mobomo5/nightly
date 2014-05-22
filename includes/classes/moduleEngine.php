@@ -23,6 +23,16 @@ class moduleEngine {
     }
 
     public function moduleExists($moduleName) {
+        $moduleName = str_replace('..', '', $moduleName);
+        if($moduleName == '/') {
+            return false;
+        }
+        if($moduleName == '') {
+            return false;
+        }
+        if($moduleName == null) {
+            return false;
+        }
         $validator = new validator('dir');
         if (!$validator->validatorExists()) {
             return false;
