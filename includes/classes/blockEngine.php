@@ -6,17 +6,21 @@
  * Time: 12:23 PM
  */
 require_once(DATABASE_OBJECT_FILE);
+
 class blockEngine {
     private static $instance;
+
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new blockEngine();
         }
         return self::$instance;
     }
-    private function __construct(){
+
+    private function __construct() {
         //Do nothing;
     }
+
     public function getBlocks($theme, $parameters, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
@@ -26,10 +30,10 @@ class blockEngine {
         // get all enabled blocks
         $results = $database->getData('b.blockID, m.moduleName, b.blockName, b.themeRegion, b.title', 'block b, module m', 'b.theme = \'' . $theme . '\' AND b.enabled = 1 AND m.moduleID = b.module ORDER BY weight');
         // if there are none available, return false.
-        if($results == false) {
+        if ($results == false) {
             return null;
         }
-        if($results == null) {
+        if ($results == null) {
 
             return null;
         }
@@ -51,6 +55,7 @@ class blockEngine {
 
         return $blocks;
     }
+
     public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
 
         $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
@@ -60,6 +65,7 @@ class blockEngine {
         }
         return $block;
     }
+
     public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
 
         if (!$this->blockExists($blockName, $moduleName)) {
@@ -71,11 +77,13 @@ class blockEngine {
 
         require_once($this->getPathToBlock($blockName, $moduleName));
     }
+
     public function blockExists($blockName, $moduleName) {
 
         $block = $this->getPathToBlock($blockName, $moduleName);
         return file_exists($block);
     }
+
     public function blockVisible($blockID, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
@@ -109,6 +117,7 @@ class blockEngine {
 
         return true;
     }
+
     public function getPathToBlock($blockName, $moduleName) {
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }

@@ -8,7 +8,6 @@
 
 require_once(NODE_INTERFACE_FILE);
 
-
 class home implements node {
 
     private $title;

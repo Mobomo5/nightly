@@ -14,6 +14,7 @@ class menuEngine {
      * and if it's not create one.
      */
     private static $instance;
+
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new menuEngine();
@@ -31,56 +32,59 @@ class menuEngine {
         $this->db = database::getInstance();
     }
 
-    public function getMenu($inMenuID){
+    public function getMenu($inMenuID) {
         //get a single menu from the database based off of ID
-        try{
+        try {
 
             $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
 
             $menu = new menu($results[0]['menuID'],
-                            $results[0]['menuName'],
-                            $results[0]['themeRegion'],
-                            $this->getMenuItem($results[0]['menuID']),
-                            $results[0]['enabled']);
+                $results[0]['menuName'],
+                $results[0]['themeRegion'],
+                $this->getMenuItem($results[0]['menuID']),
+                $results[0]['enabled']);
 
             return $menu;
-        } catch(exception $ex) {
+        } catch (exception $ex) {
             return $ex;
         }
     }
 
-    public function getMenuItem($inMenuID){
+    public function getMenuItem($inMenuID) {
         //get a single menuItem from DB based off of ID
         try {
             $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuID");
 
             $menuItem = new menuItem($results[0]['menuID'],
-                                    $results[0]['menuItemID'],
-                                    $results[0]['linkText'],
-                                    $results[0]['href'],
-                                    $results[0]['weight'],
-                                    $results[0]['hasChildren'],
-                                    $results[0]['enabled'],
-                                    $results[0]['parent']);
+                $results[0]['menuItemID'],
+                $results[0]['linkText'],
+                $results[0]['href'],
+                $results[0]['weight'],
+                $results[0]['hasChildren'],
+                $results[0]['enabled'],
+                $results[0]['parent']);
 
             return $menuItem;
-        } catch(exception $ex) {
+        } catch (exception $ex) {
             return $ex;
         }
     }
 
-    public function setMenu(menu $inMenu){
+    public function setMenu(menu $inMenu) {
         //takes in a menu object and updates DB
-        if(!is_object($inMenu)) return;
-
+        if (!is_object($inMenu)) {
+            return;
+        }
 
     }
 
-    public function setMenuItem(menuItem $inMenuItem, $inMenuItemID){
+    public function setMenuItem(menuItem $inMenuItem, $inMenuItemID) {
         //take sin a menuItem object and updates DB
-        if(!is_object($inMenuItem)) return;
+        if (!is_object($inMenuItem)) {
+            return;
+        }
 
-        try{
+        try {
 
             $results = $this->db->updateTable("menuItem",
                 "'menuID' = " . $inMenuItem->getMenuID() . ", " .
@@ -93,24 +97,24 @@ class menuEngine {
 
             return;
 
-        } catch(exception $ex){
+        } catch (exception $ex) {
             return;
         }
     }
 
-    public function addMenu($inName, $inThemeRegion, $inMenuItems, $inEnabled){
+    public function addMenu($inName, $inThemeRegion, $inMenuItems, $inEnabled) {
         //Adds a new menu to the database
     }
 
-    public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent, $inChildren){
+    public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent, $inChildren) {
         //Adds a new menuItem to the database
     }
 
-    public function deleteMenu($inMenuID){
+    public function deleteMenu($inMenuID) {
         //deletes a menu from the DB
     }
 
-    public function deleteMenuItem($inMenuItemID){
+    public function deleteMenuItem($inMenuItemID) {
         //deletes a menuItem from database
     }
 }

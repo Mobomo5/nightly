@@ -46,10 +46,10 @@ class currentUser extends user {
         }
         //Start a guest session
         $this->isLoggedIn = false;
-        $this->tempID = NULL;
+        $this->tempID = null;
         $this->setRoleID(GUEST_ROLE_ID);
-        $this->setGivenIdentifier(NULL);
-        $this->setUserName(NULL);
+        $this->setGivenIdentifier(null);
+        $this->setUserName(null);
         $this->setFirstName('Anonymous');
         $this->setLastName('Guest');
         $this->setEmail('anon@anon.ca');
@@ -75,12 +75,11 @@ class currentUser extends user {
         }
 
         $perm = permissionEngine::getInstance()->getPermission('userCanLogIn');
-        var_dump($perm);
         if (!permissionEngine::getInstance()->checkPermission($perm, $this->getRoleID())) {
             return false;
         }
 
-        if(isset($_SESSION['userCanLogIn']) && $_SESSION['userCanLogIn'] == false) {
+        if (isset($_SESSION['userCanLogIn']) && $_SESSION['userCanLogIn'] == false) {
             return false;
         }
 
@@ -100,11 +99,11 @@ class currentUser extends user {
         if ($database->isConnected()) {
             $results = $database->getData($column, $table, $where);
         } else {
-            $results = NULL;
+            $results = null;
         }
 
         //If there weren't any accounts found or too many accounts found
-        if ($results == NULL) {
+        if ($results == null) {
             $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
@@ -112,7 +111,6 @@ class currentUser extends user {
             $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
-
 
         $dbPassword = $results[0]['password'];
         $hasher = new hasher();

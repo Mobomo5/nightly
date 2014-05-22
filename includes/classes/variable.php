@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -10,21 +11,26 @@ class variable {
     private $value;
     private $readOnly;
     private $oldName;
+
     public function __construct($inName, $inValue, $inReadOnly = false) {
         $this->name = $inName;
         $this->value = $inValue;
         $this->readOnly = $inReadOnly;
         $this->oldName = null;
     }
+
     public function getName() {
         return $this->name;
     }
+
     public function getValue() {
         return $this->value;
     }
+
     public function isReadOnly() {
         return $this->readOnly;
     }
+
     public function setName($inName) {
         if ($this->readOnly) {
             return;
@@ -37,24 +43,29 @@ class variable {
         }
         $this->name = $inName;
     }
+
     public function getOldName() {
         return $this->oldName;
     }
+
     public function setValue($inValue) {
         if ($this->readOnly) {
             return;
         }
         $this->value = $inValue;
     }
+
     public function setReadOnly($inReadOnly = true) {
         if (!is_bool($inReadOnly)) {
             return;
         }
         $this->readOnly = $inReadOnly;
     }
+
     public function __toString() {
         return $this->value;
     }
+
     public function save() {
         return variableEngine::getInstance()->saveVariable($this);
     }

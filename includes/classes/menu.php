@@ -36,49 +36,49 @@ class menu {
         $this->menuItems = $inMenuItems;
     }
 
-    public function getID(){
+    public function getID() {
         return $this->menuID;
     }
 
-    public function getName(){
+    public function getName() {
         return $this->menuName;
     }
 
-    public function setName($inName){
+    public function setName($inName) {
         $this->menuName = $inName;
     }
 
-    public function getThemeRegion(){
+    public function getThemeRegion() {
         return $this->themeRegion;
     }
 
-    public function setThemeRegion($inThemeRegion){
+    public function setThemeRegion($inThemeRegion) {
         $this->themeRegion = $inThemeRegion;
     }
 
-    public function getMenuItems(){
+    public function getMenuItems() {
         return $this->menuItems;
     }
 
-    public function isEnabled(){
-        if($this->enabled == 0){
+    public function isEnabled() {
+        if ($this->enabled == 0) {
             return false;
         } else {
             return true;
         }
     }
 
-    public function setEnabled($inSetEnabled){
-        if($inSetEnabled == false || $inSetEnabled == 0){
+    public function setEnabled($inSetEnabled) {
+        if ($inSetEnabled == false || $inSetEnabled == 0) {
             $this->enabled = 0;
-        } else if($inSetEnabled == true || $inSetEnabled == 1){
+        } else if ($inSetEnabled == true || $inSetEnabled == 1) {
             $this->enabled = 1;
         } else {
             return;
         }
     }
 
-    public function __toString(){
+    public function __toString() {
         //loop through it's menu items and put them in a HTML list
 
         return "";

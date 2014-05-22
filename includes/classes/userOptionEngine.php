@@ -45,7 +45,8 @@ class userOptionEngine {
 
     /**
      * @param string $inOptionName
-     * @param int $userID
+     * @param int    $userID
+     *
      * @return bool
      */
     public function getOption($inOptionName, $userID) {
@@ -87,7 +88,8 @@ class userOptionEngine {
 
     /**
      * @param userOption $inOption
-     * @param int $userID
+     * @param int        $userID
+     *
      * @return bool
      * @internal param int $inRoleID
      */
@@ -103,7 +105,6 @@ class userOptionEngine {
         if (!$idVal->validate($userID)) {
             return false;
         }
-
 
         // is it stored already?
         if (isset($this->checkedOptions[$inOption->getComputerName()][$userID])) {
@@ -126,14 +127,13 @@ class userOptionEngine {
         //return the value
         return $enabled;
 
-
     }
-
 
     /**
      * @param userOption $option
-     * @param int $userID
-     * @param bool $value
+     * @param int        $userID
+     * @param bool       $value
+     *
      * @internal param $optionName
      * @return bool
      */
@@ -168,7 +168,6 @@ class userOptionEngine {
         return true;
     }
 
-
     /**
      * Adds an option to the table
      * on success, returns the optionID of the new option
@@ -176,6 +175,7 @@ class userOptionEngine {
      * @param $inOptionName
      * @param $inHumanName
      * @param $inOptionDescription
+     *
      * @return bool | int optionID of new option
      */
     public function addOption($inOptionName, $inHumanName, $inOptionDescription) {
@@ -212,12 +212,12 @@ class userOptionEngine {
         return $results[0]['optionID'];
     }
 
-
     /**
      *
      *
      * @param userOption $option
-     * @param int $userRole
+     * @param int        $userRole
+     *
      * @internal param string $optionName
      * @return bool
      */
@@ -238,8 +238,6 @@ class userOptionEngine {
         }
         return true;
 
-
     }
-
 
 }

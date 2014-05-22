@@ -23,6 +23,7 @@ class statusEngine {
 * and if it's not create one.
 */
     private static $instance;
+
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new statusEngine();
@@ -35,13 +36,13 @@ class statusEngine {
 
     }
 
-    public function addStatusToDatabase($inPosterID, $inParentStatus, $inSupporterCount, $inNodeID, $inStatus){
+    public function addStatusToDatabase($inPosterID, $inParentStatus, $inSupporterCount, $inNodeID, $inStatus) {
         //inserts the status into the database
         $db = database::getInstance();
         $db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
 
         //Select query for getting StatusID for next insert
-        $results = $db->getData("statusID", "status" ,"'posterID' = $inPosterID");
+        $results = $db->getData("statusID", "status", "'posterID' = $inPosterID");
         $statusID = $results[0]['statusID'];
 
         //insert into the statusRevision table
@@ -51,7 +52,7 @@ class statusEngine {
     }
 
     //Get statuses from Database and create an array of status objects
-    public function retrieveStatusFromDatabaseByUser($inUserID){
+    public function retrieveStatusFromDatabaseByUser($inUserID) {
         //Create status objects
         $db = database::getInstance();
         $statusArray = array();
@@ -60,8 +61,7 @@ class statusEngine {
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "'posterID' = $inUserID"); //<----
 
-
-        foreach($results as $row){
+        foreach ($results as $row) {
             $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
@@ -69,7 +69,7 @@ class statusEngine {
     }
 
     //Get statuses from Database and create an array of status objects
-    public function retrieveStatusFromDatabaseByNode($inNodeID){
+    public function retrieveStatusFromDatabaseByNode($inNodeID) {
         //Create status objects
         $db = database::getInstance();
         $statusArray = array();
@@ -78,7 +78,7 @@ class statusEngine {
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "'nodeID' = $inNodeID");
 
-        foreach($results as $row){
+        foreach ($results as $row) {
             $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
@@ -86,7 +86,7 @@ class statusEngine {
     }
 
     //Editing status's
-    public function editStatusInDatabaseByID($inStatusID, $inUpdatedStatus){
+    public function editStatusInDatabaseByID($inStatusID, $inUpdatedStatus) {
         $db = database::getInstance();
 
         $results = $db->getData("*",

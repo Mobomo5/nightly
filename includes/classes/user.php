@@ -6,6 +6,7 @@
  * Time: 12:22 PM
  */
 require_once(VALIDATOR_OBJECT_FILE);
+
 class user {
     private $userID;
     private $userRole;
@@ -14,21 +15,22 @@ class user {
     private $firstName;
     private $lastName;
     private $email;
+
     public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail) {
-        if(! is_int($inUserID)) {
+        if (!is_int($inUserID)) {
             return;
         }
-        if($inUserID < 0) {
+        if ($inUserID < 0) {
             return;
         }
-        if(! is_int($inUserRole)) {
+        if (!is_int($inUserRole)) {
             return;
         }
-        if($inUserRole < 1) {
+        if ($inUserRole < 1) {
             return;
         }
         $validator = new validator('email');
-        if(! $validator->validate($inEmail)) {
+        if (!$validator->validate($inEmail)) {
             return;
         }
         $this->userID = $inUserID;
@@ -39,54 +41,68 @@ class user {
         $this->lastName = $inLastName;
         $this->email = $inEmail;
     }
+
     public function getUserID() {
         return $this->userID;
     }
+
     public function getRoleID() {
         return $this->userRole;
     }
+
     public function setRoleID($inRoleID) {
-        if(! is_int($inRoleID)) {
+        if (!is_int($inRoleID)) {
             return;
         }
-        if($inRoleID < 1) {
+        if ($inRoleID < 1) {
             return;
         }
         $this->userRole = $inRoleID;
     }
+
     public function getGivenIdentifier() {
         return $this->givenIdentifier;
     }
+
     public function setGivenIdentifier($inGivenIdentifier) {
         $this->givenIdentifier = $inGivenIdentifier;
     }
+
     public function getUserName() {
         return $this->userName;
     }
+
     public function setUserName($inUserName) {
         $this->userName = $inUserName;
     }
+
     public function getFullName() {
         return $this->firstName . ' ' . $this->lastName;
     }
+
     public function getFirstName() {
         return $this->firstName;
     }
+
     public function setFirstName($inFirstName) {
         $this->firstName = $inFirstName;
     }
+
     public function getLastName() {
         return $this->lastName;
     }
+
     public function setLastName($inLastName) {
         $this->lastName = $inLastName;
     }
+
     public function getEmail() {
         return $this->email;
     }
+
     public function setEmail($inEmail) {
         $validator = new validator('email');
-        if(! $validator->validate($inEmail)) {
+        if (!$validator->validate($inEmail)) {
             return;
         }
         $this->email = $inEmail;

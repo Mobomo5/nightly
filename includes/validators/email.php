@@ -9,7 +9,7 @@ require_once(VALIDATOR_INTERFACE_FILE);
 
 class email implements subValidator {
     public function validate($inValue) {
-        if(!filter_var($inValue, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($inValue, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
         return true;

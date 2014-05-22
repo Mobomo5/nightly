@@ -24,13 +24,13 @@ class moduleEngine {
 
     public function moduleExists($moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
-        if($moduleName == '/') {
+        if ($moduleName == '/') {
             return false;
         }
-        if($moduleName == '') {
+        if ($moduleName == '') {
             return false;
         }
-        if($moduleName == null) {
+        if ($moduleName == null) {
             return false;
         }
         $validator = new validator('dir');
@@ -76,7 +76,6 @@ class moduleEngine {
         // escape
         $name = $db->escapeString($name);
         $humanName = $db->escapeString($humanName);
-
 
         $results = $db->insertData('modules', 'moduleName, humanName, enabled', '\'' . $name . '\',\'' . $humanName . '\',\'' . $enabled . '\'');
         if (!$results) {

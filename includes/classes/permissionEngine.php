@@ -49,7 +49,6 @@ class permissionEngine {
 //        if (count($results > 1)) { @todo: Why is this breaking everything?
 //            return false;
 //        }
-        var_dump($results);
         $permission = new permission($results[0]['permissionID'], $results[0]['permissionName'], $results[0]['humanName'], $results[0]['permissionDescription']);
         $this->retrievedPermissions[$inPermissionName] = $permission;
         return $permission;

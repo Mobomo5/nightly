@@ -80,7 +80,7 @@ class database implements databaseInterface {
      * disconnects the database
      */
     public function disconnect() {
-        if(! $this->isConnected()) {
+        if (!$this->isConnected()) {
             return;
         }
         $this->dbObject->disconnect();
@@ -93,6 +93,7 @@ class database implements databaseInterface {
      * @param string $select
      * @param string $from
      * @param string $where
+     *
      * @return bool
      */
     public function getData($select, $from, $where = '1') {
@@ -110,6 +111,7 @@ class database implements databaseInterface {
      * Allows the user to make custom queries. May be removed before release
      *
      * @param $inQuery
+     *
      * @return bool
      */
     public function makeCustomQuery($inQuery) {
@@ -126,6 +128,7 @@ class database implements databaseInterface {
      * @param $into
      * @param $columns
      * @param $values
+     *
      * @return bool
      */
     public function insertData($into, $columns, $values) {
@@ -145,6 +148,7 @@ class database implements databaseInterface {
      * @param $table
      * @param $set
      * @param $where
+     *
      * @return bool
      */
     public function updateTable($table, $set, $where) {
@@ -181,6 +185,7 @@ class database implements databaseInterface {
      * returns an escaped string
      *
      * @param $inString
+     *
      * @return bool
      */
     function escapeString($inString) {
@@ -196,6 +201,7 @@ class database implements databaseInterface {
      *
      * @param $from
      * @param $where
+     *
      * @return bool
      */
     function removeData($from, $where) {

@@ -7,14 +7,17 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(VARIABLE_OBJECT_FILE);
+
 class variableEngine {
     private static $instance;
+
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new variableEngine();
         }
         return self::$instance;
     }
+
     public function getVariable($variableName) {
         if ($variableName == '') {
             return null;
@@ -41,6 +44,7 @@ class variableEngine {
         $toReturn = new variable($variableName, $variableValue);
         return $toReturn;
     }
+
     public function getVariables(array $variables = array()) {
         if (count($variables) == 0) {
             return null;
@@ -70,7 +74,7 @@ class variableEngine {
         if ($results == false) {
             return null;
         }
-        if($results == null) {
+        if ($results == null) {
             return null;
         }
         $toReturn = array();
@@ -88,59 +92,62 @@ class variableEngine {
         }
         return $toReturn;
     }
+
     public function saveVariable(variable $variableToSave) {
         $database = database::getInstance();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             return false;
         }
         $variableName = $database->escapeString(htmlspecialchars($variableToSave->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToSave->getValue()));
         $isReadOnly = $variableToSave->isReadOnly();
-        if($isReadOnly == true) {
+        if ($isReadOnly == true) {
             $isReadOnly = 1;
         } else {
             $isReadOnly = 0;
         }
         $originalName = $variableToSave->getOldName();
-        if($originalName != null) {
+        if ($originalName != null) {
             $originalName = $database->escapeString(htmlspecialchars($originalName));
         } else {
             $originalName = $variableName;
         }
-        if(! $database->updateTable('variable', "variableName='{$variableName}', variableValue='{$variableValue}', readOnly={$isReadOnly}", "variableName='{$originalName}'")) {
+        if (!$database->updateTable('variable', "variableName='{$variableName}', variableValue='{$variableValue}', readOnly={$isReadOnly}", "variableName='{$originalName}'")) {
             return false;
         }
         return true;
     }
+
     public function addVariable(variable $variableToAdd) {
         $database = database::getInstance();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             return false;
         }
         $variableName = $database->escapeString(htmlspecialchars($variableToAdd->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToAdd->getValue()));
         $isReadOnly = $variableToAdd->isReadOnly();
-        if($isReadOnly == true) {
+        if ($isReadOnly == true) {
             $isReadOnly = 1;
         } else {
             $isReadOnly = 0;
         }
-        if(! $database->insertData('variable', 'variableName, variableValue, readOnly', "'{$variableName}', '{$variableValue}', {$isReadOnly}")) {
+        if (!$database->insertData('variable', 'variableName, variableValue, readOnly', "'{$variableName}', '{$variableValue}', {$isReadOnly}")) {
             return false;
         }
         return true;
     }
+
     public function deleteVariable(variable $variableToDelete) {
-        if(! $variableToDelete->isReadOnly()) {
+        if (!$variableToDelete->isReadOnly()) {
             return false;
         }
         $database = database::getInstance();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             return false;
         }
         $variableName = $database->escapeString(htmlspecialchars($variableToDelete->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToDelete->getValue()));
-        if(! $database->removeData('variable', "variableName = '{$variableName}' AND variableValue = '{$variableValue}'")) {
+        if (!$database->removeData('variable', "variableName = '{$variableName}' AND variableValue = '{$variableValue}'")) {
             return false;
         }
         return true;

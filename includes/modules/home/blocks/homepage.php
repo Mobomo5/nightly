@@ -7,7 +7,6 @@
  */
 require_once(NODE_INTERFACE_FILE);
 
-
 class homepage implements node {
     private $title;
 

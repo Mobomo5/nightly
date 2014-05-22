@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -7,5 +8,6 @@
  */
 interface subValidator {
     public function validate($inValue);
+
     public function hasOptions();
 }

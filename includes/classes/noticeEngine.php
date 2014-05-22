@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -7,6 +8,7 @@
  */
 class noticeEngine {
     private $notices;
+
     public static function getInstance() {
         if (!isset($_SESSION['educaskNotices'])) {
             $_SESSION['educaskNotices'] = new noticeEngine();
@@ -14,6 +16,7 @@ class noticeEngine {
 
         return $_SESSION['educaskNotices'];
     }
+
     private static function setInstance(noticeEngine $object) {
         //verify the variable given is a notice engine. If it is not, get out of here.
         if (get_class($object) != "noticeEngine") {
@@ -21,16 +24,20 @@ class noticeEngine {
         }
         $_SESSION['educaskNotices'] = $object;
     }
-    private function __construct(){
+
+    private function __construct() {
         $this->notices = array();
     }
+
     public function addNotice(notice $notice) {
         $this->notices[] = $notice;
         self::setInstance($this);
     }
+
     public function getNotices() {
         return $this->notices;
     }
+
     public function removeNotices() {
         $numberOfNotices = count($this->notices);
         $newArray = array();
@@ -46,6 +53,7 @@ class noticeEngine {
         $this->notices = $newArray;
         self::setInstance($this);
     }
+
     public function removeNotice(notice $toRemove) {
         $positionToRemove = $this->findNotice($toRemove);
         if ($positionToRemove == -1) {
@@ -54,6 +62,7 @@ class noticeEngine {
         $this->notices[$positionToRemove] = null;
         self::setInstance($this);
     }
+
     public function findNotice(notice $toFind) {
         $numberOfNotices = count($this->notices);
         for ($i = 0; $i < $numberOfNotices; $i++) {

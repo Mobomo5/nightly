@@ -6,24 +6,27 @@
  * Time: 4:04 PM
  */
 require_once(VALIDATOR_INTERFACE_FILE);
+
 class file implements subValidator {
     public function validate($inValue, array $inOptions = array('removeDotDot' => true)) {
-        if($inValue == '/') {
-            return false;
-        }        if($inValue == '') {
+        if ($inValue == '/') {
             return false;
         }
-        if($inValue == null) {
+        if ($inValue == '') {
             return false;
         }
-        if($inOptions['removeDotDot'] == true) {
+        if ($inValue == null) {
+            return false;
+        }
+        if ($inOptions['removeDotDot'] == true) {
             $inValue = str_replace('..', '', $inValue);
         }
-        if(! is_file(EDUCASK_ROOT . $inValue)) {
+        if (!is_file(EDUCASK_ROOT . $inValue)) {
             return false;
         }
         return true;
     }
+
     public function hasOptions() {
         return true;
     }

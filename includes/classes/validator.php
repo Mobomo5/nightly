@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -7,36 +8,39 @@
  */
 class validator {
     private $subValidator;
+
     public function __construct($inType) {
         str_replace('..', '', $inType);
         $validatorFile = EDUCASK_ROOT . '/includes/validators/' . $inType . '.php';
-        if(! is_file($validatorFile)) {
+        if (!is_file($validatorFile)) {
             $this->subValidator = false;
             return;
         }
         require_once($validatorFile);
         $this->subValidator = new $inType();
     }
+
     public function validate($inValue, array $inOptions = array()) {
-        if(! $this->subValidator) {
+        if (!$this->subValidator) {
             return false;
         }
-        if(! is_object($this->subValidator)) {
+        if (!is_object($this->subValidator)) {
             return false;
         }
-        if(! in_array('subValidator', class_implements($this->subValidator))) {
+        if (!in_array('subValidator', class_implements($this->subValidator))) {
             return false;
         }
-        if(empty($inOptions)) {
+        if (empty($inOptions)) {
             return $this->subValidator->validate($inValue);
         }
-        if($this->subValidator->hasOptions()) {
+        if ($this->subValidator->hasOptions()) {
             return $this->subValidator->validate($inValue, $inOptions);
         }
         return $this->subValidator->validate($inValue);
     }
+
     public function validatorExists() {
-        if(! $this->subValidator) {
+        if (!$this->subValidator) {
             return false;
         }
         return true;

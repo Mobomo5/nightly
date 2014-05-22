@@ -9,8 +9,7 @@ require_once(VARIABLE_OBJECT_FILE);
 require_once(VARIABLE_ENGINE_OBJECT_FILE);
 require_once(VALIDATOR_OBJECT_FILE);
 
-class site
-{
+class site {
     private $title;
     private $email;
     private $url;
@@ -24,8 +23,7 @@ class site
     //@TODO: Add Cron Stuff
     //@TODO: Add logo and favicon.
 
-    public static function getInstance()
-    {
+    public static function getInstance() {
         if (!isset($_SESSION['educaskSite'])) {
             self::setInstance(new site());
         }
@@ -33,8 +31,7 @@ class site
         return $_SESSION['educaskSite'];
     }
 
-    private static function setInstance(site $object)
-    {
+    private static function setInstance(site $object) {
         //verify the variable given is a site object. If it is not, get out of here.
         if (get_class($object) != 'site') {
             return;
@@ -42,8 +39,7 @@ class site
         $_SESSION['educaskSite'] = $object;
     }
 
-    private function __construct()
-    {
+    private function __construct() {
         $variableEngine = variableEngine::getInstance();
         $variablesWanted[] = 'siteTitle';
         $variablesWanted[] = 'siteEmail';
@@ -70,18 +66,15 @@ class site
         //@TODO: Add Cron Stuff
     }
 
-    public function getTitle()
-    {
+    public function getTitle() {
         return $this->title;
     }
 
-    public function getEmail()
-    {
+    public function getEmail() {
         return $this->email;
     }
 
-    public function setTitle($inTitle)
-    {
+    public function setTitle($inTitle) {
         if (!$this->title->setValue($inTitle)) {
             return false;
         }
@@ -89,8 +82,7 @@ class site
         self::setInstance($this);
     }
 
-    public function setEmail($inEmail)
-    {
+    public function setEmail($inEmail) {
         $validator = new validator('email');
         if (!$validator->validatorExists()) {
             return false;
@@ -105,13 +97,11 @@ class site
         self::setInstance($this);
     }
 
-    public function getTheme()
-    {
+    public function getTheme() {
         return $this->theme;
     }
 
-    public function setTheme($inTheme)
-    {
+    public function setTheme($inTheme) {
         $inTheme = str_replace('..', '', $inTheme);
         $tempName = '/includes/themes/' . $inTheme;
         $validator = new validator('dir');
@@ -128,8 +118,7 @@ class site
         self::setInstance($this);
     }
 
-    public function getWebAddress($secure = false, $withBaseDirectory = false)
-    {
+    public function getWebAddress($secure = false, $withBaseDirectory = false) {
         if ($secure == true) {
             if ($withBaseDirectory == true) {
                 return $this->urlSecure . $this->baseDirectory;
@@ -142,8 +131,7 @@ class site
         return $this->url;
     }
 
-    public function setWebAddress($inUrl)
-    {
+    public function setWebAddress($inUrl) {
         $validator = new validator('url');
         if (!$validator->validatorExists()) {
             return false;
@@ -158,8 +146,7 @@ class site
         self::setInstance($this);
     }
 
-    public function setSecureWebAddress($inUrl)
-    {
+    public function setSecureWebAddress($inUrl) {
         $validator = new validator('url');
         if (!$validator->validatorExists()) {
             return false;
@@ -174,13 +161,11 @@ class site
         self::setInstance($this);
     }
 
-    public function getBaseDirectory()
-    {
+    public function getBaseDirectory() {
         return $this->baseDirectory;
     }
 
-    public function setBaseDirectory($inDirectory)
-    {
+    public function setBaseDirectory($inDirectory) {
         $inDirectory = str_replace('..', '', $inDirectory);
         $validator = new validator('dir');
         if (!$validator->validatorExists()) {
@@ -196,19 +181,16 @@ class site
         self::setInstance($this);
     }
 
-    public function getEducaskVersion()
-    {
+    public function getEducaskVersion() {
 
         return $this->educaskVersion;
     }
 
-    public function getGuestRoleID()
-    {
+    public function getGuestRoleID() {
         return $this->guestRoleID;
     }
 
-    public function setGuestRoleID($inID)
-    {
+    public function setGuestRoleID($inID) {
         if (!is_int($inID)) {
             return false;
         }
@@ -219,13 +201,11 @@ class site
         self::setInstance($this);
     }
 
-    public function areCleanURLsEnabled()
-    {
+    public function areCleanURLsEnabled() {
         return $this->cleanURLs;
     }
 
-    public function setCleanURLs($areEnabled = true)
-    {
+    public function setCleanURLs($areEnabled = true) {
         if ($areEnabled == false) {
             if (!$this->cleanURLs->setValue(0)) {
                 return false;
@@ -239,13 +219,11 @@ class site
         self::setInstance($this);
     }
 
-    public function getTimeZone()
-    {
+    public function getTimeZone() {
         return $this->timeZone;
     }
 
-    public function setTimeZone($inTimeZone)
-    {
+    public function setTimeZone($inTimeZone) {
         $validator = new validator('phpTimeZone');
         if (!$validator->validatorExists()) {
             return false;
