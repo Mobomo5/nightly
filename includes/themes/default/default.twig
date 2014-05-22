@@ -33,14 +33,13 @@
     {% endblock %}
 
     <div id="mainContent">
-        {{ dump(blocks) }}
         <h2>{{ blocks.main.title| raw }}</h2>
 
         <p>{{ blocks.main.content|raw }}</p>
 
     </div>
     <div id="login-modal" style="display: none;">
-    {{ blocks.login.content|raw }}
+        {{ blocks.login.content|raw }}
     </div>
 
 
