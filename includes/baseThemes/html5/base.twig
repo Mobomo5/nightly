@@ -5,25 +5,19 @@
     <meta name="Generator" content="Educask version {{ site.getEducaskVersion }}">
     <meta http-equiv="X-FRAME-OPTIONS" content="DENY">
     <script src="{{ site.getBaseDirectory }}thirdPartyLibraries/js/jQuery/jquery.js"></script>
-    <!--Overlay stuff to line 16-->
+
+    <!--Overlay to line 17-->
     <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
-    <link rel="stylesheet" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.css?v=2.1.5" type="text/css" media="screen" />
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-    <link rel="stylesheet" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.5" type="text/css" media="screen" />
+    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.js?v=2.1.5"></script>
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.css?v=2.1.5" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.5" />
     <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.5"></script>
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.6"></script>
-    <link rel="stylesheet" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7" type="text/css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7" />
     <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7"></script>
+    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.6"></script>
 
     {{ site.getScriptLinks|raw }}
     <script type="text/javascript">
-        /* borrowed from tinyMCE.com */
-        tinymce.init({
-            selector: "#compose-body",
-            plugins: "tabfocus",
-            tab_focus: ":prev, :next"
-        });
-
         $(document).ready(function () {
             $(".inline").fancybox({
                 fitToView: true,
@@ -34,8 +28,6 @@
                 openEffect: "elastic",
                 closeEffect: "elastic"
             });
-        });
-        $(document).ready(function () {
             $(".inlineRefreshOnClose").fancybox({
                 fitToView: true,
                 autoSize: false,
@@ -48,10 +40,6 @@
                     parent.location.reload();
                 }
             });
-        });
-        /* borrowed from http://jqueryui.com/datepicker/ */
-        $(function () {
-            $("#datepicker").datepicker({ minDate: 0});
         });
         {{ site.getScripts|raw }}
     </script>
