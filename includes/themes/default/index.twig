@@ -1,5 +1,6 @@
 {% block body %}
 
+
     {% block titlebar %}
         <div id="titlebar">
             <ul>
@@ -14,7 +15,7 @@
                         <input name="text" type="text"/><input type="submit"/>
                     </form>
                 </li>
-                <li><a id="login" href="">Log in</a></li>
+                <li>{{ blocks.login.button|raw }}</li>
             </ul>
 
         </div>
@@ -34,21 +35,14 @@
     {% endblock %}
 
     <div id="mainContent">
+        {{ dump(blocks) }}
         <h2>{{ blocks.main.title| raw }}</h2>
 
         <p>{{ blocks.main.content|raw }}</p>
 
     </div>
     <div id="modal1" style="display: none;">
-        <div id="login-form-background">
-            <h2>Please log in</h2>
-
-            <form method="post" action="login">
-                Username: <input type="text" name="username"/><br/>
-                Password: <input type="password" name="password"/><br/>
-                <input type="submit"/><a id="login-form-cancel" href="">Cancel</a>
-            </form>
-        </div>
+        {{ blocks.login.content|raw }}
     </div>
 
 

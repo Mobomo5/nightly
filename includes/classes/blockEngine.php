@@ -23,7 +23,9 @@ class blockEngine {
         if (!$database->isConnected()) {
             return null;
         }
+        // get all enabled blocks
         $results = $database->getData('b.blockID, m.moduleName, b.blockName, b.themeRegion, b.title', 'block b, module m', 'b.theme = \'' . $theme . '\' AND b.enabled = 1 AND m.moduleID = b.module ORDER BY weight');
+        // if there are none available, return false.
         if($results == false) {
             return null;
         }
@@ -78,11 +80,14 @@ class blockEngine {
         $database = database::getInstance();
         $database->connect();
 
+        // check to see if it's in the visibility table
+        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\''); //AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\'))');
+        //Default block is visible unless specified
 
-        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\'))');
-//Default block is visible unless specified
+        // if results are empty
         if ($results == false) {
-            return false;
+            return true;
+            // it's not in the table, check to see
             $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
             if ($results != null) {
                 return false;
@@ -95,12 +100,13 @@ class blockEngine {
         }
         //Block is only visible on specified pages
         if ($results[0]['visible'] == 0) {
-            $results = $database->getData('*', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 1');
+            $results = $database->getData('*', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
             if ($results == false) {
                 return false;
             }
             return true;
         }
+
         return true;
     }
     public function getPathToBlock($blockName, $moduleName) {

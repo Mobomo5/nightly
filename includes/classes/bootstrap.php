@@ -88,6 +88,7 @@ class bootstrap {
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(USER_OBJECT_FILE);
+        require_once(NODE_INTERFACE_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
         require_once(NODE_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
@@ -137,11 +138,14 @@ class bootstrap {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
         $loader = new Twig_Loader_Filesystem(array($theme));
+
         foreach(glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
             $name = explode('/', $baseTheme);
             $name = end($name);
             $loader->addPath($baseTheme, $name);
         }
+        $loader->addPath(EDUCASK_ROOT . '/includes/baseThemes/html5');
+        $loader->addPath(EDUCASK_ROOT . '/includes/baseThemes');
         $twig = new Twig_Environment($loader, array(
             'debug' => true,
         ));

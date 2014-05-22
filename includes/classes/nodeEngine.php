@@ -92,13 +92,13 @@ class nodeEngine {
             $moduleEngine->includeModule('404');
             return new fourOhFour();
         }
-
         $interfacesThatClassImplements = class_implements($moduleClass);
 
         if ($interfacesThatClassImplements === false) {
             $moduleEngine->includeModule('404');
             return new fourOhFour();
         }
+
         if (!in_array('node', $interfacesThatClassImplements)) {
             $moduleEngine->includeModule('404');
             return new fourOhFour();

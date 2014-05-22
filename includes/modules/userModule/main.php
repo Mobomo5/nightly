@@ -1,20 +1,41 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: craig
- * Date: 4/23/14
- * Time: 2:52 PM
+ * User: Craig
+ * Date: 5/21/14
+ * Time: 2:02 PM
  */
 require_once(NODE_INTERFACE_FILE);
 
-class addOptions implements node {
+
+class userModule implements node {
+    private $params;
+    private $noGui = false;
+    private $module;
+    private $subModule;
+
 
     public function __construct() {
-        // TODO: Implement __construct() method.
+        $this->params = nodeEngine::getInstance()->getParameters(true);
+        $this->module = $this->params[0];
+        if (!empty($_POST['login'])) {
+            $this->doLogin();
+            return;
+        } elseif (!empty($_POST['logout'])) {
+            $this->doLogout();
+            return;
+        } elseif (!empty($_POST[''])) {
+
+        }
+
     }
 
     public function getTitle() {
         // TODO: Implement getTitle() method.
+    }
+
+    public function setTitle($inTitle) {
+        // TODO: Implement setTitle() method.
     }
 
     public function getContent() {
@@ -57,7 +78,11 @@ class addOptions implements node {
         // TODO: Implement getReturnPage() method.
     }
 
-    public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
+    private function doLogOut() {
+        return currentUser::getUserSession()->logOut();
+    }
+
+    private function doLogIn() {
+        return currentUser::getUserSession()->logIn($_POST['username'], $_POST['password']);
     }
 }

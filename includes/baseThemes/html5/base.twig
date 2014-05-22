@@ -1,57 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ blocks.page.getTitle }} | {{ site.getTitle }}</title>
+    <title>{{ blocks.main.getTitle }} | {{ site.getTitle }}</title>
     <meta name="Generator" content="Educask version {{ site.getEducaskVersion }}">
     <meta http-equiv="X-FRAME-OPTIONS" content="DENY">
-    <script src="{{ site.getBaseDirectory }}thirdPartyLibraries/js/jQuery/jquery.js"></script>
-    <!--Overlay stuff to line 16-->
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
-    <link rel="stylesheet" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.css?v=2.1.5" type="text/css" media="screen" />
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-    <link rel="stylesheet" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.5" type="text/css" media="screen" />
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.5"></script>
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.6"></script>
-    <link rel="stylesheet" href="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7" type="text/css" media="screen" />
-    <script type="text/javascript" src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7"></script>
-    {{ script.links|raw }}
-    <script type="text/javascript">
-        /* borrowed from tinyMCE.com */
-        tinymce.init({
-            selector: "#compose-body",
-            plugins: "tabfocus",
-            tab_focus: ":prev, :next"
-        });
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/lib/jquery-1.10.1.min.js"></script>
 
-        $(document).ready(function () {
-            $(".inline").fancybox({
-                fitToView: true,
-                autoSize: false,
-                width: "90%",
-                height: "80%",
-                closeClick: false,
-                openEffect: "elastic",
-                closeEffect: "elastic"
-            });
-        });
-        $(document).ready(function () {
-            $(".inlineRefreshOnClose").fancybox({
-                fitToView: true,
-                autoSize: false,
-                width: "90%",
-                height: "80%",
-                closeClick: false,
-                openEffect: "elastic",
-                closeEffect: "elastic",
-                afterClose: function () {
-                    parent.location.reload();
-                }
-            });
-        });
-        /* borrowed from http://jqueryui.com/datepicker/ */
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/theme.css"/>
+    <link rel="stylesheet" type="text/css"
+          src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.css"/>
+
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.js"></script>
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/fancybox/source/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript"
+            src="{{ site.getBaseDirectory }}thirdPartyLibraries/easyModal/jquery.easyModal.js"></script>
+
+    {{ script.links|raw }}
+
+
+    <script type="text/javascript">
+
         $(function () {
-            $("#datepicker").datepicker({ minDate: 0});
+            $("#modal1").easyModal({
+                        top: 100,
+                        overlay: 0.4,
+                        overlayClose: false}
+            );
+            $("#notices-modal").easyModal({
+                        top: 100,
+                        overlay: 0.4,
+                        overlayClose: false}
+            );
+
+            $("#login").click(function (e) {
+                $("#modal1").trigger("openModal");
+                e.preventDefault();
+            });
+            $("#login-form-cancel").click(function (e) {
+                $("#modal1").trigger("closeModal");
+                e.preventDefault();
+            });
+            $("#notices-close").click(function (e) {
+                $("#notices-modal").trigger("closeModal");
+                e.preventDefault();
+            });
         });
+        $('document').ready(function (e) {
+            $("#notices-modal").trigger("openModal");
+
+        })
+
         {{ site.getScripts|raw }}
     </script>
 
@@ -60,6 +61,11 @@
 </head>
 <body>
 {% block body %}
+    {% if blocks|keys[0] == "home" %}
+        {% include "homepage.twig" %}
+    {% else %}
+        {% include "index.twig" %}
+    {% endif %}
 {% endblock %}
 </body>
 </html>
