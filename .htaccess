@@ -8,7 +8,7 @@ Header always append X-Frame-Options DENY
     RewriteEngine on
 
     #Uncomment the below line if Educask is not installed in the main directory or is in a virtual subdomain and is not working properly. Change the directory to the directory that Educask is installed in.
-    RewriteBase /~keegan/
+    RewriteBase /~craig/
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

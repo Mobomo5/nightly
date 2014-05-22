@@ -14,7 +14,7 @@ class login implements node {
         $this->noGUI = false;
         if (!currentUser::getUserSession()->isLoggedIn()) {
             $this->content = $this->getLogIn();
-            $this->button = '<button id="login" href="">Log in</button>';
+            $this->button = '<button id="login" class="inlineLogIn" href="#login-modal">Log in</button>';
         } else {
             $this->content = $this->getLogOut();
             $this->button = '<form action="userModule" method="post"><button type="submit">Log Out</a><input type="hidden" name="logout" value="1"></form>';
