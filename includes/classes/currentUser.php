@@ -80,10 +80,9 @@ class currentUser extends user {
             return false;
         }
 
-//        if($_SESSION['userCanLogIn'] == false) {
-//            return false;
-//        }
-
+        if($_SESSION['userCanLogIn'] == false) {
+            return false;
+        }
 
         $database = database::getInstance();
         $database->connect();
@@ -103,7 +102,6 @@ class currentUser extends user {
         } else {
             $results = NULL;
         }
-
 
         //If there weren't any accounts found or too many accounts found
         if ($results == NULL) {

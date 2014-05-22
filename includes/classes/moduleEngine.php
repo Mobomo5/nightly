@@ -51,7 +51,6 @@ class moduleEngine {
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canAddModule');
         if (!$perm->canDo()) {
-            noticeEngine::getInstance()->addNotice(new notice('error', 'Sorry, I can\'t let you do that...'));
             return false;
         }
 

@@ -72,6 +72,7 @@ class site {
         if(! $this->title->setValue($inTitle)) {
             return false;
         }
+        $this->title->save();
         self::setInstance($this);
     }
     public function setEmail($inEmail) {
@@ -85,22 +86,26 @@ class site {
         if(! $this->email->setValue($inEmail)) {
             return false;
         }
+        $this->email->save();
         self::setInstance($this);
     }
     public function getTheme() {
         return $this->theme;
     }
     public function setTheme($inTheme) {
+        $inTheme = str_replace('..', '', $inTheme);
+        $tempName = '/includes/themes/' . $inTheme;
         $validator = new validator('dir');
         if(! $validator->validatorExists()) {
             return false;
         }
-        if(! $validator->validate($inTheme)) {
+        if(! $validator->validate($tempName)) {
             return false;
         }
         if(! $this->theme->setValue($inTheme)) {
             return false;
         }
+        $this->theme->save();
         self::setInstance($this);
     }
     public function getWebAddress($secure = false, $withBaseDirectory = false) {
@@ -126,6 +131,7 @@ class site {
         if(! $this->url->setValue($inUrl)) {
             return false;
         }
+        $this->url->save();
         self::setInstance($this);
     }
     public function setSecureWebAddress($inUrl) {
@@ -139,19 +145,28 @@ class site {
         if(! $this->urlSecure->setValue($inUrl)) {
             return false;
         }
+        $this->urlSecure->save();
         self::setInstance($this);
     }
     public function getBaseDirectory() {
         return $this->baseDirectory;
     }
     public function setBaseDirectory($inDirectory) {
+        $inDirectory = str_replace('..', '', $inDirectory);
+        $validator = new validator('dir');
+        if(! $validator->validatorExists()) {
+            return false;
+        }
+        if(! $validator->validate($inDirectory)) {
+            return false;
+        }
         if(! $this->baseDirectory->setValue($inDirectory)) {
             return false;
         }
+        $this->baseDirectory->save();
         self::setInstance($this);
     }
     public function getEducaskVersion() {
-
         return $this->educaskVersion;
     }
     public function getGuestRoleID() {
@@ -164,6 +179,7 @@ class site {
         if(! $this->guestRoleID->setValue($inID)) {
             return false;
         }
+        $this->guestRoleID->save();
         self::setInstance($this);
     }
     public function areCleanURLsEnabled() {
@@ -179,6 +195,7 @@ class site {
         if(! $this->cleanURLs->setValue(1)) {
             return false;
         }
+        $this->cleanURLs->save();
         self::setInstance($this);
     }
     public function getTimeZone() {
@@ -195,6 +212,7 @@ class site {
         if(! $this->timeZone->setValue($inTimeZone)) {
             return false;
         }
+        $this->timeZone->save();
         self::setInstance($this);
     }
     //@TODO: Add Cron Stuff

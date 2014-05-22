@@ -9,7 +9,7 @@ require_once(VALIDATOR_INTERFACE_FILE);
 class file implements subValidator {
     public function validate($inValue, array $inOptions = array('removeDotDot' => true)) {
         if($inOptions['removeDotDot'] == true) {
-            str_replace('..', '', $inValue);
+            $inValue = str_replace('..', '', $inValue);
         }
         if(! is_file(EDUCASK_ROOT . $inValue)) {
             return false;

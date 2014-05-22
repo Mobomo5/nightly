@@ -32,7 +32,7 @@ class general {
         }
         return $this->function->run();
     }
-    public function functionExists() {
+    public function functionsExists() {
         if(! $this->function) {
             return false;
         }

@@ -7,11 +7,11 @@
  * Time: 10:56 PM
  */
 class mySQL implements databaseInterface {
-    private $mysqli;
-    private $dbServer;
-    private $dbUsername;
-    private $dbPassword;
-    private $db;
+    private $mysqli = '';
+    private $dbServer = '';
+    private $dbUsername = '';
+    private $dbPassword = '';
+    private $db = '';
     private static $instance;
 
     /**
@@ -25,32 +25,55 @@ class mySQL implements databaseInterface {
         }
         return self::$instance;
     }
+    private function __construct() {
+        //Do nothing;
+    }
 
     /**
      * @bool Returns false if there are any connection errors, otherwise returns true.
      */
     function isConnected() {
+        if(empty($this->mysqli)) {
+            return false;
+        }
+        if($this->mysqli == '') {
+            return false;
+        }
+        if(! is_object($this->mysqli)) {
+            return false;
+        }
         if ($this->mysqli->connect_error) {
+            return false;
+        }
+        if(! $this->mysqli->ping()) {
             return false;
         }
         return true;
     }
-
-    function connect() {
+    public function connect() {
+        if($this->isConnected()) {
+            return;
+        }
         if (empty($this->dbUsername) or empty($this->db) or empty($this->dbPassword) or empty($this->dbServer)) {
             return false;
         }
-        if (!empty($this->mysqli)) {
-            return $this->mysqli;
-        }
-        return $this->mysqli = new mysqli($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
-    }
-
-    function disconnect() {
-        if (!$this->isConnected()) {
+        if ($this->dbUsername == '' or $this->db == '' or $this->dbPassword == '' or $this->dbServer == '') {
             return false;
         }
+        $this->mysqli = $mysql = new mysqli($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
+        if($this->mysqli->connect_errno) {
+            $this->mysqli = '';
+            return false;
+        }
+        self::$instance = $this;
+    }
+    public function disconnect() {
+        if (!$this->isConnected()) {
+            return;
+        }
         $this->mysqli->close();
+        unset($this->mysqli);
+        self::$instance = $this;
     }
 
     /**
@@ -65,27 +88,23 @@ class mySQL implements databaseInterface {
         $query = "SELECT " . $select . " FROM " . $from . " WHERE " . $where . ";";
         $results = $this->mysqli->query($query);
         if ($this->mysqli->errno) {
-            echo $this->mysqli->error;
             return false;
         }
         $numRows = $results->num_rows;
         if ($numRows == 0) {
-
             return null;
         }
         $resultsArray = $this->makeAssoc($results);
         return $resultsArray;
     }
-
-    function makeCustomQuery($inQuery) {
-        $query = $this->mysqli->real_escape_string($inQuery);
-        if (!($results = $this->mysqli->query($query))) {
+    public function makeCustomQuery($inQuery) {
+        if (!($results = $this->mysqli->query($inQuery))) {
+            return false;
         }
         $resultsArray = $this->makeAssoc($results);
         return $resultsArray;
     }
-
-    function insertData($into, $columns, $values) {
+    public function insertData($into, $columns, $values) {
         $query = 'INSERT INTO ' . $into . ' (' . $columns . ') VALUES (' . $values . ');';
         $results = $this->mysqli->query($query);
         if (!$results) {
@@ -93,13 +112,11 @@ class mySQL implements databaseInterface {
         }
         return true;
     }
-
-    function updateTable($table, $set, $values) {
+    public function updateTable($table, $set, $values) {
         $query = 'UPDATE ' . $table . ' SET ' . $set . ' WHERE ' . $values . ';';
         $results = $this->mysqli->query($query);
         return $results;
     }
-
     private function makeAssoc($results) {
         $numRows = $results->num_rows;
         $resultArray = array();
@@ -108,22 +125,23 @@ class mySQL implements databaseInterface {
         }
         return $resultArray;
     }
-
-    function configure($dbServer, $userName, $password, $db) {
+    public function configure($dbServer, $userName, $password, $db) {
         $this->db = $db;
         $this->dbServer = $dbServer;
         $this->dbPassword = $password;
         $this->dbUsername = $userName;
+        self::$instance = $this;
     }
-
-    function escapeString($inString) {
+    public function escapeString($inString) {
         $escapedString = $this->mysqli->real_escape_string($inString);
         return $escapedString;
     }
-
-    function removeData($from, $where) {
+    public function removeData($from, $where) {
         $query = 'DELETE FROM ' . $from . ' WHERE ' . $where . ';';
         $results = $this->mysqli->query($query);
         return $results;
+    }
+    public function __wakeup() {
+        $this->connect();
     }
 }

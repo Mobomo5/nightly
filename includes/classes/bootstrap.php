@@ -120,14 +120,21 @@ class bootstrap {
         define('SITE_EMAIL', $this->site->getEmail());
         define('SITE_TITLE', $this->site->getTitle());
         date_default_timezone_set($this->site->getTimeZone());
+
         $blockEngine = blockEngine::getInstance();
         $nodeEngine = nodeEngine::getInstance();
         $user = currentUser::getUserSession();
+        $hookEngine = hookEngine::getInstance();
+        $router = router::getInstance();
+
+        $hookEngine->runAction('addStaticRoutes');
+        $moduleInCharge = $router->whichModuleHandlesRequest();
+
         $node = $nodeEngine->getNode();
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices();
         noticeEngine::getInstance()->removeNotices();
-//        /database::getInstance()->bootstrapDisconnect();
+        database::getInstance()->bootstrapDisconnect();
     }
     //@TODO: Add Cron Stuff
     private function render() {
@@ -150,6 +157,6 @@ class bootstrap {
             'debug' => true,
         ));
         $twig->addExtension(new Twig_Extension_Debug());
-        echo $twig->render('base.twig', array('site' => $this->site, 'blocks' => $this->blocks));
+        echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
 }
