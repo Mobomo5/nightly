@@ -1,60 +1,43 @@
+{% extends "@html5/base.twig" %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/theme.css"/>
+    <script type="text/javascript"src="{{ site.getBaseDirectory }}thirdPartyLibraries/easyModal/jquery.easyModal.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#modal1").easyModal({
+                        top: 100,
+                        overlay: 0.4,
+                        overlayClose: false}
+            );
+            $("#notices-modal").easyModal({
+                        top: 100,
+                        overlay: 0.4,
+                        overlayClose: false}
+            );
+
+            $("#login").click(function (e) {
+                $("#modal1").trigger("openModal");
+                e.preventDefault();
+            });
+            $("#login-form-cancel").click(function (e) {
+                $("#modal1").trigger("closeModal");
+                e.preventDefault();
+            });
+            $("#notices-close").click(function (e) {
+                $("#notices-modal").trigger("closeModal");
+                e.preventDefault();
+            });
+        });
+        $('document').ready(function (e) {
+            $("#notices-modal").trigger("openModal");
+
+        })
+    </script>
+{% endblock %}
 {% block body %}
-
-
-    {% block titlebar %}
-        <div id="titlebar">
-            <ul>
-                <li><a id="logo" href="#"></a></li>
-                {#iterate through the supplied blocks looking for titlebar menu items. stick them here.#}
-                <li><a href="{{ href }}">name1</a></li>
-                <li><a href="{{ href }}">name2</a></li>
-                <li><a href="{{ href }}">name3</a></li>
-                <li><a href="{{ href }}">name4</a></li>
-                <li>
-                    <form action="#" id="search-box" method="post">
-                        <input name="text" type="text"/><input type="submit"/>
-                    </form>
-                </li>
-                <li>{{ blocks.login.button|raw }}</li>
-            </ul>
-
-        </div>
-    {% endblock %}
-    {% block sidebar %}
-        <div id="sidebar">
-            <ul>
-                <li>SIDEBAR!</li>
-                {# again, iterate through blocks to look for sidebar menu items.#}
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-            </ul>
-        </div>
-    {% endblock %}
-
-    <div id="mainContent">
-        {{ dump(blocks) }}
-        <h2>{{ blocks.main.title| raw }}</h2>
-
-        <p>{{ blocks.main.content|raw }}</p>
-
-    </div>
-    <div id="modal1" style="display: none;">
-        {{ blocks.login.content|raw }}
-    </div>
-
-
-    {# check for notices. If there are any, print them into a modal, with a close button#}
-    {% if blocks.notices.0 is defined %}
-
-        <div id="notices-modal" style="display: none;">
-            <h2>Notice</h2>
-            {% for notice in blocks.notices %}
-                <div class="{{ notice.style }}">{{ notice.message|capitalize }}</div>
-            {% endfor %}
-            <a id="notices-close" href="">Close</a>
-        </div>
+    {% if blocks|keys[0] == "home" %}
+        {% include "homepage.twig" %}
+    {% else %}
+        {% include "default.twig" %}
     {% endif %}
 {% endblock %}
