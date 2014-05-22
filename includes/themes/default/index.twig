@@ -1,9 +1,6 @@
 {% extends "@html5/base.twig" %}
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/theme.css"/>
-    <script>
-        document.getElementById('#login-modal').style.visibility = 'hidden';
-    </script>
 {% endblock %}
 {% block body %}
     {% if blocks|keys[0] == "home" %}

@@ -81,6 +81,9 @@ class userModule implements node {
     }
 
     private function doLogIn() {
-        return currentUser::getUserSession()->logIn($_POST['username'], $_POST['password']);
+        if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
+            noticeEngine::getInstance()->addNotice(new notice('error', 'I couldn\'t log you in.'));
+        }
+        return;
     }
 }

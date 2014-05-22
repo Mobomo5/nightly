@@ -83,7 +83,7 @@ class login implements node {
                 Username: <input type="text" name="username"/><br/>
                 Password: <input type="password" name="password"/><br/>
                 <input type="hidden" name="login" value="1">
-                <input type="submit"/><a id="login-form-cancel" href="">Cancel</a>
+                <input type="submit"/><a id="login-form-cancel" href="javascript:$.fancybox.close()">Cancel</a>
             </form>
         </div>';
         return $content;
