@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User: Keegan Bailey
  * Date: 23/04/14
@@ -6,7 +7,6 @@
  *
  * Handles the creation of Status objects
  */
-
 class status {
     private $statusID; //ID of the status
     private $statusMsg; //Contents of the status
@@ -26,14 +26,14 @@ class status {
         $this->voterArray = array();
     }
 
-    public function addChildStatusTo(status $inChildStatus){
+    public function addChildStatusTo(status $inChildStatus) {
         $this->childStatus[] += $inChildStatus;
     }
 
-    public function removeChildStatusFrom(status $inChildStatus){
+    public function removeChildStatusFrom(status $inChildStatus) {
         //Look for the child status in the array and remove it.
-        foreach($this->childStatus as $child){
-            if($child->getStatusID() == $inChildStatus->getStatusID()){
+        foreach ($this->childStatus as $child) {
+            if ($child->getStatusID() == $inChildStatus->getStatusID()) {
                 $child = null;
                 unset($child);
             }
@@ -44,29 +44,29 @@ class status {
      * on this status. If he has, do nothing, and if he has not, then
      * allow the vote and add his ID to the array of voters
      */
-    public function upVote($inUserID){
+    public function upVote($inUserID) {
         $alreadyVoted = false;
-        foreach($this->voterArray as $user){
-            if($user == $inUserID){
+        foreach ($this->voterArray as $user) {
+            if ($user == $inUserID) {
                 $alreadyVoted = true;
             }
         }
 
-        if(! $alreadyVoted){
+        if (!$alreadyVoted) {
             $this->votes++;
             $this->voterArray[] += $inUserID;
         }
     }
 
-    public function downVote($inUserID){
+    public function downVote($inUserID) {
         $alreadyVoted = false;
-        foreach($this->voterArray as $user){
-            if($user == $inUserID){
+        foreach ($this->voterArray as $user) {
+            if ($user == $inUserID) {
                 $alreadyVoted = true;
             }
         }
 
-        if($alreadyVoted){
+        if ($alreadyVoted) {
             $this->votes--;
             $this->voterArray[] -= $inUserID;
         }
@@ -79,15 +79,15 @@ class status {
         return $this->statusID;
     }
 
-    public function getStatus(){
+    public function getStatus() {
         return $this->statusMsg;
     }
 
-    public function getUpVotes(){
+    public function getUpVotes() {
         return $this->votes;
     }
 
-    public function getNodeID(){
+    public function getNodeID() {
         return $this->nodeID;
     }
 }

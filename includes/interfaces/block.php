@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -7,7 +8,10 @@
  */
 interface block {
     public function __construct($inParameters);
+
     public function getTitle();
+
     public function setTitle();
+
     public function getContent();
 }

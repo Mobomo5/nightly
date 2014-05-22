@@ -6,6 +6,7 @@
  * Time: 6:33 PM
  */
 require_once(SITE_OBJECT_FILE);
+
 class link {
     private $cleanURLEnabled;
     private $href;
@@ -18,7 +19,7 @@ class link {
         }
 
         $this->href = $inHref;
-        if($forceCleanURLS) {
+        if ($forceCleanURLS) {
             $this->cleanURLEnabled = true;
             return;
         }
@@ -31,15 +32,14 @@ class link {
         if (substr($this->href, 0, 4) == "http") {
             return $this->href;
         }
-        if (! $this->cleanURLEnabled) {
-            return EDUCASK_WEB_ROOT . '/?p=' .$this->href;
+        if (!$this->cleanURLEnabled) {
+            return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
         }
 
         return EDUCASK_WEB_ROOT . '/' . $this->href;
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         return '' . $this->getHref();
     }
 }

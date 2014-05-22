@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -7,33 +8,36 @@
  */
 class general {
     private $function;
+
     public function __construct($inFunction) {
         str_replace('..', '', $inFunction);
         $functionFile = EDUCASK_ROOT . '/includes/generalFunctions/' . $inFunction . '.php';
-        if(! is_file($functionFile)) {
+        if (!is_file($functionFile)) {
             $this->function = false;
             return;
         }
         require_once($functionFile);
         $this->function = new $inFunction();
     }
+
     public function run(array $inOptions = array()) {
-        if(! $this->function) {
+        if (!$this->function) {
             return false;
         }
-        if(! in_array('generalFunction', class_implements($this->function))) {
+        if (!in_array('generalFunction', class_implements($this->function))) {
             return false;
         }
-        if(empty($inOptions)) {
+        if (empty($inOptions)) {
             return $this->function->run();
         }
-        if($this->function->hasOptions()) {
+        if ($this->function->hasOptions()) {
             return $this->function->run($inOptions);
         }
         return $this->function->run();
     }
+
     public function functionsExists() {
-        if(! $this->function) {
+        if (!$this->function) {
             return false;
         }
         return true;

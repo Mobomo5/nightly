@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -16,25 +17,25 @@ class mail {
     private $replacements;
 
     public function __construct($inSenderEmail = SITE_EMAIL, $inSenderName = SITE_TITLE, array $inRecipients = array(), $inSubject = 'Email', $inBody = '<p>This is an email.</p>', $isBulkMail = false) {
-        if(! is_bool($isBulkMail)) {
+        if (!is_bool($isBulkMail)) {
             return;
         }
-        if(! filter_var($inSenderEmail, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($inSenderEmail, FILTER_VALIDATE_EMAIL)) {
             return;
         }
-        foreach($inRecipients as $recipient) {
-            if(! filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+        foreach ($inRecipients as $recipient) {
+            if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
                 return;
             }
-            $recipient = str_replace("\r\n",'', $recipient);
-            $recipient = str_replace('\r\n','', $recipient);
+            $recipient = str_replace("\r\n", '', $recipient);
+            $recipient = str_replace('\r\n', '', $recipient);
         }
-        $inSenderEmail = str_replace("\r\n",'', $inSenderEmail);
-        $inSenderEmail = str_replace('\r\n','', $inSenderEmail);
-        $inSenderName = str_replace("\r\n",'', $inSenderName);
-        $inSenderName = str_replace('\r\n','', $inSenderName);
-        $inSubject = str_replace("\r\n",'', $inSubject);
-        $inSubject = str_replace('\r\n','', $inSubject);
+        $inSenderEmail = str_replace("\r\n", '', $inSenderEmail);
+        $inSenderEmail = str_replace('\r\n', '', $inSenderEmail);
+        $inSenderName = str_replace("\r\n", '', $inSenderName);
+        $inSenderName = str_replace('\r\n', '', $inSenderName);
+        $inSubject = str_replace("\r\n", '', $inSubject);
+        $inSubject = str_replace('\r\n', '', $inSubject);
 
         $this->senderEmail = $inSenderEmail;
         $this->senderName = trim(htmlspecialchars($inSenderName));
@@ -46,14 +47,14 @@ class mail {
     }
 
     public function addRecipient($inRecipient) {
-        if(! filter_var($inRecipient, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($inRecipient, FILTER_VALIDATE_EMAIL)) {
             return;
         }
         $this->recipients[] = $inRecipient;
     }
 
     public function removeRecipient($inRecipient) {
-        if(! filter_var($inRecipient, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($inRecipient, FILTER_VALIDATE_EMAIL)) {
             return;
         }
         $toRemove = array_search($inRecipient, $this->recipients);
@@ -63,18 +64,19 @@ class mail {
     public function getSenderEmail() {
         return $this->senderEmail;
     }
+
     public function getSenderName() {
         return $this->senderName;
     }
 
     public function changeSender($inSenderEmail = SITE_EMAIL, $inSenderName = SITE_TITLE) {
-        if(! filter_var($inSenderEmail, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($inSenderEmail, FILTER_VALIDATE_EMAIL)) {
             return;
         }
-        $inSenderName = str_replace("\r\n",'', $inSenderName);
-        $inSenderName = str_replace('\r\n','', $inSenderName);
-        $inSenderEmail = str_replace("\r\n",'', $inSenderEmail);
-        $inSenderEmail = str_replace('\r\n','', $inSenderEmail);
+        $inSenderName = str_replace("\r\n", '', $inSenderName);
+        $inSenderName = str_replace('\r\n', '', $inSenderName);
+        $inSenderEmail = str_replace("\r\n", '', $inSenderEmail);
+        $inSenderEmail = str_replace('\r\n', '', $inSenderEmail);
 
         $this->senderEmail = $inSenderEmail;
         $this->senderName = trim(htmlspecialchars($inSenderName));
@@ -85,7 +87,7 @@ class mail {
     }
 
     public function setBulkMail($isBulkMail = false) {
-        if(! is_bool($isBulkMail)) {
+        if (!is_bool($isBulkMail)) {
             return;
         }
         $this->isBulkMail = $isBulkMail;
@@ -96,8 +98,8 @@ class mail {
     }
 
     public function setSubject($inSubject) {
-        $inSubject = str_replace("\r\n",'', $inSubject);
-        $inSubject = str_replace('\r\n','', $inSubject);
+        $inSubject = str_replace("\r\n", '', $inSubject);
+        $inSubject = str_replace('\r\n', '', $inSubject);
         $this->subject = trim(htmlspecialchars($inSubject));
     }
 
@@ -122,7 +124,7 @@ class mail {
             }
             $recipients = substr($recipients, 0, -2);
 
-            if (! mail($recipients, $this->subject, $this->body, $headers)) {
+            if (!mail($recipients, $this->subject, $this->body, $headers)) {
                 return false;
             }
 
@@ -140,44 +142,47 @@ class mail {
 
         return $sent;
     }
+
     public function doReplacement($emailForReplacement) {
-        if($this->replacements == null) {
+        if ($this->replacements == null) {
             return $this->body;
         }
-        if(! filter_var($emailForReplacement, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($emailForReplacement, FILTER_VALIDATE_EMAIL)) {
             return $this->body;
         }
         $body = $this->body;
-        foreach($this->replacements as $pattern => $email) {
+        foreach ($this->replacements as $pattern => $email) {
             $body = str_replace($pattern, $email[$emailForReplacement], $body);
         }
         return $body;
     }
+
     public function addReplacementValue($replacementPattern, $email, $replacement) {
         $firstChars = substr($replacementPattern, 0, 1);
-        if($firstChars != '[[') {
+        if ($firstChars != '[[') {
             return;
         }
         $lastChars = substr($replacementPattern, -2);
-        if($lastChars != ']]') {
+        if ($lastChars != ']]') {
             return;
         }
-        if(! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return;
         }
         $replacement = strip_tags(trim($replacement), $this->allowedTags);
         $this->replacements[$replacementPattern][$email] = $replacement;
     }
+
     public function removeReplacementValue($replacementPattern, $email) {
         $firstChars = substr($replacementPattern, 0, 1);
-        if($firstChars != '[[') {
+        if ($firstChars != '[[') {
             return;
         }
         $lastChars = substr($replacementPattern, -2);
-        if($lastChars != ']]') {
+        if ($lastChars != ']]') {
             return;
         }
-        if(! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return;
         }
         unset($this->replacements[$replacementPattern][$email]);

@@ -7,13 +7,11 @@
  */
 require_once(NODE_INTERFACE_FILE);
 
-
 class userModule implements node {
     private $params;
     private $noGui = false;
     private $module;
     private $subModule;
-
 
     public function __construct() {
         $this->params = nodeEngine::getInstance()->getParameters(true);

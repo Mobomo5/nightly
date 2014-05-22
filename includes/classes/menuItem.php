@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User: Keegan Bailey
  * Date: 13/05/14
@@ -30,13 +31,13 @@ class menuItem {
         if (!is_numeric($inID)) {
             return;
         }
-        if($inID < 1) {
+        if ($inID < 1) {
             return;
         }
         if (!is_numeric($inMenuID)) {
             return;
         }
-        if($inMenuID < 1) {
+        if ($inMenuID < 1) {
             return;
         }
         if (!is_string($inLinkText)) {
@@ -62,80 +63,98 @@ class menuItem {
         $this->parent = $inParent;
         $this->children = $inChildren;
     }
+
     public function getID() {
         return $this->id;
     }
+
     public function getMenuID() {
         return $this->menuID;
     }
+
     public function setMenuID($inMenuID) {
         if (!is_numeric($inMenuID)) {
             return;
         }
-        if($inMenuID < 1) {
+        if ($inMenuID < 1) {
             return;
         }
         $this->menuID = $inMenuID;
     }
+
     public function getLinkText() {
         return $this->linkText;
     }
+
     public function setLinkText($inLinkText) {
         if (!is_string($inLinkText)) {
             return;
         }
         $this->linkText = trim(htmlspecialchars($inLinkText));
     }
+
     public function getHref() {
         return $this->href;
     }
+
     public function setHref(link $inHref) {
         $this->href = $inHref;
     }
+
     public function getWeight() {
         return $this->weight;
     }
+
     public function setWeight($inWeight) {
-        if(! is_numeric($inWeight)) {
+        if (!is_numeric($inWeight)) {
             return;
         }
         $this->weight = $inWeight;
     }
+
     public function hasChildren() {
         return $this->hasChildren;
     }
+
     public function setHasChildren($inHasChildren) {
-        if(! is_bool($inHasChildren)) {
+        if (!is_bool($inHasChildren)) {
             return;
         }
         $this->hasChildren = $inHasChildren;
     }
+
     public function isEnabled() {
         return $this->enabled;
     }
+
     public function setEnabled($inSetEnabled) {
-        if(! is_bool($inSetEnabled)) {
+        if (!is_bool($inSetEnabled)) {
             return;
         }
         $this->enabled = $inSetEnabled;
     }
+
     public function getParent() {
         return $this->parent;
     }
+
     public function setParent($inParent) {
         $this->parent = $inParent;
     }
+
     public function getChildren() {
         return $this->children;
     }
+
     public function addChild(menuItem $inChild) {
         $this->children[] = $inChild;
     }
+
     public function removeChild($inChildID) {
         if (!is_numeric($inChildID)) {
             return;
         }
-        if($inChildID < 1) {
+        if ($inChildID < 1) {
             return;
         }
         for ($i = 0; $i < count($this->children); $i++) {

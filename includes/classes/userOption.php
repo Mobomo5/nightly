@@ -13,10 +13,11 @@ class userOption {
     private $description;
 
     /**
-     * @param int $inId
+     * @param int    $inId
      * @param string $inComputerName
      * @param string $inHumanName
      * @param string $inDescription
+     *
      * @internal param bool $inValue
      */
     public function __construct($inId, $inComputerName, $inHumanName, $inDescription) {
@@ -34,11 +35,11 @@ class userOption {
         $this->humanName = $inHumanName;
         $this->description = $inDescription;
 
-
     }
 
     /**
      * @param string $computerName
+     *
      * @return bool
      */
     public function setComputerName($computerName) {

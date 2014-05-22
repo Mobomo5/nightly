@@ -24,7 +24,7 @@ class site {
     //@TODO: Add logo and favicon.
 
     public static function getInstance() {
-        if(!isset($_SESSION['educaskSite'])) {
+        if (!isset($_SESSION['educaskSite'])) {
             self::setInstance(new site());
         }
 
@@ -33,7 +33,7 @@ class site {
 
     private static function setInstance(site $object) {
         //verify the variable given is a site object. If it is not, get out of here.
-        if(get_class($object) != 'site') {
+        if (get_class($object) != 'site') {
             return;
         }
         $_SESSION['educaskSite'] = $object;
@@ -75,7 +75,7 @@ class site {
     }
 
     public function setTitle($inTitle) {
-        if(!$this->title->setValue($inTitle)) {
+        if (!$this->title->setValue($inTitle)) {
             return false;
         }
         $this->title->save();
@@ -84,13 +84,13 @@ class site {
 
     public function setEmail($inEmail) {
         $validator = new validator('email');
-        if(!$validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
-        if(!$validator->validate($inEmail)) {
+        if (!$validator->validate($inEmail)) {
             return false;
         }
-        if(!$this->email->setValue($inEmail)) {
+        if (!$this->email->setValue($inEmail)) {
             return false;
         }
         $this->email->save();
@@ -105,13 +105,13 @@ class site {
         $inTheme = str_replace('..', '', $inTheme);
         $tempName = '/includes/themes/' . $inTheme;
         $validator = new validator('dir');
-        if(!$validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
-        if(!$validator->validate($tempName)) {
+        if (!$validator->validate($tempName)) {
             return false;
         }
-        if(!$this->theme->setValue($inTheme)) {
+        if (!$this->theme->setValue($inTheme)) {
             return false;
         }
         $this->theme->save();
@@ -119,13 +119,13 @@ class site {
     }
 
     public function getWebAddress($secure = false, $withBaseDirectory = false) {
-        if($secure == true) {
-            if($withBaseDirectory == true) {
+        if ($secure == true) {
+            if ($withBaseDirectory == true) {
                 return $this->urlSecure . $this->baseDirectory;
             }
             return $this->urlSecure;
         }
-        if($withBaseDirectory == true) {
+        if ($withBaseDirectory == true) {
             return $this->url . $this->baseDirectory;
         }
         return $this->url;
@@ -133,13 +133,13 @@ class site {
 
     public function setWebAddress($inUrl) {
         $validator = new validator('url');
-        if(!$validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
-        if(!$validator->validate($inUrl, array('mightBeIP', 'noDirectories', 'httpOnly'))) {
+        if (!$validator->validate($inUrl, array('mightBeIP', 'noDirectories', 'httpOnly'))) {
             return false;
         }
-        if(!$this->url->setValue($inUrl)) {
+        if (!$this->url->setValue($inUrl)) {
             return false;
         }
         $this->url->save();
@@ -148,13 +148,13 @@ class site {
 
     public function setSecureWebAddress($inUrl) {
         $validator = new validator('url');
-        if(!$validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
-        if(!$validator->validate($inUrl, array('mightBeIP', 'noDirectories', 'httpsOnly'))) {
+        if (!$validator->validate($inUrl, array('mightBeIP', 'noDirectories', 'httpsOnly'))) {
             return false;
         }
-        if(!$this->urlSecure->setValue($inUrl)) {
+        if (!$this->urlSecure->setValue($inUrl)) {
             return false;
         }
         $this->urlSecure->save();
@@ -168,13 +168,13 @@ class site {
     public function setBaseDirectory($inDirectory) {
         $inDirectory = str_replace('..', '', $inDirectory);
         $validator = new validator('dir');
-        if(!$validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
-        if(!$validator->validate($inDirectory)) {
+        if (!$validator->validate($inDirectory)) {
             return false;
         }
-        if(!$this->baseDirectory->setValue($inDirectory)) {
+        if (!$this->baseDirectory->setValue($inDirectory)) {
             return false;
         }
         $this->baseDirectory->save();
@@ -191,10 +191,10 @@ class site {
     }
 
     public function setGuestRoleID($inID) {
-        if(!is_int($inID)) {
+        if (!is_int($inID)) {
             return false;
         }
-        if(!$this->guestRoleID->setValue($inID)) {
+        if (!$this->guestRoleID->setValue($inID)) {
             return false;
         }
         $this->guestRoleID->save();
@@ -206,13 +206,13 @@ class site {
     }
 
     public function setCleanURLs($areEnabled = true) {
-        if($areEnabled == false) {
-            if(!$this->cleanURLs->setValue(0)) {
+        if ($areEnabled == false) {
+            if (!$this->cleanURLs->setValue(0)) {
                 return false;
             }
             return;
         }
-        if(!$this->cleanURLs->setValue(1)) {
+        if (!$this->cleanURLs->setValue(1)) {
             return false;
         }
         $this->cleanURLs->save();
@@ -225,13 +225,13 @@ class site {
 
     public function setTimeZone($inTimeZone) {
         $validator = new validator('phpTimeZone');
-        if(!$validator->validatorExists()) {
+        if (!$validator->validatorExists()) {
             return false;
         }
-        if(!$validator->validate($inTimeZone)) {
+        if (!$validator->validate($inTimeZone)) {
             return false;
         }
-        if(!$this->timeZone->setValue($inTimeZone)) {
+        if (!$this->timeZone->setValue($inTimeZone)) {
             return false;
         }
         $this->timeZone->save();

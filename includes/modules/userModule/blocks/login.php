@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Craig
@@ -91,6 +92,5 @@ class login implements node {
     private function getLogOut() {
 
     }
-
 
 }

@@ -1,11 +1,11 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
  * Date: 4/9/14
  * Time: 5:20 PM
  */
-
 class bootstrap {
     private static $instance;
     private $blocks;
@@ -17,18 +17,20 @@ class bootstrap {
         }
         return self::$instance;
     }
+
     private function __construct() {
-        if(! is_file(EDUCASK_ROOT . '/includes/config.php')) {
+        if (!is_file(EDUCASK_ROOT . '/includes/config.php')) {
             header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
             exit();
         }
-        if(is_file(EDUCASK_WEB_ROOT . '/update.php')) {
+        if (is_file(EDUCASK_WEB_ROOT . '/update.php')) {
             header('Location: ' . EDUCASK_WEB_ROOT . '/update.php');
             exit();
         }
         $this->blocks = null;
         $this->site = null;
     }
+
     public function init() {
         $this->declareConstants();
         $this->doRequires();
@@ -41,6 +43,7 @@ class bootstrap {
         //@TODO: Add Cron Stuff
         $this->render();
     }
+
     private function declareConstants() {
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
         define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
@@ -79,6 +82,7 @@ class bootstrap {
         define('USER_OPTION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOption.php');
         define('ROUTER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/router.php');
     }
+
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
@@ -93,13 +97,15 @@ class bootstrap {
         require_once(NODE_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
     }
+
     private function connectDatabase() {
         $database = database::getInstance();
         $database->connect();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             die('<html><head><title>:( Database is a no-go | Educask</title></head><body><h1>:( The database is a no-go.</h1><p>Sorry, but I had problems connecting to the database.</p></body></html>');
         }
     }
+
     private function initializePlugins() {
         foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*/*.inc.php') as $toInclude) {
             require_once($toInclude);
@@ -114,9 +120,10 @@ class bootstrap {
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('defineConstants');
     }
+
     private function getVariables() {
         $this->site = site::getInstance();
-        define('GUEST_ROLE_ID',(int) $this->site->getGuestRoleID()->getValue());
+        define('GUEST_ROLE_ID', (int)$this->site->getGuestRoleID()->getValue());
         define('SITE_EMAIL', $this->site->getEmail());
         define('SITE_TITLE', $this->site->getTitle());
         date_default_timezone_set($this->site->getTimeZone());
@@ -136,17 +143,18 @@ class bootstrap {
         noticeEngine::getInstance()->removeNotices();
         database::getInstance()->bootstrapDisconnect();
     }
+
     //@TODO: Add Cron Stuff
     private function render() {
         Twig_Autoloader::register();
         $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();
         str_replace('..', '', $theme);
-        if(! is_dir($theme)) {
+        if (!is_dir($theme)) {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
         $loader = new Twig_Loader_Filesystem(array($theme));
 
-        foreach(glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
+        foreach (glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
             $name = explode('/', $baseTheme);
             $name = end($name);
             $loader->addPath($baseTheme, $name);
