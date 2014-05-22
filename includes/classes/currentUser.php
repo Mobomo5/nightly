@@ -80,7 +80,7 @@ class currentUser extends user {
             return false;
         }
 
-        if($_SESSION['userCanLogIn'] == false) {
+        if(isset($_SESSION['userCanLogIn']) && $_SESSION['userCanLogIn'] == false) {
             return false;
         }
 
