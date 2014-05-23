@@ -14,7 +14,7 @@ class default1 implements node {
     }
 
     public function getTitle() {
-        // TODO: Implement getTitle() method.
+        return 'default dummy';
     }
 
     public function setTitle($inTitle) {

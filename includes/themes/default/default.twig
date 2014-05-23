@@ -18,19 +18,7 @@
 
         </div>
     {% endblock %}
-    {% block sidebar %}
-        <div id="sidebar">
-            <ul>
-                <li>SIDEBAR!</li>
-                {# again, iterate through blocks to look for sidebar menu items.#}
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-            </ul>
-        </div>
-    {% endblock %}
+
 
     <div id="mainContent">
         {% if blocks.notices.0 is defined %}
@@ -49,6 +37,19 @@
     <div id="login-modal" style="display: none;">
         {{ blocks.login.0.content|raw }}
     </div>
+    {% block sidebar %}
+        <div id="sidebar">
+            <ul>
+                <li>SIDEBAR!</li>
+                {# again, iterate through blocks to look for sidebar menu items.#}
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+                <li><a href="{{ href }}">List1</a></li>
+            </ul>
+        </div>
+    {% endblock %}
 
 
     {# check for notices. If there are any, print them into a modal, with a close button#}
