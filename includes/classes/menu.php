@@ -28,6 +28,9 @@ class menu {
     private $menuItems;
 
     public function __construct($inID, $inName, $inThemeRegion, $inMenuItems, $inEnabled) {
+        if (!is_numeric($inID)) return;
+        if (!is_string($inName)) return;
+        if (!is_string($inThemeRegion)) return;
 
         $this->menuID = $inID;
         $this->menuName = $inName;
