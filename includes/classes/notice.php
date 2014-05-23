@@ -11,7 +11,7 @@ class notice {
     private $message;
     private $removeOnceDisplayed;
 
-    public function __construct($style = 'neutral', $message = '', $removeOnceDisplayed = true) {
+    public function __construct(noticeType $style = noticeType::neutral, $message = '', $removeOnceDisplayed = true) {
         $this->style = $style;
         $this->message = $message;
         $this->removeOnceDisplayed = $removeOnceDisplayed;

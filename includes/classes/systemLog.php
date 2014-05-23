@@ -21,16 +21,8 @@ class logger {
     private function __construct() {
     }
 
-    public function logIt($userID, $inMessage) {
-        if (!is_numeric($userID)) {
-            return false;
-        }
-        $database = database::getInstance();
-        $database->connect();
-        if (!$database->isConnected()) {
-            return false;
-        }
-        $message = $database->escapeString(htmlspecialchars($inMessage));
-        $database->insertData('systemLog', 'user, message', $userID . ', \'' . $message . '\'');
+    public function logIt(logEntry $entry) {
+
+
     }
 }
