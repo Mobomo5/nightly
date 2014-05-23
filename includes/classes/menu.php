@@ -61,6 +61,17 @@ class menu {
         return $this->menuItems;
     }
 
+    public function getHTML()
+    {
+        $toReturn = '<ul>';
+        foreach ($this->menuItems as $child) {
+            $toReturn .= '<li>' . $child->getHTML() . '</li>';
+        }
+        $toReturn .= '</ul>';
+
+        return $toReturn;
+    }
+
     public function setName($inName) {
         $this->menuName = $inName;
     }
@@ -90,20 +101,7 @@ class menu {
 
     public function __toString() {
         //loop through it's menu items and put them in a HTML list
-        $list = "<ul id='{$this->getID()}'>";
-        foreach ($this->getMenuItems() as $menuItem) {
-            if ($menuItem->isEnabled()) {
-                if (!$menuItem->hasChildred()) {
-                    $list .= "<li id='{$menuItem->getID()}'><a href='{$menuItem->getHref()}'>{$menuItem->getLinkText()}</a></li>";
-                } else {
-                    //??
-                }
-            }
-        }
-
-        $list .= "</ul>";
-
-        return $list;
+        return $this->getHTML();
     }
 }
 
