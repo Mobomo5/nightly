@@ -31,4 +31,6 @@ interface databaseInterface {
 
     function removeData($from, $where);
 
+    function getError();
+
 } 

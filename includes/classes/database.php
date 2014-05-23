@@ -210,4 +210,10 @@ class database implements databaseInterface {
         }
         return $this->dbObject->removeData($from, $where);
     }
+
+    function getError() {
+        return $this->dbObject->getError();
+    }
+
+
 }

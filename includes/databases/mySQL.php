@@ -157,4 +157,8 @@ class mySQL implements databaseInterface {
     public function __wakeup() {
         $this->connect();
     }
+
+    function getError() {
+        return $this->mysqli->error;
+    }
 }
