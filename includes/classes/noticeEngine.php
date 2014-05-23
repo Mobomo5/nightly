@@ -80,3 +80,9 @@ class noticeEngine {
         return -1;
     }
 }
+
+abstract class noticeType {
+    const error = 'error';
+    const normal = 'normal';
+    const positive = 'positive';
+}
