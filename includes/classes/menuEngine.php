@@ -46,7 +46,7 @@ class menuEngine {
 
             return $menu;
         } catch (exception $ex) {
-            return $ex;
+            return $ex->getMessage();
         }
     }
 
@@ -66,7 +66,7 @@ class menuEngine {
 
             return $menuItem;
         } catch (exception $ex) {
-            return $ex;
+            return $ex->getMessage();
         }
     }
 
@@ -76,9 +76,22 @@ class menuEngine {
             return;
         }
 
+        try {
+
+            $results = $this->db->updateTable("menu",
+                "'menuName' = {$inMenu->getName()}, " .
+                "'themeRegion' = {$inMenu->getThemeRegion()}, " .
+                "'enabled' = {$inMenu->isEnabled()}, ",
+                "'menuID' = {$inMenu->getID()}");
+
+            return;
+
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 
-    public function setMenuItem(menuItem $inMenuItem, $inMenuItemID) {
+    public function setMenuItem(menuItem $inMenuItem) {
         //take sin a menuItem object and updates DB
         if (!is_object($inMenuItem)) {
             return;
@@ -87,23 +100,33 @@ class menuEngine {
         try {
 
             $results = $this->db->updateTable("menuItem",
-                "'menuID' = " . $inMenuItem->getMenuID() . ", " .
-                "'linkText' = " . $inMenuItem->getLinkText() . ", " .
-                "'href' = " . $inMenuItem->getHref() . ", " .
-                "'weight' = " . $inMenuItem->getWeight() . ", " .
-                "'hasChildren'" . $inMenuItem->getChildren() . ", " .
-                "'enabled'" . $inMenuItem->isEnabled() . ", ",
-                "'menuItemID' = $inMenuItemID");
+                "'menuID' = {$inMenuItem->getMenuID()}, " .
+                "'linkText' = {$inMenuItem->getLinkText()}, " .
+                "'href' = {$inMenuItem->getHref()}, " .
+                "'weight' = {$inMenuItem->getWeight()}, " .
+                "'hasChildren' = {$inMenuItem->getChildren()}, " .
+                "'enabled' = {$inMenuItem->isEnabled()}, ",
+                "'menuItemID' = {$inMenuItem->getID()}");
 
             return;
 
         } catch (exception $ex) {
-            return;
+            return $ex->getMessage();
         }
     }
 
-    public function addMenu($inName, $inThemeRegion, $inMenuItems, $inEnabled) {
+    public function addMenu($inName, $inThemeRegion, $inEnabled) {
         //Adds a new menu to the database
+        if (!is_string($inName)) return;
+        if (!is_string($inThemeRegion)) return;
+        if (!is_numeric($inEnabled)) return;
+
+        try {
+            $results = $this->db->insertData("menu", "'menuName', 'themeRegion', 'enabled'", "$inName, $inThemeRegion, $inEnabled");
+            return;
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 
     public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent, $inChildren) {
