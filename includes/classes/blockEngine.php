@@ -47,10 +47,10 @@ class blockEngine {
                 continue;
             }
             if ($blockData['title'] == '') {
-                $blocks[$blockData['themeRegion']] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
+                $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
                 continue;
             }
-            $blocks[$blockData['themeRegion']] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
+            $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
         }
 
         return $blocks;

@@ -13,7 +13,7 @@
                         <input name="text" type="text"/><input type="submit"/>
                     </form>
                 </li>
-                <li>{{ blocks.login.button|raw }}</li>
+                <li>{{ blocks.login.0.button|raw }}</li>
             </ul>
 
         </div>
@@ -41,13 +41,13 @@
                 <a id="notices-close" onClick="$(this).parent().remove()">Close</a>
             </div>
         {% endif %}
-        <h2>{{ blocks.main.title| raw }}</h2>
+        <h2>{{ blocks.main.0.title| raw }}</h2>
 
-        <p>{{ blocks.main.content|raw }}</p>
+        <p>{{ blocks.main.0.content|raw }}</p>
 
     </div>
     <div id="login-modal" style="display: none;">
-        {{ blocks.login.content|raw }}
+        {{ blocks.login.0.content|raw }}
     </div>
 
 
