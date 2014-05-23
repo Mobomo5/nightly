@@ -52,6 +52,8 @@ class menuEngine {
 
     public function getMenuItem($inMenuID) {
         //get a single menuItem from DB based off of ID
+
+
         try {
             $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuID");
 
@@ -143,6 +145,8 @@ class menuEngine {
 
     public function deleteMenu($inMenuID) {
         //deletes a menu from the DB
+        if(!is_numeric($inMenuID)) return;
+
         try {
             $results = $this->db->removeData("menu","'menuID' = $inMenuID");
             return;
@@ -153,6 +157,8 @@ class menuEngine {
 
     public function deleteMenuItem($inMenuItemID) {
         //deletes a menuItem from database
+        if(!is_numeric($inMenuItemID)) return;
+
         try {
             $results = $this->db->removeData("menuItem","'menuItemID' = $inMenuItemID");
             return;
