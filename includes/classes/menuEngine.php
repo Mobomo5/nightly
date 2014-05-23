@@ -129,15 +129,35 @@ class menuEngine {
         }
     }
 
-    public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent, $inChildren) {
+    public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent) {
         //Adds a new menuItem to the database
+        try {
+            $results = $this->db->insertData("menuItem",
+                "'menuID', 'linkText', 'href', 'weight', 'hasChildren', 'enabled', 'parent'",
+                "$inMenuID, $inLinkText, $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent");
+            return;
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 
     public function deleteMenu($inMenuID) {
         //deletes a menu from the DB
+        try {
+            $results = $this->db->removeData("menu","'menuID' = $inMenuID");
+            return;
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 
     public function deleteMenuItem($inMenuItemID) {
         //deletes a menuItem from database
+        try {
+            $results = $this->db->removeData("menuItem","'menuItemID' = $inMenuItemID");
+            return;
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 }
