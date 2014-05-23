@@ -25,9 +25,10 @@ class menu {
     private $menuName;
     private $themeRegion;
     private $enabled;
-    private $menuItems;
+    private $menuItems = array();
 
-    public function __construct($inID, $inName, $inThemeRegion, $inMenuItems, $inEnabled) {
+    public function __construct($inID, $inName, $inThemeRegion, menuItem $inMenuItems, $inEnabled)
+    {
         if (!is_numeric($inID)) return;
         if (!is_string($inName)) return;
         if (!is_string($inThemeRegion)) return;
@@ -36,7 +37,10 @@ class menu {
         $this->menuName = $inName;
         $this->themeRegion = $inThemeRegion;
         $this->enabled = $inEnabled;
-        $this->menuItems = $inMenuItems;
+
+        foreach ($inMenuItems as $menuItem) {
+            array_push($this->menuItems, $menuItem);
+        }
     }
 
     public function getID() {
@@ -47,20 +51,33 @@ class menu {
         return $this->menuName;
     }
 
-    public function setName($inName) {
-        $this->menuName = $inName;
+    public function getThemeRegion()
+    {
+        return $this->themeRegion;
     }
 
-    public function getThemeRegion() {
-        return $this->themeRegion;
+    public function getMenuItems()
+    {
+        return $this->menuItems;
+    }
+
+    public function setName($inName) {
+        $this->menuName = $inName;
     }
 
     public function setThemeRegion($inThemeRegion) {
         $this->themeRegion = $inThemeRegion;
     }
 
-    public function getMenuItems() {
-        return $this->menuItems;
+    public function setEnabled($inSetEnabled)
+    {
+        if ($inSetEnabled == false || $inSetEnabled == 0) {
+            $this->enabled = 0;
+        } else if ($inSetEnabled == true || $inSetEnabled == 1) {
+            $this->enabled = 1;
+        } else {
+            return;
+        }
     }
 
     public function isEnabled() {
@@ -71,20 +88,22 @@ class menu {
         }
     }
 
-    public function setEnabled($inSetEnabled) {
-        if ($inSetEnabled == false || $inSetEnabled == 0) {
-            $this->enabled = 0;
-        } else if ($inSetEnabled == true || $inSetEnabled == 1) {
-            $this->enabled = 1;
-        } else {
-            return;
-        }
-    }
-
     public function __toString() {
         //loop through it's menu items and put them in a HTML list
+        $list = "<ul id='{$this->getID()}'>";
+        foreach ($this->getMenuItems() as $menuItem) {
+            if ($menuItem->isEnabled()) {
+                if (!$menuItem->hasChildred()) {
+                    $list .= "<li id='{$menuItem->getID()}'><a href='{$menuItem->getHref()}'>{$menuItem->getLinkText()}</a></li>";
+                } else {
+                    //??
+                }
+            }
+        }
 
-        return "";
+        $list .= "</ul>";
+
+        return $list;
     }
 }
 
