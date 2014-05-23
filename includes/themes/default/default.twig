@@ -2,7 +2,7 @@
     {% block titlebar %}
         <div id="titlebar">
             <ul>
-                <li><a id="logo" href="#"></a></li>
+                <li><a id="logo" href="{{ site.getBaseDirectory }}"></a></li>
                 {#iterate through the supplied blocks looking for titlebar menu items. stick them here.#}
                 <li><a href="{{ blocks.menus.href }}">name1</a></li>
                 <li><a href="{{ href }}">name2</a></li>
