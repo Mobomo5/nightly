@@ -45,7 +45,7 @@ class userOptionEngine {
 
     /**
      * @param string $inOptionName
-     * @param int    $userID
+     * @param int $userID
      *
      * @return bool
      */
@@ -88,7 +88,7 @@ class userOptionEngine {
 
     /**
      * @param userOption $inOption
-     * @param int        $userID
+     * @param int $userID
      *
      * @return bool
      * @internal param int $inRoleID
@@ -131,8 +131,8 @@ class userOptionEngine {
 
     /**
      * @param userOption $option
-     * @param int        $userID
-     * @param bool       $value
+     * @param int $userID
+     * @param bool $value
      *
      * @internal param $optionName
      * @return bool
@@ -216,7 +216,7 @@ class userOptionEngine {
      *
      *
      * @param userOption $option
-     * @param int        $userRole
+     * @param int $userRole
      *
      * @internal param string $optionName
      * @return bool

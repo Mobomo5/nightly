@@ -84,12 +84,15 @@ class bootstrap {
         define('ROUTER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/router.php');
         define('SYSTEM_LOG_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/systemLog.php');
         define('LOG_ENTRY_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/logEntry.php');
+        define('ROLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/role.php');
+        define('ROLE_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/roleEngine.php');
     }
 
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
         require_once(VARIABLE_OBJECT_FILE);
+        require_once(ROLE_ENGINE_FILE);
         require_once(USER_OPTION_ENGINE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
@@ -144,7 +147,8 @@ class bootstrap {
         $node = $nodeEngine->getNode();
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices();
-        noticeEngine::getInstance()->removeNotices(); // test the system log
+        noticeEngine::getInstance()->removeNotices();
+
         database::getInstance()->bootstrapDisconnect();
 
 

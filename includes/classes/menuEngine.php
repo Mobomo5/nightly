@@ -144,7 +144,7 @@ class menuEngine {
     public function deleteMenu($inMenuID) {
         //deletes a menu from the DB
         try {
-            $results = $this->db->removeData("menu","'menuID' = $inMenuID");
+            $results = $this->db->removeData("menu", "'menuID' = $inMenuID");
             return;
         } catch (exception $ex) {
             return $ex->getMessage();
@@ -154,7 +154,7 @@ class menuEngine {
     public function deleteMenuItem($inMenuItemID) {
         //deletes a menuItem from database
         try {
-            $results = $this->db->removeData("menuItem","'menuItemID' = $inMenuItemID");
+            $results = $this->db->removeData("menuItem", "'menuItemID' = $inMenuItemID");
             return;
         } catch (exception $ex) {
             return $ex->getMessage();

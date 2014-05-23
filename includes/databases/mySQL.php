@@ -82,8 +82,8 @@ class mySQL implements databaseInterface {
     /**
      * returns an associative array of values stored as $result[row][column]=>value
      *
-     * @param string       $select
-     * @param string       $from
+     * @param string $select
+     * @param string $from
      * @param mixed|string $where
      *
      * @throws Exception

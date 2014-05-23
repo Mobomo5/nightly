@@ -13,7 +13,7 @@ class userOption {
     private $description;
 
     /**
-     * @param int    $inId
+     * @param int $inId
      * @param string $inComputerName
      * @param string $inHumanName
      * @param string $inDescription

@@ -1,1 +1,300 @@
-*{font-family:consolas;margin:0;padding:0}html{height:100%}body{background-color:rgba(255,255,255,0.97);height:100%;padding:0 5% 0 5%}@media all and (max-width:1138px){body a{justify-content:space-around}}@media all and (max-width:440px){body{padding:0}}#homepage-background{display:flex;flex-flow:row wrap;width:100%;height:100%;background-color:#6495ed}#homepage-background a{white-space:nowrap;display:inline-block;width:26%;height:31%;margin:4% 3% 0 3%;box-shadow:4px 4px 4px #366097;text-align:center;text-decoration:none}#homepage-background a h2{font-weight:normal}@media all and (max-device-width:440px){#homepage-background{padding:0;margin:0}#homepage-background a{margin:0;padding:0;width:100%;height:20%}}.box{display:flex;width:100%;height:100%;padding:5%;flex-grow:1}#box-1{background-color:#ffdab9}#box-2{background-color:#ff7f50}#box-3{background-color:#8fbc8f}#box-4{background-color:#cd5c5c}#box-5{background-color:#9370db}#box-6{background-color:#ffc0cb}#homepage-footer{height:8%;width:100%}#titlebar{position:fixed;top:0;left:0;right:0;height:1px;width:100%}#titlebar ul{min-height:25px;box-sizing:border-box;display:flex;flex-flow:row nowrap;z-index:100;height:4%;background-color:rgba(41,39,150,0.97);align-items:stretch;list-style:none;width:100%}#titlebar ul li{padding-top:3px;flex-grow:1;background-color:inherit;min-height:29px;text-align:center;display:flex}#titlebar ul li #logo{background-image:url("../../../images/educasklogo.png");background-size:contain;padding:0 auto;min-height:25px;height:25px;width:128.5px;background-clip:border-box;background-repeat:no-repeat;z-index:30}#titlebar ul li #logo:hover{background-color:transparent}#titlebar ul li a{color:#eee;padding:0 3em;font-size:large;display:block;text-decoration:none;text-align:center}#titlebar ul li a:visited{color:#eee}#titlebar ul li a:hover{background-color:rgba(39,37,142,0.97)}@media only screen and (max-device-width:440px){#titlebar{position:relative;display:block;margin-bottom:60em}#titlebar #titlebar{margin:none;padding:none}#titlebar ul{display:block;width:100%;text-align:center}#titlebar ul li{width:100%;height:7em;text-align:center}#titlebar ul li a,#titlebar ul li form,#titlebar ul li #login{font-size:xx-large;padding-top:1em;width:100%;text-align:center}#titlebar ul li #logo{width:100%;background-position:center}}#sidebar{box-sizing:border-box;border-radius:3px;position:relative;display:block;text-align:center;float:left;height:92%;margin-top:4%;background-color:rgba(239,239,251,0.97);width:10%;z-index:1}#sidebar ul{position:relative;list-style:none}#sidebar ul li{height:2em}#sidebar ul li a{display:block;text-decoration:none}#sidebar ul li a:hover{background-color:rgba(223,223,247,0.97)}@media all and (max-device-width:440px){#sidebar{position:relative;bottom:0;width:100%;height:auto;padding:none;margin:none}#sidebar li{height:8em}}#mainContent{border-radius:5px;border:solid 2px rgba(241,241,251,0.97);background:rgba(255,255,255,0.97);box-sizing:border-box;position:relative;display:block;float:right;padding:5px;margin-top:4%;margin-right:10%;width:79%;height:auto;z-index:1}@media all and (max-device-width:440px){#mainContent{width:100%;margin:none;float:none}}#login-form-background{padding:40px;background-color:#ddd;border-radius:6px;border:solid 2px #c4c4c4}#login-form-background h2{margin-bottom:20px}#notices-modal{padding:4px;width:100%;background-color:#ddd;border-radius:6px;border:solid 2px #c4c4c4}#notices-modal h2{margin-bottom:20px}#notices-modal .error{color:#bd0000}
+* {
+    font-family: consolas;
+    margin: 0;
+    padding: 0
+}
+
+html {
+    height: 100%
+}
+
+body {
+    background-color: rgba(255, 255, 255, 0.97);
+    height: 100%;
+    padding: 0 5% 0 5%
+}
+
+@media all and (max-width: 1138px) {
+    body a {
+        justify-content: space-around
+    }
+}
+
+@media all and (max-width: 440px) {
+    body {
+        padding: 0
+    }
+}
+
+#homepage-background {
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+    height: 100%;
+    background-color: #6495ed
+}
+
+#homepage-background a {
+    white-space: nowrap;
+    display: inline-block;
+    width: 26%;
+    height: 31%;
+    margin: 4% 3% 0 3%;
+    box-shadow: 4px 4px 4px #366097;
+    text-align: center;
+    text-decoration: none
+}
+
+#homepage-background a h2 {
+    font-weight: normal
+}
+
+@media all and (max-device-width: 440px) {
+    #homepage-background {
+        padding: 0;
+        margin: 0
+    }
+
+    #homepage-background a {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 20%
+    }
+}
+
+.box {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 5%;
+    flex-grow: 1
+}
+
+#box-1 {
+    background-color: #ffdab9
+}
+
+#box-2 {
+    background-color: #ff7f50
+}
+
+#box-3 {
+    background-color: #8fbc8f
+}
+
+#box-4 {
+    background-color: #cd5c5c
+}
+
+#box-5 {
+    background-color: #9370db
+}
+
+#box-6 {
+    background-color: #ffc0cb
+}
+
+#homepage-footer {
+    height: 8%;
+    width: 100%
+}
+
+#titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    width: 100%
+}
+
+#titlebar ul {
+    min-height: 25px;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    z-index: 100;
+    height: 4%;
+    background-color: rgba(41, 39, 150, 0.97);
+    align-items: stretch;
+    list-style: none;
+    width: 100%
+}
+
+#titlebar ul li {
+    padding-top: 3px;
+    flex-grow: 1;
+    background-color: inherit;
+    min-height: 29px;
+    text-align: center;
+    display: flex
+}
+
+#titlebar ul li #logo {
+    background-image: url("../../../images/educasklogo.png");
+    background-size: contain;
+    padding: 0 auto;
+    min-height: 25px;
+    height: 25px;
+    width: 128.5px;
+    background-clip: border-box;
+    background-repeat: no-repeat;
+    z-index: 30
+}
+
+#titlebar ul li #logo:hover {
+    background-color: transparent
+}
+
+#titlebar ul li a {
+    color: #eee;
+    padding: 0 3em;
+    font-size: large;
+    display: block;
+    text-decoration: none;
+    text-align: center
+}
+
+#titlebar ul li a:visited {
+    color: #eee
+}
+
+#titlebar ul li a:hover {
+    background-color: rgba(39, 37, 142, 0.97)
+}
+
+@media only screen and (max-device-width: 440px) {
+    #titlebar {
+        position: relative;
+        display: block;
+        margin-bottom: 60em
+    }
+
+    #titlebar #titlebar {
+        margin: none;
+        padding: none
+    }
+
+    #titlebar ul {
+        display: block;
+        width: 100%;
+        text-align: center
+    }
+
+    #titlebar ul li {
+        width: 100%;
+        height: 7em;
+        text-align: center
+    }
+
+    #titlebar ul li a, #titlebar ul li form, #titlebar ul li #login {
+        font-size: xx-large;
+        padding-top: 1em;
+        width: 100%;
+        text-align: center
+    }
+
+    #titlebar ul li #logo {
+        width: 100%;
+        background-position: center
+    }
+}
+
+#sidebar {
+    box-sizing: border-box;
+    border-radius: 3px;
+    position: relative;
+    display: block;
+    text-align: center;
+    float: left;
+    height: 92%;
+    margin-top: 4%;
+    background-color: rgba(239, 239, 251, 0.97);
+    width: 10%;
+    z-index: 1
+}
+
+#sidebar ul {
+    position: relative;
+    list-style: none
+}
+
+#sidebar ul li {
+    height: 2em
+}
+
+#sidebar ul li a {
+    display: block;
+    text-decoration: none
+}
+
+#sidebar ul li a:hover {
+    background-color: rgba(223, 223, 247, 0.97)
+}
+
+@media all and (max-device-width: 440px) {
+    #sidebar {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        height: auto;
+        padding: none;
+        margin: none
+    }
+
+    #sidebar li {
+        height: 8em
+    }
+}
+
+#mainContent {
+    border-radius: 5px;
+    border: solid 2px rgba(241, 241, 251, 0.97);
+    background: rgba(255, 255, 255, 0.97);
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    float: right;
+    padding: 5px;
+    margin-top: 4%;
+    margin-right: 10%;
+    width: 79%;
+    height: auto;
+    z-index: 1
+}
+
+@media all and (max-device-width: 440px) {
+    #mainContent {
+        width: 100%;
+        margin: none;
+        float: none
+    }
+}
+
+#login-form-background {
+    padding: 40px;
+    background-color: #ddd;
+    border-radius: 6px;
+    border: solid 2px #c4c4c4
+}
+
+#login-form-background h2 {
+    margin-bottom: 20px
+}
+
+#notices-modal {
+    padding: 4px;
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 6px;
+    border: solid 2px #c4c4c4
+}
+
+#notices-modal h2 {
+    margin-bottom: 20px
+}
+
+#notices-modal .error {
+    color: #bd0000
+}
