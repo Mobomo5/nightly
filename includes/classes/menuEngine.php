@@ -32,8 +32,11 @@ class menuEngine {
         $this->db = database::getInstance();
     }
 
+    //region Get
     public function getMenu($inMenuID) {
         //get a single menu from the database based off of ID
+        if (!is_numeric($inMenuID)) return;
+
         try {
 
             $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
@@ -50,12 +53,13 @@ class menuEngine {
         }
     }
 
-    public function getMenuItem($inMenuID) {
+    public function getMenuItem($inMenuItemID)
+    {
         //get a single menuItem from DB based off of ID
-
+        if (!is_numeric($inMenuItemID)) return;
 
         try {
-            $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuID");
+            $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuItemID");
 
             $menuItem = new menuItem($results[0]['menuID'],
                 $results[0]['menuItemID'],
@@ -71,12 +75,13 @@ class menuEngine {
             return $ex->getMessage();
         }
     }
+    //endregion
 
+    //region Set
     public function setMenu(menu $inMenu) {
         //takes in a menu object and updates DB
-        if (!is_object($inMenu)) {
-            return;
-        }
+        if (!is_object($inMenu)) return;
+        if (!$this->permissionObject->checkPermission("userCanSetMenu")) return;
 
         try {
 
@@ -95,9 +100,8 @@ class menuEngine {
 
     public function setMenuItem(menuItem $inMenuItem) {
         //take sin a menuItem object and updates DB
-        if (!is_object($inMenuItem)) {
-            return;
-        }
+        if (!is_object($inMenuItem)) return;
+        if (!$this->permissionObject->checkPermission("userCanSetMenuItem")) return;
 
         try {
 
@@ -116,12 +120,16 @@ class menuEngine {
             return $ex->getMessage();
         }
     }
+    //endregion
 
+    //region Add
     public function addMenu($inName, $inThemeRegion, $inEnabled) {
         //Adds a new menu to the database
         if (!is_string($inName)) return;
         if (!is_string($inThemeRegion)) return;
         if (!is_numeric($inEnabled)) return;
+
+        if (!$this->permissionObject->checkPermission("userCanAddMenu")) return;
 
         try {
             $results = $this->db->insertData("menu", "'menuName', 'themeRegion', 'enabled'", "$inName, $inThemeRegion, $inEnabled");
@@ -133,6 +141,10 @@ class menuEngine {
 
     public function addMenuItem($inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $inParent) {
         //Adds a new menuItem to the database
+
+
+        if (!$this->permissionObject->checkPermission("userCanAddMenuItem")) return;
+
         try {
             $results = $this->db->insertData("menuItem",
                 "'menuID', 'linkText', 'href', 'weight', 'hasChildren', 'enabled', 'parent'",
@@ -142,10 +154,13 @@ class menuEngine {
             return $ex->getMessage();
         }
     }
+    //endregion
 
+    //region Delete
     public function deleteMenu($inMenuID) {
         //deletes a menu from the DB
         if(!is_numeric($inMenuID)) return;
+        if (!$this->permissionObject->checkPermission("userCanDeleteMenu")) return;
 
         try {
             $results = $this->db->removeData("menu","'menuID' = $inMenuID");
@@ -158,6 +173,7 @@ class menuEngine {
     public function deleteMenuItem($inMenuItemID) {
         //deletes a menuItem from database
         if(!is_numeric($inMenuItemID)) return;
+        if (!$this->permissionObject->checkPermission("userCanDeleteMenuItem")) return;
 
         try {
             $results = $this->db->removeData("menuItem","'menuItemID' = $inMenuItemID");
@@ -166,4 +182,5 @@ class menuEngine {
             return $ex->getMessage();
         }
     }
+    //endregion
 }
