@@ -45,6 +45,7 @@ class bootstrap {
     }
 
     private function declareConstants() {
+        define('SYSTEM_LOG_ANONYMOUS', 0);
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
         define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
         define('VARIABLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variable.php');
@@ -81,6 +82,8 @@ class bootstrap {
         define('USER_OPTION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOptionEngine.php');
         define('USER_OPTION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userOption.php');
         define('ROUTER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/router.php');
+        define('SYSTEM_LOG_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/systemLog.php');
+        define('LOG_ENTRY_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/logEntry.php');
     }
 
     private function doRequires() {
@@ -96,6 +99,7 @@ class bootstrap {
         require_once(CURRENT_USER_OBJECT_FILE);
         require_once(NODE_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
+        require_once(SYSTEM_LOG_ENGINE_FILE);
     }
 
     private function connectDatabase() {
@@ -140,8 +144,10 @@ class bootstrap {
         $node = $nodeEngine->getNode();
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices();
-        noticeEngine::getInstance()->removeNotices();
+        noticeEngine::getInstance()->removeNotices(); // test the system log
         database::getInstance()->bootstrapDisconnect();
+
+
     }
 
     //@TODO: Add Cron Stuff

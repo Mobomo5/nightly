@@ -9,13 +9,12 @@
 class userID implements subValidator {
 
     public function validate($inValue) {
-        if (empty($inValue)) {
-            return false;
-        }
         if (!is_numeric($inValue)) {
+
             return false;
         }
         if (preg_match('/\s/', $inValue)) {
+
             return false;
         }
         return true;

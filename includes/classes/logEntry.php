@@ -7,38 +7,65 @@
  * Time: 10:32 AM
  */
 class logEntry {
+    /**
+     * @var int|string
+     */
     private $id;
-    private $date;
+    /**
+     * @var
+     */
+    private $type;
+    /**
+     * @var
+     */
     private $message;
+    /**
+     * @var
+     */
     private $userID;
 
-    public function __construct($id, $date, $message, $userID) {
+    /**
+     * @param $id
+     * @param $type string from logEntryType
+     * @param $message
+     * @param $userID
+     */
+    public function __construct($id, $type, $message, $userID) {
         // clean
         if (!is_numeric($id)) {
             return false;
         }
         if (strlen($id) > 10) {
+
             return false;
         }
-        //@todo: validate date
+
+        // is the type in logEntryType
+        if (!logEntryType::validateType($type)) {
+
+            return false;
+        }
+
         $val = new validator('userID');
         if (!$val->validate($userID)) {
+            echo 'broken';
+
             return false;
         }
 
         //store
         $this->id = $id;
-        $this->date = $date;
+        $this->type = $type;
         $this->message = $message;
         $this->userID = $userID;
 
     }
 
     /**
-     * @return mixed
+     * @return \logEntryType
      */
-    public function getDate() {
-        return $this->date;
+    public function getType() {
+        return $this->type;
     }
 
     /**
