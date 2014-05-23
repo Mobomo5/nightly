@@ -28,6 +28,7 @@ class menuItem {
     private $children = array();
 
     public function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, menuItem $inParent = null, array $inChildren = array()) {
+        //region constructor checks
         if (!is_numeric($inID)) {
             return;
         }
@@ -52,6 +53,7 @@ class menuItem {
         if (!is_bool($inEnabled)) {
             return;
         }
+        //endregion
 
         $this->id = $inID;
         $this->menuID = $inMenuID;
@@ -64,6 +66,7 @@ class menuItem {
         $this->children = $inChildren;
     }
 
+    //region get
     public function getID() {
         return $this->id;
     }
@@ -72,7 +75,43 @@ class menuItem {
         return $this->menuID;
     }
 
-    public function setMenuID($inMenuID) {
+    public function getLinkText() {
+        return $this->linkText;
+    }
+
+    public function getHref() {
+        return $this->href;
+    }
+
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    public function hasChildren()
+    {
+        return $this->hasChildren;
+    }
+
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+    //endregion
+
+    //region set
+    public function setMenuID($inMenuID)
+    {
         if (!is_numeric($inMenuID)) {
             return;
         }
@@ -82,27 +121,16 @@ class menuItem {
         $this->menuID = $inMenuID;
     }
 
-    public function getLinkText() {
-        return $this->linkText;
-    }
-
-    public function setLinkText($inLinkText) {
+    public function setLinkText($inLinkText)
+    {
         if (!is_string($inLinkText)) {
             return;
         }
         $this->linkText = trim(htmlspecialchars($inLinkText));
     }
 
-    public function getHref() {
-        return $this->href;
-    }
-
     public function setHref(link $inHref) {
         $this->href = $inHref;
-    }
-
-    public function getWeight() {
-        return $this->weight;
     }
 
     public function setWeight($inWeight) {
@@ -112,19 +140,11 @@ class menuItem {
         $this->weight = $inWeight;
     }
 
-    public function hasChildren() {
-        return $this->hasChildren;
-    }
-
     public function setHasChildren($inHasChildren) {
         if (!is_bool($inHasChildren)) {
             return;
         }
         $this->hasChildren = $inHasChildren;
-    }
-
-    public function isEnabled() {
-        return $this->enabled;
     }
 
     public function setEnabled($inSetEnabled) {
@@ -133,21 +153,15 @@ class menuItem {
         }
         $this->enabled = $inSetEnabled;
     }
+    //endregion
 
-    public function getParent() {
-        return $this->parent;
-    }
-
-    public function setParent($inParent) {
-        $this->parent = $inParent;
-    }
-
-    public function getChildren() {
-        return $this->children;
-    }
-
+    //region child functions
     public function addChild(menuItem $inChild) {
-        $this->children[] = $inChild;
+        if (!is_object($inChild)) {
+            return;
+        }
+
+        array_push($this->children, $inChild);
     }
 
     public function removeChild($inChildID) {
@@ -163,4 +177,5 @@ class menuItem {
             }
         }
     }
+    //endregion
 }
