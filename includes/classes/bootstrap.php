@@ -23,7 +23,7 @@ class bootstrap {
             header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
             exit();
         }
-        if (is_file(EDUCASK_WEB_ROOT . '/update.php')) {
+        if (is_file(EDUCASK_ROOT . '/update.php')) {
             header('Location: ' . EDUCASK_WEB_ROOT . '/update.php');
             exit();
         }
