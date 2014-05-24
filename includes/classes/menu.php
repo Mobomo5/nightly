@@ -29,9 +29,12 @@ class menu {
 
     public function __construct($inID, $inName, $inThemeRegion, menuItem $inMenuItems, $inEnabled)
     {
+        //region checks
         if (!is_numeric($inID)) return;
         if (!is_string($inName)) return;
         if (!is_string($inThemeRegion)) return;
+        if (!is_object($inMenuItems)) return;
+        //endregion
 
         $this->menuID = $inID;
         $this->menuName = $inName;
@@ -43,6 +46,7 @@ class menu {
         }
     }
 
+    //region get
     public function getID() {
         return $this->menuID;
     }
@@ -72,6 +76,17 @@ class menu {
         return $toReturn;
     }
 
+    public function isEnabled()
+    {
+        if ($this->enabled == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    //endregion
+
+    //region set
     public function setName($inName) {
         $this->menuName = $inName;
     }
@@ -91,13 +106,7 @@ class menu {
         }
     }
 
-    public function isEnabled() {
-        if ($this->enabled == 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    //endregion
 
     public function __toString() {
         //loop through it's menu items and put them in a HTML list
