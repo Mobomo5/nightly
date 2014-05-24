@@ -138,8 +138,8 @@ class currentUser extends user {
 
         $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID=' . $this->tempID);
         self::setUserSession($this);
-        $logger = logger::getInstance();
-        $logger->logIt($this->tempID, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.');
+        $logEntry = new logEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID());
+        logger::getInstance()->logIt($logEntry);
         $hookEngine->runAction('userLoggedIn');
         return true;
     }

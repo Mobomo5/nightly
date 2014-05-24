@@ -43,7 +43,22 @@ class logger {
         return $results[0]['eventID'];
 
     }
+
+    public function getLog($level = 'all') {
+        $db = database::getInstance();
+        if (strcmp($level, 'info')) {
+            $results = $db->getData('*', 'systemLog', 'type = \'info\'');
+        } elseif (strcmp($level, 'warning')) {
+            $results = $db->getData('*', 'systemLog', 'type = \'warning\'');
+        } elseif (strcmp($level, 'neutral')) {
+            $results = $db->getData('*', 'systemLog', 'type = \'neutral\'');
+        } else {
+            $results = $db->getData('*', 'systemLog');
+        }
+        return $results;
+    }
 }
+
 
 abstract class logEntryType {
     const warning = 'warning';

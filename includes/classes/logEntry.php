@@ -46,12 +46,6 @@ class logEntry {
             return false;
         }
 
-        $val = new validator('userID');
-        if (!$val->validate($userID)) {
-            echo 'broken';
-
-            return false;
-        }
 
         //store
         $this->id = $id;
