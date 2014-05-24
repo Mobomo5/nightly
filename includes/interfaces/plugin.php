@@ -8,8 +8,6 @@
  */
 interface plugin {
     public static function init();
-
     public static function run($inContent = '');
-
     public static function getPriority();
 }

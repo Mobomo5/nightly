@@ -8,6 +8,5 @@
  */
 interface subValidator {
     public function validate($inValue);
-
     public function hasOptions();
 }

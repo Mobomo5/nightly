@@ -10,27 +10,15 @@
  */
 interface databaseInterface {
     public static function getInstance();
-
     public function isConnected();
-
     public function connect();
-
     function disconnect();
-
     function getData($select, $from, $where);
-
     function makeCustomQuery($inQuery);
-
     function insertData($into, $columns, $values);
-
     function updateTable($table, $set, $where);
-
     function configure($dbServer, $userName, $password, $db);
-
     function escapeString($inString);
-
     function removeData($from, $where);
-
     function getError();
-
-} 
+}

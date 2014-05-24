@@ -57,7 +57,6 @@ class blockEngine {
     }
 
     public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
-
         $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
         $block = new $blockName($parameters);
         if ($title != null) {
@@ -67,7 +66,6 @@ class blockEngine {
     }
 
     public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
-
         if (!$this->blockExists($blockName, $moduleName)) {
             return;
         }
@@ -79,7 +77,6 @@ class blockEngine {
     }
 
     public function blockExists($blockName, $moduleName) {
-
         $block = $this->getPathToBlock($blockName, $moduleName);
         return file_exists($block);
     }
@@ -119,6 +116,8 @@ class blockEngine {
     }
 
     public function getPathToBlock($blockName, $moduleName) {
+        $moduleName = str_replace('..', '', $moduleName);
+        $blockName = str_replace('..', '', $blockName);
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
 
