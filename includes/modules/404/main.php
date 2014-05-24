@@ -5,9 +5,9 @@
  * Date: 4/23/14
  * Time: 2:52 PM
  */
-require_once(NODE_INTERFACE_FILE);
+require_once(BLOCK_INTERFACE_FILE);
 
-class fourOhFour implements node {
+class fourOhFour implements block {
 
     public function __construct() {
         // TODO: Implement __construct() method.

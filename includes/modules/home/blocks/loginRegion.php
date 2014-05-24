@@ -5,9 +5,9 @@
  * Date: 5/22/14
  * Time: 8:44 PM
  */
-require_once(NODE_INTERFACE_FILE);
+require_once(BLOCK_INTERFACE_FILE);
 
-class loginRegion implements node {
+class loginRegion implements block {
     private $title;
     private $href;
 

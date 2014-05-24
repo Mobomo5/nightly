@@ -5,9 +5,9 @@
  * Date: 5/22/14
  * Time: 8:46 PM
  */
-require_once(NODE_INTERFACE_FILE);
+require_once(BLOCK_INTERFACE_FILE);
 
-class default1 implements node {
+class default1 implements block {
 
     public function __construct() {
         // TODO: Implement __construct() method.

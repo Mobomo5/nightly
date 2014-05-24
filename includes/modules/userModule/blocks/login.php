@@ -6,7 +6,9 @@
  * Date: 5/21/14
  * Time: 2:50 PM
  */
-class login implements node {
+require_once(BLOCK_INTERFACE_FILE);
+
+class login implements block {
     private $content;
     private $button;
     private $noGUI;

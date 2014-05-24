@@ -6,7 +6,9 @@
  * Date: 4/25/14
  * Time: 11:11 PM
  */
-class main implements node {
+require_once(BLOCK_INTERFACE_FILE);
+
+class main implements block {
     private $title;
     private $content;
 

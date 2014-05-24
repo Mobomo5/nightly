@@ -95,6 +95,7 @@ class bootstrap {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
         require_once(VARIABLE_OBJECT_FILE);
+        require_once(FILE_SYSTEM_ENGINE_FILE);
         require_once(ROLE_ENGINE_FILE);
         require_once(USER_OPTION_ENGINE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
