@@ -23,7 +23,7 @@ class bootstrap {
             header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
             exit();
         }
-        if (is_file(EDUCASK_WEB_ROOT . '/update.php')) {
+        if (is_file(EDUCASK_ROOT . '/update.php')) {
             header('Location: ' . EDUCASK_WEB_ROOT . '/update.php');
             exit();
         }
@@ -148,8 +148,8 @@ class bootstrap {
         $moduleInCharge = $router->whichModuleHandlesRequest();
 
         $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $nodeEngine->getParameters(), get_class($node), $user->getRoleID());
-        $this->blocks['notices'] = noticeEngine::getInstance()->getNotices();
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getDecodedParameters(), get_class($node), $user->getRoleID());
+        $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
         noticeEngine::getInstance()->removeNotices();
 
         database::getInstance()->bootstrapDisconnect();
