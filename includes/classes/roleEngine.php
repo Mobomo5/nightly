@@ -56,7 +56,6 @@ class roleEngine {
      * @return role
      */
     public function getRoleByName($inName) {
-
         // query
         $db = database::getInstance();
         $results = $db->getData('*', 'role', 'roleName = \'' . $inName . '\'');
@@ -76,7 +75,10 @@ class roleEngine {
      * @param role $inRole
      * @return bool
      */
-    public function setRole(role $inRole) {
+    public function setRole(role $inRole) { // check permissions
+        if (!permissionEngine::getInstance()->checkPermissionByName('userCanAlterRoles')) {
+            return false;
+        }
         $db = database::getInstance();
 
         $roleID = $inRole->getId();
@@ -98,7 +100,10 @@ class roleEngine {
      * @return bool|int the roleID of the added role
      */
     public function addRole(role $inRole) {
-
+        // check permissions
+        if (!permissionEngine::getInstance()->checkPermissionByName('userCanCreateRoles')) {
+            return false;
+        }
         $roleName = $inRole->getName();
         $roleDesc = $inRole->getDescription();
 
@@ -126,6 +131,10 @@ class roleEngine {
      *
      */
     public function deleteRole(role $roleToDelete) {
+        // check permissions
+        if (!permissionEngine::getInstance()->checkPermissionByName('userCanDeleteRoles')) {
+            return false;
+        }
 
         $roleID = $roleToDelete->getId();
         $roleName = $roleToDelete->getName();
