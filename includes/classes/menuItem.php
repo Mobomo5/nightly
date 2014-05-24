@@ -107,6 +107,23 @@ class menuItem {
     {
         return $this->enabled;
     }
+
+    public function getHTML()
+    {
+        $toReturn = '<a href="' . $this->getHref() . '">' . $this->getLinkText() . '</a>';
+        if (!$this->hasChildren()) {
+            return $toReturn;
+        }
+        $toReturn .= '<ul>';
+
+        foreach ($this->getChildren() as $child) {
+            $toReturn .= '<li>' . $child->getHTML() . '</li>';
+        }
+
+        $toReturn .= '</ul>';
+
+        return $toReturn;
+    }
     //endregion
 
     //region set

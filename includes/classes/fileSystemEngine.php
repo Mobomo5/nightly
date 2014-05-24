@@ -264,6 +264,7 @@ class fileSystemEngine {
         if ($subDirectories) {
             foreach ($subDirectories as $sub) {
                 $this->deleteFolder($sub['folderID'], $deleteSubDirectories);
+
             }
         }
 
