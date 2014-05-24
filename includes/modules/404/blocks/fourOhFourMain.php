@@ -6,9 +6,9 @@
  * Time: 11:21 PM
  */
 
-require_once(BLOCK_INTERFACE_FILE);
+require_once(NODE_INTERFACE_FILE);
 
-class fourOhFourMain implements block {
+class fourOhFourMain implements node {
     private $content;
     private $title;
 
