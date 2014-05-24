@@ -16,11 +16,9 @@ class blockEngine {
         }
         return self::$instance;
     }
-
     private function __construct() {
         //Do nothing;
     }
-
     public function getBlocks($theme, $parameters, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
@@ -34,37 +32,42 @@ class blockEngine {
             return null;
         }
         if ($results == null) {
-
             return null;
         }
         $blocks = array();
         foreach ($results as $blockData) {
             if (!$this->blockExists($blockData['blockName'], $blockData['moduleName'])) {
                 continue;
-
             }
             if (!$this->blockVisible($blockData['blockID'], $nodeType, $roleID)) {
                 continue;
             }
-            if ($blockData['title'] == '') {
-                $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
+            $block = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
+            if($block == false) {
                 continue;
             }
-            $blocks[$blockData['themeRegion']][] = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID, $blockData['title']);
+            if($blockData['title'] != '') {
+                $block->setTile($blockData['title']);
+            }
+            $blocks[$blockData['themeRegion']][] = $block;
         }
-
         return $blocks;
     }
-
-    public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID, $title = null) {
+    public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID) {
         $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
-        $block = new $blockName($parameters);
-        if ($title != null) {
-            $block->setTitle($title);
+        if (!class_exists($blockName)) {
+            return false;
         }
+        $interfacesThatClassImplements = class_implements($blockName);
+        if ($interfacesThatClassImplements === false) {
+            return false;
+        }
+        if (!in_array('block', $interfacesThatClassImplements)) {
+            return false;
+        }
+        $block = new $blockName($parameters);
         return $block;
     }
-
     public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
         if (!$this->blockExists($blockName, $moduleName)) {
             return;
@@ -75,12 +78,10 @@ class blockEngine {
 
         require_once($this->getPathToBlock($blockName, $moduleName));
     }
-
     public function blockExists($blockName, $moduleName) {
         $block = $this->getPathToBlock($blockName, $moduleName);
         return file_exists($block);
     }
-
     public function blockVisible($blockID, $nodeType, $roleID) {
         $database = database::getInstance();
         $database->connect();
@@ -114,13 +115,11 @@ class blockEngine {
 
         return true;
     }
-
     public function getPathToBlock($blockName, $moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
-
     public function addBlock($blockName, $title = '', $theme = 'default', $themeRegion, $weight = 1, $enabled = 1, $module = 1) {
 
     }
