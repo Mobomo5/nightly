@@ -47,7 +47,7 @@ class blockEngine {
                 continue;
             }
             if($blockData['title'] != '') {
-                $block->setTile($blockData['title']);
+                $block->setTitle($blockData['title']);
             }
             $blocks[$blockData['themeRegion']][] = $block;
         }

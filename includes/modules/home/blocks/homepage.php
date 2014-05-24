@@ -5,9 +5,9 @@
  * Date: 5/10/14
  * Time: 11:39 PM
  */
-require_once(NODE_INTERFACE_FILE);
+require_once(BLOCK_INTERFACE_FILE);
 
-class homepage implements node {
+class homepage implements block {
     private $title;
 
     public function __construct() {
