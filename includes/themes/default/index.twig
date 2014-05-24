@@ -3,7 +3,7 @@
     <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/theme.css"/>
 {% endblock %}
 {% block body %}
-    {% if blocks|keys[0] == "home" %}
+    {% if blocks.home is defined %}
         {% include "homepage.twig" %}
     {% else %}
         {% include "default.twig" %}
