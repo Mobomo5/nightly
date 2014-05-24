@@ -23,7 +23,6 @@ class logger {
     }
 
     public function logIt(logEntry $entry) {
-        $id = $entry->getId();
         $type = $entry->getType();
         $message = $entry->getMessage();
         $userID = $entry->getUserID();
@@ -45,6 +44,9 @@ class logger {
     }
 
     public function getLog($level = 'all') {
+        if (!permissionEngine::getInstance()->checkPermissionByName('userCanViewLog')) {
+            return false;
+        }
         $db = database::getInstance();
         if (strcmp($level, 'info')) {
             $results = $db->getData('*', 'systemLog', 'type = \'info\'');
