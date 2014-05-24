@@ -187,12 +187,4 @@ class permissionEngine {
         }
         return true;
     }
-
-    public function checkPermissionByName($inName) {
-        $perm = permissionEngine::getInstance()->getPermission($inName);
-        if (!$perm) {
-            return false;
-        }
-        return $perm;
-    }
 }

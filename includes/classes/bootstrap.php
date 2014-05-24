@@ -86,6 +86,9 @@ class bootstrap {
         define('LOG_ENTRY_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/logEntry.php');
         define('ROLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/role.php');
         define('ROLE_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/roleEngine.php');
+        define('FILE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/file.php');
+        define('FOLDER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/folder.php');
+        define('FILE_SYSTEM_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/fileSystemEngine.php');
     }
 
     private function doRequires() {

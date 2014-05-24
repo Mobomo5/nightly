@@ -76,7 +76,7 @@ class roleEngine {
      * @return bool
      */
     public function setRole(role $inRole) { // check permissions
-        if (!permissionEngine::getInstance()->checkPermissionByName('userCanAlterRoles')) {
+        if (!permissionEngine::getInstance()->getPermission('userCanAlterRoles')->canDo()) {
             return false;
         }
         $db = database::getInstance();
@@ -101,7 +101,7 @@ class roleEngine {
      */
     public function addRole(role $inRole) {
         // check permissions
-        if (!permissionEngine::getInstance()->checkPermissionByName('userCanCreateRoles')) {
+        if (!permissionEngine::getInstance()->getPermission('userCanCreateRoles')->canDo()) {
             return false;
         }
         $roleName = $inRole->getName();
@@ -132,7 +132,7 @@ class roleEngine {
      */
     public function deleteRole(role $roleToDelete) {
         // check permissions
-        if (!permissionEngine::getInstance()->checkPermissionByName('userCanDeleteRoles')) {
+        if (!permissionEngine::getInstance()->getPermission('userCanDeleteRoles')->canDo()) {
             return false;
         }
 
