@@ -1,5 +1,4 @@
 <?php
-
 /**
  * User: Keegan Bailey
  * Date: 13/05/14
@@ -26,7 +25,6 @@ class menuItem {
     private $enabled;
     private $parent;
     private $children = array();
-
     public function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, menuItem $inParent = null, array $inChildren = array()) {
         //region constructor checks
         if (!is_numeric($inID)) {
@@ -54,7 +52,6 @@ class menuItem {
             return;
         }
         //endregion
-
         $this->id = $inID;
         $this->menuID = $inMenuID;
         $this->linkText = trim(htmlspecialchars($inLinkText));
@@ -65,70 +62,49 @@ class menuItem {
         $this->parent = $inParent;
         $this->children = $inChildren;
     }
-
     //region get
     public function getID() {
         return $this->id;
     }
-
     public function getMenuID() {
         return $this->menuID;
     }
-
     public function getLinkText() {
         return $this->linkText;
     }
-
     public function getHref() {
         return $this->href;
     }
-
-    public function getWeight()
-    {
+    public function getWeight() {
         return $this->weight;
     }
-
-    public function getParent()
-    {
+    public function getParent() {
         return $this->parent;
     }
-
-    public function getChildren()
-    {
+    public function getChildren() {
         return $this->children;
     }
-
-    public function hasChildren()
-    {
+    public function hasChildren() {
         return $this->hasChildren;
     }
-
-    public function isEnabled()
-    {
+    public function isEnabled() {
         return $this->enabled;
     }
-
-    public function getHTML()
-    {
+    public function getHTML() {
         $toReturn = '<a href="' . $this->getHref() . '">' . $this->getLinkText() . '</a>';
         if (!$this->hasChildren()) {
             return $toReturn;
         }
         $toReturn .= '<ul>';
-
         foreach ($this->getChildren() as $child) {
             $toReturn .= '<li>' . $child->getHTML() . '</li>';
         }
-
         $toReturn .= '</ul>';
-
         return $toReturn;
     }
     //endregion
-
     //region set
-    public function setMenuID($inMenuID)
-    {
+    public function setMenuID($inMenuID) {
         if (!is_numeric($inMenuID)) {
             return;
         }
@@ -137,33 +113,27 @@ class menuItem {
         }
         $this->menuID = $inMenuID;
     }
-
-    public function setLinkText($inLinkText)
-    {
+    public function setLinkText($inLinkText) {
         if (!is_string($inLinkText)) {
             return;
         }
         $this->linkText = trim(htmlspecialchars($inLinkText));
     }
-
     public function setHref(link $inHref) {
         $this->href = $inHref;
     }
-
     public function setWeight($inWeight) {
         if (!is_numeric($inWeight)) {
             return;
         }
         $this->weight = $inWeight;
     }
-
     public function setHasChildren($inHasChildren) {
         if (!is_bool($inHasChildren)) {
             return;
         }
         $this->hasChildren = $inHasChildren;
     }
-
     public function setEnabled($inSetEnabled) {
         if (!is_bool($inSetEnabled)) {
             return;
@@ -171,16 +141,13 @@ class menuItem {
         $this->enabled = $inSetEnabled;
     }
     //endregion
-
     //region child functions
     public function addChild(menuItem $inChild) {
         if (!is_object($inChild)) {
             return;
         }
-
         array_push($this->children, $inChild);
     }
-
     public function removeChild($inChildID) {
         if (!is_numeric($inChildID)) {
             return;
