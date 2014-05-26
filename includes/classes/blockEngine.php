@@ -6,6 +6,7 @@
  * Time: 12:23 PM
  */
 require_once(DATABASE_OBJECT_FILE);
+require_once(HOOK_ENGINE_OBJECT_FILE);
 
 class blockEngine {
     private static $instance;
@@ -19,12 +20,13 @@ class blockEngine {
     private function __construct() {
         //Do nothing;
     }
-    public function getBlocks($theme, $parameters, $nodeType, $roleID) {
+    public function getBlocks($theme, $parameters, $pageType, $roleID) {
         $database = database::getInstance();
         $database->connect();
         if (!$database->isConnected()) {
             return null;
         }
+        $theme = $database->escapeString(str_replace('..', '', $theme));
         // get all enabled blocks
         $results = $database->getData('b.blockID, m.moduleName, b.blockName, b.themeRegion, b.title', 'block b, module m', 'b.theme = \'' . $theme . '\' AND b.enabled = 1 AND m.moduleID = b.module ORDER BY weight');
         // if there are none available, return false.
@@ -36,13 +38,10 @@ class blockEngine {
         }
         $blocks = array();
         foreach ($results as $blockData) {
-            if (!$this->blockExists($blockData['blockName'], $blockData['moduleName'])) {
+            if (!$this->blockVisible($blockData['blockID'], $pageType, $roleID)) {
                 continue;
             }
-            if (!$this->blockVisible($blockData['blockID'], $nodeType, $roleID)) {
-                continue;
-            }
-            $block = $this->getBlock($blockData['moduleName'], $blockData['blockID'], $blockData['blockName'], $parameters, $nodeType, $roleID);
+            $block = $this->getBlock($blockData['moduleName'], $blockData['blockName'], $parameters);
             if($block == false) {
                 continue;
             }
@@ -53,8 +52,24 @@ class blockEngine {
         }
         return $blocks;
     }
-    public function getBlock($moduleName, $blockID, $blockName, $parameters, $nodeType, $roleID) {
-        $this->includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID);
+    private function getBlock($moduleName, $blockName, $parameters) {
+        $this->includeBlock($blockName, $moduleName);
+        if(! $this->validateBlock($blockName)) {
+            return false;
+        }
+        $block = new $blockName($parameters);
+        return $block;
+    }
+    private function includeBlock($moduleName, $blockName){
+        $moduleName = str_replace('..', '', $moduleName);
+        $blockName = str_replace('..', '', $blockName);
+        $blockPath = $this->getPathToBlock($moduleName, $blockName);
+        if(! is_file($blockPath)) {
+            return;
+        }
+        require_once($blockPath);
+    }
+    private function validateBlock($blockName) {
         if (!class_exists($blockName)) {
             return false;
         }
@@ -65,62 +80,51 @@ class blockEngine {
         if (!in_array('block', $interfacesThatClassImplements)) {
             return false;
         }
-        $block = new $blockName($parameters);
-        return $block;
-    }
-    public function includeBlock($blockName, $moduleName, $blockID, $nodeType, $roleID) {
-        if (!$this->blockExists($blockName, $moduleName)) {
-            return;
-        }
-        if (!$this->blockVisible($blockID, $nodeType, $roleID)) {
-            return;
-        }
-
-        require_once($this->getPathToBlock($blockName, $moduleName));
-    }
-    public function blockExists($blockName, $moduleName) {
-        $block = $this->getPathToBlock($blockName, $moduleName);
-        return file_exists($block);
-    }
-    public function blockVisible($blockID, $nodeType, $roleID) {
-        $database = database::getInstance();
-        $database->connect();
-
-        // check to see if it's in the visibility table
-        $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\''); //AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\'))');
-        //Default block is visible unless specified
-
-        // if results are empty
-        if ($results == false) {
-            return true;
-            // it's not in the table, check to see
-            $results = $database->getData('visible', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
-            if ($results != null) {
-                return false;
-            }
-            return true;
-        }
-        //Block is visible everywhere
-        if ($results[0]['visible'] == 1) {
-            return true;
-        }
-        //Block is only visible on specified pages
-        if ($results[0]['visible'] == 0) {
-            $results = $database->getData('*', 'blockVisibility', 'blockID = \'' . $blockID . '\' AND ((referenceType = \'nodeType\' AND referenceID = \'' . $nodeType . '\') OR (referenceType = \'roleID\' AND referenceID = \'' . $roleID . '\')) AND visible = 0');
-            if ($results == false) {
-                return false;
-            }
-            return true;
-        }
-
         return true;
     }
-    public function getPathToBlock($blockName, $moduleName) {
+    private function getPathToBlock($blockName, $moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
-    public function addBlock($blockName, $title = '', $theme = 'default', $themeRegion, $weight = 1, $enabled = 1, $module = 1) {
+    private function blockVisible($blockID, $pageType, $roleID) {
+        if(! is_numeric($blockID)) {
+            return false;
+        }
+        if($blockID < 1) {
+            return false;
+        }
+        $database = database::getInstance();
+        $database->connect();
+        if(! $database->isConnected()) {
+            return false;
+        }
 
+        // check to see if it's in the visibility table
+        $results = $database->getData('*', 'blockVisibility', 'blockID = ' . $blockID);
+        //Query failed. Play it safe and don't display the block.
+        if($results == false) {
+            return false;
+        }
+        //Default is to display the block unless specified.
+        if($results == null) {
+            return true;
+        }
+        foreach($results as $rule) {
+            if($rule['visible'] == 1) {
+                continue;
+            }
+            if($rule['referenceType'] == 'pageType') {
+                if($pageType == $rule['referenceID']) {
+                    return false;
+                }
+            }
+            if($rule['referenceType'] == 'role') {
+                if($roleID == intval($rule['referenceID'])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
