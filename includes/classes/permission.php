@@ -22,7 +22,7 @@ class permission {
             return;
         }
         $this->id = $inID;
-        $this->name = preg_replace('/\s/', '', $inName);;
+        $this->name = preg_replace('/\s+/', '', $inName);;
         $this->humanName = strip_tags($inHumanName);
         $this->description = strip_tags($inDescription);
     }
@@ -36,7 +36,7 @@ class permission {
     }
 
     public function setName($inName) {
-        $inName = preg_replace('/\s/', '', $inName);
+        $inName = preg_replace('/\s+/', '', $inName);
         $this->name = $inName;
     }
 

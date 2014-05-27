@@ -65,8 +65,8 @@ class bootstrap {
         define('NOTICE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/noticeEngine.php');
         define('PASSWORD_FUNCTIONS_FILE', EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
         define('NODE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeEngine.php');
-        define('NODE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/node.php');
         define('MODULE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/moduleEngine.php');
+        define('MODULE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/module.php');
         define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
         define('BLOCK_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/block.php');
         define('STATUS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/status.php');
@@ -94,19 +94,11 @@ class bootstrap {
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
-        require_once(VARIABLE_OBJECT_FILE);
-        require_once(FILE_SYSTEM_ENGINE_FILE);
-        require_once(ROLE_ENGINE_FILE);
-        require_once(USER_OPTION_ENGINE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
-        require_once(USER_OBJECT_FILE);
-        require_once(NODE_INTERFACE_FILE);
-        require_once(CURRENT_USER_OBJECT_FILE);
-        require_once(NODE_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
-        require_once(SYSTEM_LOG_ENGINE_FILE);
+        require_once(CURRENT_USER_OBJECT_FILE);
     }
 
     private function connectDatabase() {
@@ -140,7 +132,6 @@ class bootstrap {
         date_default_timezone_set($this->site->getTimeZone());
 
         $blockEngine = blockEngine::getInstance();
-        $nodeEngine = nodeEngine::getInstance();
         $user = currentUser::getUserSession();
         $hookEngine = hookEngine::getInstance();
         $router = router::getInstance();
@@ -148,13 +139,11 @@ class bootstrap {
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
 
-        $node = $nodeEngine->getNode();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), get_class($node), $user->getRoleID());
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), 'test', $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
         noticeEngine::getInstance()->removeNotices();
 
         database::getInstance()->bootstrapDisconnect();
-
 
     }
 

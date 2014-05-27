@@ -26,7 +26,7 @@ class permissionEngine {
     }
 
     public function getPermission($inPermissionName) {
-        if (preg_match('/\s/', $inPermissionName)) {
+        if (preg_match('/\s+/', $inPermissionName)) {
             return false;
         }
         if (!empty($this->retrievedPermissions[$inPermissionName])) {
@@ -90,7 +90,7 @@ class permissionEngine {
         if (!$database->isConnected()) {
             return false;
         }
-        $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s/', '', $inPermission->getName())));
+        $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s+/', '', $inPermission->getName())));
         $inHumanName = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getHumanName())));
         $inDescription = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getDescription())));
 
@@ -105,7 +105,7 @@ class permissionEngine {
         if (!$database->isConnected()) {
             return false;
         }
-        $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s/', '', $inPermission->getName())));
+        $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s+/', '', $inPermission->getName())));
         $inHumanName = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getHumanName())));
         $inDescription = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getDescription())));
         if (!$database->updateTable('permission', "permissionName='{$inName}', humanName='{$inHumanName}', permissionDescription='{$inDescription}'", "permissionID={$inPermission->getID()}")) {

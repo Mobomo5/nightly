@@ -110,21 +110,66 @@ class blockEngine {
         if($results == null) {
             return true;
         }
-        foreach($results as $rule) {
-            if($rule['visible'] == 1) {
+        $comparators = array('referenceType' => '', 'referenceValue' => '');
+        $hookEngine = hookEngine::getInstance();
+        $comparators = $hookEngine->runFilter('blockVisibilityComparator', $comparators);
+        $comparators[] = array('referenceType' => 'pageType', 'referenceValue' => $pageType);
+        $comparators[] = array('referenceType' => 'role', 'referenceValue' => $roleID);
+        $finalComparators = array();
+        foreach($comparators as $comparator) {
+            if(! isset($comparator['referenceType'])) {
                 continue;
             }
-            if($rule['referenceType'] == 'pageType') {
-                if($pageType == $rule['referenceID']) {
-                    return false;
-                }
+            if(! isset($comparator['referenceValue'])) {
+                continue;
             }
-            if($rule['referenceType'] == 'role') {
-                if($roleID == intval($rule['referenceID'])) {
-                    return false;
-                }
+            if(isset($finalComparators[$comparator['referenceType']])) {
+                continue;
             }
+            $finalComparators[$comparator['referenceType']] = $comparator['referenceValue'];
+        }
+        $countOfDoNotDisplays = 0;
+        $countOfDoDisplays = 0;
+        foreach($results as $rule) {
+            if(! isset($finalComparators[$rule['referenceType']])) {
+                continue;
+            }
+            if($finalComparators[$rule['referenceType']] != $rule['referenceID'])  {
+                continue;
+            }
+            if($rule['visible'] == 0) {
+                $countOfDoNotDisplays += 1;
+                continue;
+            }
+            $countOfDoDisplays += 1;
+        }
+        if($countOfDoNotDisplays > $countOfDoDisplays) {
+            return false;
         }
         return true;
+    }
+    public function setBlockVisibility($inBlockID, $referenceID, $referenceType, $isVisible = false) {
+        if(! is_numeric($inBlockID)) {
+            return false;
+        }
+        if( $inBlockID < 1) {
+            return false;
+        }
+        if(! is_bool($isVisible)) {
+            return false;
+        }
+        $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
+        $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $exists = $database->getData('visible', 'blockVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}");
+        if($exists == false) {
+            return false;
+        }
+        if($exists != null) {
+            
+        }
     }
 }
