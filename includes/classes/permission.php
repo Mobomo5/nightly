@@ -21,13 +21,10 @@ class permission {
         if ($inID < 1) {
             return;
         }
-        if (preg_match('/\s/', $inName)) {
-            return;
-        }
         $this->id = $inID;
-        $this->name = $inName;
-        $this->humanName = $inHumanName;
-        $this->description = $inDescription;
+        $this->name = preg_replace('/\s/', '', $inName);;
+        $this->humanName = strip_tags($inHumanName);
+        $this->description = strip_tags($inDescription);
     }
 
     public function getID() {
@@ -39,9 +36,7 @@ class permission {
     }
 
     public function setName($inName) {
-        if (preg_match('/\s/', $inName)) {
-            return;
-        }
+        $inName = preg_replace('/\s/', '', $inName);
         $this->name = $inName;
     }
 
@@ -50,9 +45,7 @@ class permission {
     }
 
     public function setHumanName($inName) {
-        if (preg_match('/\s/', $inName)) {
-            return;
-        }
+        $inName = strip_tags($inName);
         $this->humanName = $inName;
     }
 
@@ -61,11 +54,7 @@ class permission {
     }
 
     public function setDescription($inDescription) {
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
-            return;
-        }
-        $this->description = $inDescription;
+        $this->description = strip_tags($inDescription);
     }
 
     public function canDo() {

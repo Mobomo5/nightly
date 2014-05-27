@@ -35,22 +35,18 @@ class logEntry {
         if (!is_numeric($id)) {
             return false;
         }
-        if (strlen($id) > 10) {
-
+        if(! is_numeric($userID)) {
             return false;
         }
-
         // is the type in logEntryType
         if (!logEntryType::validateType($type)) {
-
             return false;
         }
-
 
         //store
         $this->id = $id;
         $this->type = $type;
-        $this->message = $message;
+        $this->message = strip_tags($message);
         $this->userID = $userID;
 
     }

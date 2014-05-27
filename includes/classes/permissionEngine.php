@@ -86,35 +86,28 @@ class permissionEngine {
     }
 
     public function addPermission(permission $inPermission) {
-        if (preg_match('/\s/', $inPermission->getName())) {
-            return;
-        }
         $database = database::getInstance();
         if (!$database->isConnected()) {
             return false;
         }
-        $inName = $database->escapeString(htmlspecialchars($inPermission->getName()));
-        $inHumanName = $database->escapeString(htmlspecialchars($inPermission->getHumanName()));
-        $inDescription = $database->escapeString(htmlspecialchars($inPermission->getDescription()));
+        $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s/', '', $inPermission->getName())));
+        $inHumanName = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getHumanName())));
+        $inDescription = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getDescription())));
 
-        if (!$database->insertData('permission', 'permissionName, humanName, permissionDescription', '\'' . $inName . '\', \'' . $inHumanName . '\', \'' . $inDescription . '\'')) { /// sending bad info as a column
-
+        if (!$database->insertData('permission', 'permissionName, humanName, permissionDescription', '\'' . $inName . '\', \'' . $inHumanName . '\', \'' . $inDescription . '\'')) {
             return false;
         }
         return true;
     }
 
     public function savePermission(permission $inPermission) {
-        if (preg_match('/\s/', $inPermission->getName())) {
-            return;
-        }
         $database = database::getInstance();
         if (!$database->isConnected()) {
             return false;
         }
-        $inName = $database->escapeString(htmlspecialchars($inPermission->getName()));
-        $inHumanName = $database->escapeString(htmlspecialchars($inPermission->getHumanName()));
-        $inDescription = $database->escapeString(htmlspecialchars($inPermission->getDescription()));
+        $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s/', '', $inPermission->getName())));
+        $inHumanName = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getHumanName())));
+        $inDescription = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getDescription())));
         if (!$database->updateTable('permission', "permissionName='{$inName}', humanName='{$inHumanName}', permissionDescription='{$inDescription}'", "permissionID={$inPermission->getID()}")) {
             return false;
         }
