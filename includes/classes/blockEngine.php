@@ -169,7 +169,15 @@ class blockEngine {
             return false;
         }
         if($exists != null) {
-            
+            $success = $this->insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible);
+            if($success == false) {
+                return false;
+            }
+            return true;
         }
+        $success = $database->updateTable('blockVisibility', "");
+    }
+    private function insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible = false) {
+
     }
 }

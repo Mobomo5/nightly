@@ -6,6 +6,8 @@
  * Date: 5/15/14
  * Time: 2:19 PM
  */
+
+//@ToDo: Change this to use a php mailer class, not the mail function.
 class mail {
     private $senderEmail;
     private $senderName;
