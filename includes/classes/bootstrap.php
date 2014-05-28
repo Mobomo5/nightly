@@ -95,6 +95,7 @@ class bootstrap {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
+        requiree_once(MODULE_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
@@ -135,11 +136,17 @@ class bootstrap {
         $user = currentUser::getUserSession();
         $hookEngine = hookEngine::getInstance();
         $router = router::getInstance();
+        $moduleEngine = moduleEngine::getInstance();
 
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
+        $moduleEngine->includeModule($moduleInCharge);
+        $module = new $moduleInCharge();
+        if ($module->noGUI()) {
+            $this->noGUIWork();
+        }
 
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), 'test', $user->getRoleID());
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), $module->getPageType(), $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
         noticeEngine::getInstance()->removeNotices();
 
@@ -167,5 +174,19 @@ class bootstrap {
         $twig = new Twig_Environment($loader, array('debug' => true,));
         $twig->addExtension(new Twig_Extension_Debug());
         echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
+    }
+    private function noGUIWork() {
+        $link = $module->getReturnPage();
+        //verify the variable given is a link object. If it is not, go to the home page.
+        if (get_class($link) != 'link') {
+            $past = $router->getPreviousParameters();
+            if ($past == null) {
+                $link = new link('home');
+            } else {
+                $link = new link($past); // haha, A Link to the Past!
+            }
+        }
+        header('Location: ' . $link);
+        exit();
     }
 }

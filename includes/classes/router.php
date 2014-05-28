@@ -23,7 +23,7 @@ class router {
         if (isset($_SESSION['educaskPreviousPage'])) {
             self::$previousURL = $_SESSION['educaskPreviousPage'];
         } else {
-            self::$previousURL = '';
+            self::$previousURL = null;
         }
         if (empty($_GET['p'])) {
             self::$currentURL = 'home';

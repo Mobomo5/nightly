@@ -107,18 +107,7 @@ class nodeEngine {
         $module = new $moduleClass();
 
         if ($module->noGUI()) {
-            $link = $module->getReturnPage();
-            //verify the variable given is a link object. If it is not, go to the home page.
-            if (get_class($link) != 'link') {
-                $past = $router->getPreviousParameters();
-                if ($past == null) {
-                    $link = new link('home');
-                } else {
-                    $link = new link($past); // haha, A Link to the Past!
-                }
-            }
-            header('Location: ' . $link);
-            exit();
+
         }
 
         $_SESSION['educaskPreviousPage'] = self::$currentURL;

@@ -48,11 +48,25 @@ class moduleEngine {
     public function includeModule($moduleName) {
         if (!$this->moduleExists($moduleName)) {
             require_once(EDUCASK_ROOT . '/includes/modules/404/main.php');
-            return;
+            return false;
         }
-
-        //  The module's main.php must contain a function that will give the name of the page
-        require_once(EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/main.php');
+        $validator = new validator('file');
+        if (!$validator->validatorExists()) {
+            return false;
+        }
+        $file = '/includes/modules/' . $moduleName . '/main.php';
+        if(! $validator->validate($file)) {
+            return false;
+        }
+        require_once(EDUCASK_ROOT . $file);
+        if(! class_exists($moduleName)) {
+            return false;
+        }
+        $interfacesImplemented = class_implements($moduleName);
+        if(! in_array('module', $interfacesImplemented)) {
+            return false;
+        }
+        return true;
     }
 
     public function addModule($name, $humanName, $enabled = 1) {
