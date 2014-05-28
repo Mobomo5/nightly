@@ -101,9 +101,6 @@ class database implements databaseInterface {
             return false;
         }
         $result = $this->dbObject->getData($select, $from, $where);
-        if (!$result) {
-            return false; //@todo: link to last page.
-        }
         return $result;
     }
 
