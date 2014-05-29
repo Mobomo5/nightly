@@ -141,13 +141,17 @@ class bootstrap {
 
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
-        $moduleEngine->includeModule($moduleInCharge);
+        if(! $moduleEngine->includeModule($moduleInCharge)) {
+            require_once(EDUCASK_ROOT . '/includes/modules/500/main.php');
+            $moduleInCharge = 'fiveHundred';
+        }
         $module = new $moduleInCharge();
         if ($module->noGUI()) {
             $this->noGUIWork($module);
         }
+        $contentToPassToPageBlock = $module->getPageContent();
 
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), $module->getPageType(), $user->getRoleID());
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
         noticeEngine::getInstance()->removeNotices();
 

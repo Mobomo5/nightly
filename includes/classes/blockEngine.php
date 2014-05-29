@@ -20,7 +20,7 @@ class blockEngine {
     private function __construct() {
         //Do nothing;
     }
-    public function getBlocks($theme, $parameters, $pageType, $roleID) {
+    public function getBlocks($theme, $pageType, $roleID) {
         $database = database::getInstance();
         $database->connect();
         if (!$database->isConnected()) {
@@ -42,7 +42,7 @@ class blockEngine {
             if (!$this->blockVisible($blockData['blockID'], $pageType, $roleID)) {
                 continue;
             }
-            $block = $this->getBlock($blockData['moduleName'], $blockData['blockName'], $parameters);
+            $block = $this->getBlock($blockData['moduleName'], $blockData['blockName']);
             if($block == false) {
                 continue;
             }
@@ -53,12 +53,12 @@ class blockEngine {
         }
         return $blocks;
     }
-    private function getBlock($moduleName, $blockName, $parameters) {
+    private function getBlock($moduleName, $blockName) {
         $this->includeBlock($blockName, $moduleName);
         if(! $this->validateBlock($blockName)) {
             return false;
         }
-        $block = new $blockName($parameters);
+        $block = new $blockName();
         return $block;
     }
     private function includeBlock($moduleName, $blockName){

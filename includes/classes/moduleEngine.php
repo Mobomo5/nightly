@@ -46,8 +46,11 @@ class moduleEngine {
     }
 
     public function includeModule($moduleName) {
+        $noFourOhFour = false;
+        if(! $this->moduleExists('404')) {
+            $noFourOhFour = true;
+        }
         if (!$this->moduleExists($moduleName)) {
-            require_once(EDUCASK_ROOT . '/includes/modules/404/main.php');
             return false;
         }
         $validator = new validator('file');
