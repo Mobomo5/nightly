@@ -17,7 +17,7 @@ class user {
     private $email;
 
     public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail) {
-        if (!is_int($inUserID)) {
+        if (!is_numeric($inUserID)) {
             return;
         }
         if ($inUserID < 0) {
