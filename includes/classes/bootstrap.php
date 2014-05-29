@@ -100,6 +100,7 @@ class bootstrap {
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
+        require_once(LINK_OBJECT_FILE);
     }
 
     private function connectDatabase() {
@@ -143,7 +144,7 @@ class bootstrap {
         $moduleEngine->includeModule($moduleInCharge);
         $module = new $moduleInCharge();
         if ($module->noGUI()) {
-            $this->noGUIWork();
+            $this->noGUIWork($module);
         }
 
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $router->getParameters(), $module->getPageType(), $user->getRoleID());
@@ -175,18 +176,19 @@ class bootstrap {
         $twig->addExtension(new Twig_Extension_Debug());
         echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
-    private function noGUIWork() {
+    private function noGUIWork($module) {
         $link = $module->getReturnPage();
         //verify the variable given is a link object. If it is not, go to the home page.
-        if (get_class($link) != 'link') {
-            $past = $router->getPreviousParameters();
-            if ($past == null) {
-                $link = new link('home');
-            } else {
-                $link = new link($past); // haha, A Link to the Past!
-            }
+        if (get_class($link) == 'link') {
+            header('Location: ' . $link);
+            exit();
         }
-        header('Location: ' . $link);
+        $past = $router->getPreviousParameters();
+        if ($past == null) {
+            header('Location: ' . new link('home'));
+            exit();
+        }
+        header('Location: ' . new link($past));
         exit();
     }
 }
