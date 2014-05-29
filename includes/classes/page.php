@@ -16,5 +16,5 @@ class page implements block{
     public function setTitle($inTitle){
 
     }
-    public function getContent();
+    public function getContent(){}
 } 
