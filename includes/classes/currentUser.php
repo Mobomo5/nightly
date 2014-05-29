@@ -4,6 +4,7 @@ require_once(DATABASE_OBJECT_FILE);
 require_once(PASSWORD_FUNCTIONS_FILE);
 require_once(HASHER_OBJECT_FILE);
 require_once(SYSTEM_LOGGER_OBJET_FILE);
+require_once(PERMISSION_ENGINE_OBJECT_FILE);
 require_once(LINK_OBJECT_FILE);
 require_once(USER_OBJECT_FILE);
 
@@ -126,7 +127,6 @@ class currentUser extends user {
             unset($result['password']);
         }
         unset($hasher);
-
         $this->isLoggedIn = true;
         $this->tempID = $results[0]['userID'];
         $this->setRoleID($results[0]['roleID']);
@@ -141,6 +141,8 @@ class currentUser extends user {
         $logEntry = new logEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID());
         logger::getInstance()->logIt($logEntry);
         $hookEngine->runAction('userLoggedIn');
+        $previousPage = new link(router::getInstance()->getPreviousParameters());
+        header('Location: ' . $previousPage);
         return true;
     }
 

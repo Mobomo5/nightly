@@ -1,9 +1,10 @@
 {% block body %}
     <div id="homepage-background">
         {% for item in blocks.menu %}
-            <a href="{{ item.href }}">
+            <a href="{{ item.href }}" class="{{ item.CssClass }}">
                 <span class="box" id="box-{{ loop.index }}">
                     <h2>{{ item.title|title }}</h2>
+                    {{ item.content }}
                 </span>
             </a>
         {% endfor %}
@@ -13,5 +14,9 @@
                 {% endblock %}
             </div>
         </div>
+
+    </div>
+    <div id="login-modal" style="display: none;">
+    {{ blocks.login.0.content|raw }}
     </div>
 {% endblock %}

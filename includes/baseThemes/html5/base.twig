@@ -46,7 +46,10 @@
                 openEffect: "fade",
                 closeEffect: "fade",
                 autoCenter: false,
-                scrolling: false
+                scrolling: false,
+                afterShow: function () {
+                    $('#login').attr("tabindex",1).focus()
+                }
             });
             $(".inlineRefreshOnClose").fancybox({
                 fitToView: true,

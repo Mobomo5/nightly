@@ -14,7 +14,7 @@ class userModule implements module {
     private $subModule;
 
     public function __construct() {
-        $this->params = nodeEngine::getInstance()->getParameters(true);
+        $this->params = router::getInstance()->getParameters(true);
         $this->module = $this->params[0];
         if (!empty($_POST['login'])) {
             $this->doLogin();
@@ -36,6 +36,7 @@ class userModule implements module {
         if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
             noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'I couldn\'t log you in.'));
         }
+
         return;
     }
 
