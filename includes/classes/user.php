@@ -51,7 +51,7 @@ class user {
     }
 
     public function setRoleID($inRoleID) {
-        if (!is_int($inRoleID)) {
+        if (!is_numeric($inRoleID)) {
             return;
         }
         if ($inRoleID < 1) {
