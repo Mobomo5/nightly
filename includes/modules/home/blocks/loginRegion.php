@@ -26,7 +26,7 @@ class loginRegion implements block {
 
             return;
         }
-        // get names
+        // get namess
         $this->title = $user->getFirstName() . ' ' . $user->getLastName();
 
         // get news
