@@ -5,48 +5,16 @@
  * Date: 4/23/14
  * Time: 2:52 PM
  */
-require_once(BLOCK_INTERFACE_FILE);
+require_once(MODULE_INTERFACE_FILE);
 
-class fourOhFour implements block {
+class fourOhFour implements module {
 
     public function __construct() {
         // TODO: Implement __construct() method.
     }
 
-    public function getTitle() {
-        // TODO: Implement getTitle() method.
-    }
-
-    public function getContent() {
-        // TODO: Implement getContent() method.
-    }
-
-    public function pageAuthorIsVisible() {
-        // TODO: Implement pageAuthorIsVisible() method.
-    }
-
-    public function datePagePublishedIsVisible() {
-        // TODO: Implement datePagePublishedIsVisible() method.
-    }
-
-    public function getDatePagePublished() {
-        // TODO: Implement getDatePagePublished() method.
-    }
-
-    public function getPageAuthor() {
-        // TODO: Implement getPageAuthor() method.
-    }
-
-    public static function getNodeType() {
-        // TODO: Implement getNodeType() method.
-    }
-
-    public function statusesAreVisible() {
-        // TODO: Implement statusesAreVisible() method.
-    }
-
-    public function getStatuses() {
-        // TODO: Implement getStatuses() method.
+    public static function getPageType() {
+        return 'fourOhFour';
     }
 
     public function noGUI() {
@@ -55,9 +23,5 @@ class fourOhFour implements block {
 
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
-    }
-
-    public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
     }
 }

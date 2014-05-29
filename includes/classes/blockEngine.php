@@ -38,6 +38,7 @@ class blockEngine {
         }
         $blocks = array();
         foreach ($results as $blockData) {
+
             if (!$this->blockVisible($blockData['blockID'], $pageType, $roleID)) {
                 continue;
             }
@@ -102,14 +103,16 @@ class blockEngine {
 
         // check to see if it's in the visibility table
         $results = $database->getData('*', 'blockVisibility', 'blockID = ' . $blockID);
-        //Query failed. Play it safe and don't display the block.
-        if($results == false) {
-            return false;
-        }
+
         //Default is to display the block unless specified.
         if($results == null) {
             return true;
         }
+        //Query failed. Play it safe and don't display the block.
+        if($results == false) {
+            return false;
+        }
+
         $comparators = array('referenceType' => '', 'referenceValue' => '');
         $hookEngine = hookEngine::getInstance();
         $comparators = $hookEngine->runFilter('blockVisibilityComparator', $comparators);
@@ -130,6 +133,8 @@ class blockEngine {
         }
         $countOfDoNotDisplays = 0;
         $countOfDoDisplays = 0;
+
+
         foreach($results as $rule) {
             if(! isset($finalComparators[$rule['referenceType']])) {
                 continue;
@@ -137,13 +142,14 @@ class blockEngine {
             if($finalComparators[$rule['referenceType']] != $rule['referenceID'])  {
                 continue;
             }
+
             if($rule['visible'] == 0) {
                 $countOfDoNotDisplays += 1;
                 continue;
             }
             $countOfDoDisplays += 1;
         }
-        if($countOfDoNotDisplays > $countOfDoDisplays) {
+        if($countOfDoNotDisplays >= $countOfDoDisplays) {
             return false;
         }
         return true;

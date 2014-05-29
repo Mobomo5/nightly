@@ -103,7 +103,7 @@ class router {
             }
         }
         if (!moduleEngine::getInstance()->moduleExists($module)) {
-            return '404';
+            return 'fourOhFour';
         }
         return $module;
     }

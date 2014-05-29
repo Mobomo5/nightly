@@ -5,9 +5,9 @@
  * Date: 5/21/14
  * Time: 2:02 PM
  */
-require_once(NODE_INTERFACE_FILE);
+require_once(MODULE_INTERFACE_FILE);
 
-class userModule implements node {
+class userModule implements module {
     private $params;
     private $noGui = false;
     private $module;
@@ -28,54 +28,6 @@ class userModule implements node {
 
     }
 
-    public function getTitle() {
-        // TODO: Implement getTitle() method.
-    }
-
-    public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
-    }
-
-    public function getContent() {
-        // TODO: Implement getContent() method.
-    }
-
-    public function pageAuthorIsVisible() {
-        // TODO: Implement pageAuthorIsVisible() method.
-    }
-
-    public function datePagePublishedIsVisible() {
-        // TODO: Implement datePagePublishedIsVisible() method.
-    }
-
-    public function getDatePagePublished() {
-        // TODO: Implement getDatePagePublished() method.
-    }
-
-    public function getPageAuthor() {
-        // TODO: Implement getPageAuthor() method.
-    }
-
-    public static function getNodeType() {
-        // TODO: Implement getNodeType() method.
-    }
-
-    public function statusesAreVisible() {
-        // TODO: Implement statusesAreVisible() method.
-    }
-
-    public function getStatuses() {
-        // TODO: Implement getStatuses() method.
-    }
-
-    public function noGUI() {
-        // TODO: Implement noGUI() method.
-    }
-
-    public function getReturnPage() {
-        // TODO: Implement getReturnPage() method.
-    }
-
     private function doLogOut() {
         return currentUser::getUserSession()->logOut();
     }
@@ -85,5 +37,17 @@ class userModule implements node {
             noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'I couldn\'t log you in.'));
         }
         return;
+    }
+
+    public static function getPageType() {
+        // TODO: Implement getPageType() method.
+    }
+
+    public function noGUI() {
+        // TODO: Implement noGUI() method.
+    }
+
+    public function getReturnPage() {
+        // TODO: Implement getReturnPage() method.
     }
 }
