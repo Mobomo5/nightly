@@ -217,4 +217,4 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-includes/classes/statusEngine.php
+*.htaccess
