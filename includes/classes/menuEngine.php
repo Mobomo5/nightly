@@ -25,6 +25,7 @@ class menuEngine {
         $this->permissionObject = permissionEngine::getInstance();
         $this->db = database::getInstance();
     }
+
     //region Get
     public function getMenu($inMenuID) {
         //get a single menu from the database based off of ID
@@ -66,6 +67,7 @@ class menuEngine {
         }
     }
     //endregion
+
     //region Set
     public function setMenu(menu $inMenu) {
         //takes in a menu object and updates DB
@@ -111,6 +113,7 @@ class menuEngine {
         }
     }
     //endregion
+
     //region Add
     public function addMenu($inName, $inThemeRegion, $inEnabled) {
         //Adds a new menu to the database
@@ -150,6 +153,7 @@ class menuEngine {
         }
     }
     //endregion
+
     //region Delete
     public function deleteMenu($inMenuID) {
         //deletes a menu from the DB
