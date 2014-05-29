@@ -86,21 +86,21 @@ class nodeEngine {
         $moduleClass = $parameters[0];
         $moduleEngine = moduleEngine::getInstance();
         $moduleEngine->includeModule($moduleClass);
-        //See the interfaces that the module implements, and make sure it implements node. If not, return 404.
+        //See the interfaces that the module implements, and make sure it implements node. If not, return fourOhFour.
 
         if (!class_exists($moduleClass)) {
-            $moduleEngine->includeModule('404');
+            $moduleEngine->includeModule('fourOhFour');
             return new fourOhFour();
         }
         $interfacesThatClassImplements = class_implements($moduleClass);
 
         if ($interfacesThatClassImplements === false) {
-            $moduleEngine->includeModule('404');
+            $moduleEngine->includeModule('fourOhFour');
             return new fourOhFour();
         }
 
         if (!in_array('node', $interfacesThatClassImplements)) {
-            $moduleEngine->includeModule('404');
+            $moduleEngine->includeModule('fourOhFour');
             return new fourOhFour();
         }
 
@@ -113,8 +113,8 @@ class nodeEngine {
         $_SESSION['educaskPreviousPage'] = self::$currentURL;
 
         $pageTitle = $module->getTitle();
-        if ($pageTitle == '404' && $moduleClass != 'fourOhFour') {
-            $moduleEngine->includeModule('404');
+        if ($pageTitle == 'fourOhFour' && $moduleClass != 'fourOhFour') {
+            $moduleEngine->includeModule('fourOhFour');
             return new fourOhFour();
         }
 
