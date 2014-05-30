@@ -20,7 +20,7 @@ class login implements block {
             $this->button = '<button id="login" class="inlineLogIn" href="#login-modal">Log in</button>';
         } else {
             $this->content = $this->getLogOut();
-            $this->button = '<form action="' . new link('users') . '" method="post"><button type="submit">Log Out</a><input type="hidden" name="logout" value="1"></form>';
+            $this->button = '<form action="' . new link('users') . '" method="post"><button id="login" type="submit">Log Out</button><input type="hidden" name="logout" value="1"/></form>';
         }
 
     }

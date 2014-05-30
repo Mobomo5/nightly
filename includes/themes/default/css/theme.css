@@ -151,7 +151,7 @@ body {
 
 #titlebar ul #flex-end {
     position: absolute;
-    right: 5px;
+    right: 0;
 }
 
 #titlebar ul li {
@@ -175,6 +175,11 @@ body {
 
 #titlebar ul li #logo:hover {
     background-color: transparent;
+}
+
+#titlebar ul li #login {
+    margin: 2px;
+    height: 2em;
 }
 
 #titlebar ul li a {
