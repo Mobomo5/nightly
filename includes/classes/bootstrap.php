@@ -146,22 +146,30 @@ class bootstrap {
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
         if (!$moduleEngine->includeModule($moduleInCharge)) {
-            require_once(EDUCASK_ROOT . '/includes/modules/500/main.php');
+            $moduleEngine->includeModule('fiveHundred');
             $moduleInCharge = 'fiveHundred';
         }
         $module = new $moduleInCharge();
+        if($module->forceFourOhFour()) {
+            $moduleEngine->includeModule('fourOhFour');
+            $module = new fourOhFour();
+        }
         if ($module->noGUI()) {
             $this->noGUIWork($module);
         }
         $contentToPassToPageBlock = $module->getPageContent();
-        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID());
+        $titleToPassToPageBlock = $module->getTitle();
+        require_once(EDUCASK_ROOT . '/includes/modules/node/blocks/page.php');
+        $pageBlock = new page();
+        $pageBlock->setContent($contentToPassToPageBlock);
+        $pageBlock->setTitle($titleToPassToPageBlock);
+        $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID(), $pageBlock);
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
         $this->blocks['menus'] = menuEngine::getInstance()->getMenu(1);
 
         noticeEngine::getInstance()->removeNotices();
 
         database::getInstance()->bootstrapDisconnect();
-
     }
 
     //@TODO: Add Cron Stuff
@@ -193,6 +201,7 @@ class bootstrap {
             header('Location: ' . $link);
             exit();
         }
+        $router = router::getInstance();
         $past = $router->getPreviousParameters();
         if ($past == null) {
             header('Location: ' . new link('home'));

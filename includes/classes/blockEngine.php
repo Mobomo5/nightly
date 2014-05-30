@@ -22,7 +22,7 @@ class blockEngine {
         //Do nothing;
     }
 
-    public function getBlocks($theme, $pageType, $roleID) {
+    public function getBlocks($theme, $pageType, $roleID, page $pageBlock) {
         $database = database::getInstance();
         $database->connect();
         if (!$database->isConnected()) {
@@ -40,8 +40,11 @@ class blockEngine {
         }
         $blocks = array();
         foreach ($results as $blockData) {
-
             if (!$this->blockVisible($blockData['blockID'], $pageType, $roleID)) {
+                continue;
+            }
+            if($blockData['blockName'] == 'page') {
+                $blocks[$blockData['themeRegion']][] = $pageBlock;
                 continue;
             }
             $block = $this->getBlock($blockData['moduleName'], $blockData['blockName']);
@@ -148,7 +151,6 @@ class blockEngine {
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
-
             if ($rule['visible'] == 0) {
                 $countOfDoNotDisplays += 1;
                 continue;

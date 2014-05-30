@@ -22,7 +22,7 @@ class loginRegion implements block {
             // You ain't logged in. Convince them to log in.
             $this->title = 'Click here to log in';
             $this->href = '#login-modal';
-            $this->content = 'There is no user logged in.';
+            $this->content = 'You\'re not logged in.';
             $this->css = 'inlineLogIn'; // to ensure the link will open the fancybox
 
             return;

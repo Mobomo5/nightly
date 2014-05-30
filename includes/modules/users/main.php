@@ -72,4 +72,8 @@ class users implements module {
     public function getPageContent() {
         // TODO: Implement getPageContent() method.
     }
+
+    public function getTitle() {
+        return 'User';
+    }
 }
