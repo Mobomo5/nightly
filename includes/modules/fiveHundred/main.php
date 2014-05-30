@@ -1,42 +1,32 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Craig
- * Date: 4/25/14
- * Time: 5:19 PM
+ * User: craig
+ * Date: 4/23/14
+ * Time: 2:52 PM
  */
-
 require_once(MODULE_INTERFACE_FILE);
-require_once(ROUTER_OBJECT_FILE);
-class home implements module {
-
+class fiveHundred implements module {
     public function __construct() {
         // TODO: Implement __construct() method.
     }
-
     public static function getPageType() {
-        return 'home';
+        return 'fiveHundred';
     }
-
     public function noGUI() {
-        // TODO: Implement noGUI() method.
+        return false;
     }
-
     public function getReturnPage() {
-        // TODO: Implement getReturnPage() method.
+        return '';
     }
-
     public function getPageContent() {
-        // TODO: Implement getPageContent() method.
+        $content = "<p>Sorry, but I had problems rendering the page you requested. Please try again.</p>";
+        return $content;
     }
     public function getTitle() {
-        return 'Home';
+        return '500: Internal Server Error';
     }
     public function forceFourOhFour() {
-        $params = router::getInstance()->getParameters(true);
-        if(isset($params[1])) {
-            return true;
-        }
         return false;
     }
 }

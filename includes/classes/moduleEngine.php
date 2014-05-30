@@ -47,7 +47,7 @@ class moduleEngine {
 
     public function includeModule($moduleName) {
         if (!$this->moduleExists($moduleName)) {
-            return false;
+                $moduleName = 'fourOhFour';
         }
         $validator = new validator('file');
         if (!$validator->validatorExists()) {
