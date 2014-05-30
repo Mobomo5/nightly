@@ -114,7 +114,7 @@ class database implements databaseInterface {
     public function makeCustomQuery($inQuery) {
         $result = $this->dbObject->query($inQuery);
         if (!$result) {
-            return false; //@todo: link to last page.
+            return false;
         }
         return $result;
     }
@@ -134,7 +134,7 @@ class database implements databaseInterface {
         }
         $result = $this->dbObject->insertData($into, $columns, $values);
         if (!$result) {
-            return false; //@todo: link to last page.
+            return false;
         }
         return $result;
     }

@@ -19,6 +19,6 @@ class optionName implements subValidator {
     }
 
     public function hasOptions() {
-        // TODO: Implement hasOptions() method.
+        return false;
     }
 }

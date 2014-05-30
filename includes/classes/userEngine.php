@@ -25,7 +25,7 @@ class userEngine {
 
     public function getUser($inID) {
 
-        if (!permissionEngine::getInstance()->currentUserCanDo('userCanGetUsersFromDB')) { //@todo: add this perm to db
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanGetUsersFromDB')) {
             return false;
         }
 
@@ -62,7 +62,7 @@ class userEngine {
 
     public function setUser(user $inUser) {
 
-        if (!permissionEngine::getInstance()->currentUserCanDo('userCanModifyUsersInDB')) { //@todo: add this perm to db
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanModifyUsersInDB')) {
             return false;
         }
 
@@ -90,7 +90,7 @@ class userEngine {
      * @return bool | int returns new user ID on success
      */
     public function addUser(user $inUser, $password) {
-        if (!permissionEngine::getInstance()->currentUserCanDo('userCanAddUsersToDB')) { //@todo: add this perm to db
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanAddUsersToDB')) {
             return false;
         }
         $db = database::getInstance();
@@ -128,7 +128,7 @@ class userEngine {
     }
 
     public function deleteUser(user $userToBeDeleted) {
-        if (!permissionEngine::getInstance()->currentUserCanDo('userCanDeleteUsers')) { //@todo: add this perm to db
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanDeleteUsers')) {
             return false;
         }
 
@@ -152,7 +152,7 @@ class userEngine {
 
     public function updateUserPassword(user $inUser, $newPassword, $oldPassword) {
 
-        if (!permissionEngine::getInstance()->currentUserCanDo('userCanUpdatePassword')) { //@todo: add this perm to db
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanUpdatePassword')) {
             return false;
         }
 
