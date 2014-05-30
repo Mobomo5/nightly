@@ -22,8 +22,6 @@ class users implements module {
         } elseif (!empty($_POST['logout'])) {
             $this->doLogout();
             return;
-        } elseif (!empty($_POST[''])) {
-
         }
 
         // nothing in the post. Check to see if there are second parameters
@@ -39,9 +37,18 @@ class users implements module {
         }
 
 //        check to see if the user has permission to see other users
+//        if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewOtherUsers')){
+//            return false;
+//        }
 //        check to see if that is actually a user
+        $user = userEngine::getInstance()->getUser($userID);
+        var_dump($user);
+        if (!$user) {
+            return false;
+        }
 //        get the user
-//        $userObject =
+        var_dump($user);
+        exit;
 
     }
 
@@ -75,5 +82,9 @@ class users implements module {
 
     public function getTitle() {
         return 'User';
+    }
+
+    public function forceFourOhFour() {
+        return false;
     }
 }
