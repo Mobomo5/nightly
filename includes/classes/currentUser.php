@@ -176,9 +176,6 @@ class currentUser extends user {
         if (empty($oldPass)) {
             return false;
         }
-        if (strlen($newPass) < 6) {
-            return false;
-        }
 
         $user = currentUser::getUserSession()->toUser();
         return userEngine::getInstance()->updateUserPassword($user, $newPass, $oldPass);
