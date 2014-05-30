@@ -54,6 +54,7 @@ class currentUser extends user {
         $this->setFirstName('Anonymous');
         $this->setLastName('Guest');
         $this->setEmail('anon@anon.ca');
+        $this->setBirthday(strtotime('now'));
     }
 
     public function getUserID() {
@@ -159,8 +160,8 @@ class currentUser extends user {
 
     public function toUser() {
         if (!$this->isLoggedIn) {
-            return new user(1, GUEST_ROLE_ID, $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail());
+            return new user(1, GUEST_ROLE_ID, $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getBirthday());
         }
-        return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail());
+        return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getBirthday());
     }
 }

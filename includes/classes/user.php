@@ -42,7 +42,14 @@ class user {
         $this->firstName = $inFirstName;
         $this->lastName = $inLastName;
         $this->email = $inEmail;
-        $this->birthday = $inBirthday;
+
+        // validate bday
+        $val = new validator('birthday');
+        if (!$val->validate(strtotime($inBirthday))) {
+            $this->birthday = strtotime('June 23, 1912');
+        } else {
+            $this->birthday = strtotime($inBirthday);
+        }
     }
 
     public function getUserID() {
@@ -96,10 +103,23 @@ class user {
     }
 
     /**
-     * @return mixed
+     * @return string unix timestamp
      */
     public function getBirthday() {
         return $this->birthday;
+    }
+
+    public function setBirthday($inDate) {
+
+        $val = new validator('birthday');
+
+        if (!$val->validate($inDate)) {
+            $this->birthday = strtotime('June 23, 1912');
+            return;
+        }
+
+        $this->birthday = strtotime($inDate);
+
     }
 
     public function setLastName($inLastName) {
@@ -119,6 +139,6 @@ class user {
     }
 
     public function __toString() {
-        return 'User: ' . $this->getFullName() . '<br/>User ID is ' . $this->userID . '<br/>User name is: ' . $this->userName . '<br/>Email is ' . $this->email . '<br/>Given ID is ' . $this->givenIdentifier . '<br/>User role is ' . $this->userRole . '<br/>';
+        return 'User: ' . $this->getFullName() . '<br/>User ID is ' . $this->userID . '<br/>User name is: ' . $this->userName . '<br/>Email is ' . $this->email . '<br/>Given ID is ' . $this->givenIdentifier . '<br/>User role is ' . $this->userRole . '<br/>Born ' . $this->birthday . '<br/>Julian ' . date("F jS, Y", $this->birthday);
     }
 }
