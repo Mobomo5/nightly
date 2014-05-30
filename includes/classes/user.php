@@ -107,4 +107,8 @@ class user {
         }
         $this->email = $inEmail;
     }
+
+    public function __toString() {
+        return 'User: ' . $this->getFullName() . '<br/>User ID is ' . $this->userID . '<br/>User name is: ' . $this->userName . '<br/>Email is ' . $this->email . '<br/>Given ID is ' . $this->givenIdentifier . '<br/>User role is ' . $this->userRole . '<br/>';
+    }
 }
