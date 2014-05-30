@@ -20,7 +20,7 @@ class login implements block {
             $this->button = '<button id="login" class="inlineLogIn" href="#login-modal">Log in</button>';
         } else {
             $this->content = $this->getLogOut();
-            $this->button = '<form action="' . new link('userModule') . '" method="post"><button type="submit">Log Out</a><input type="hidden" name="logout" value="1"></form>';
+            $this->button = '<form action="' . new link('users') . '" method="post"><button type="submit">Log Out</a><input type="hidden" name="logout" value="1"></form>';
         }
 
     }
@@ -81,8 +81,8 @@ class login implements block {
         $content = '<div id="login-form-background">
             <h2>Please log in</h2>
 
-            <form method="post" action="userModule">
-                Username: <input tabindex="1" id="login" type="text" name="username"/><br/>
+            <form method="post" action="users">
+                Username: <input tabindex="1" id="login-username" type="text" name="username"/><br/>
                 Password: <input tabindex="2" type="password" name="password"/><br/>
                 <input type="hidden" name="login" value="1">
                 <input tabindex="3" type="submit"/><a tabindex="4" id="login-form-cancel" href="javascript:$.fancybox.close()">Cancel</a>

@@ -7,6 +7,9 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
+require_once(MENU_ITEM_OBJECT_FILE);
+require_once(MENU_OBJECT_FILE);
+
 class menuEngine {
     /* Checking to see if the instance variable is holding onto to status engine object
      * and if it's not create one.
@@ -33,12 +36,26 @@ class menuEngine {
             return;
         }
         try {
-            $results = $this->db->getData("*", "menu", "'menuID' = $inMenuID");
-            $menu = new menu($results[0]['menuID'],
-                $results[0]['menuName'],
-                $results[0]['themeRegion'],
-                $this->getMenuItem($results[0]['menuID']),
-                $results[0]['enabled']);
+            // get the menu specified
+            $results = $this->db->getData("*", "menu", "menuID = '$inMenuID'");
+            $menuID = $results[0]['menuID'];
+            $menuName = $results[0]['menuName'];
+            $menuRegion = $results[0]['themeRegion'];
+            $menuEnabled = !!$results[0]['enabled']; // convert to bool
+
+            // get all top level menu items for that menu
+            $itemResults = $this->db->getData("*", "menuItem", "menuID = '$menuID' AND parent = '0' ORDER BY weight");
+            // turn each top level into a menuItem object
+            $menuItems = array();
+            foreach ($itemResults as $item) {
+                $itemID = $item['menuItemID'];
+                if (!$this->menuItemIsVisible($itemID)) {
+                    continue;
+                }
+                $menuItems[] = $this->getMenuItem($itemID);
+            }
+
+            $menu = new menu($menuID, $menuName, $menuRegion, $menuItems, $menuEnabled);
             return $menu;
         }
         catch (exception $ex) {
@@ -51,20 +68,54 @@ class menuEngine {
             return;
         }
         try {
-            $results = $this->db->getData("*", "menuItem", "'menuID' = $inMenuItemID");
+            // get all menu items for this menu
+            $results = $this->db->getData("*", "menuItem", "menuItemID = '$inMenuItemID' ORDER BY weight");
+
+            if (!$results) {
+                return false;
+            }
+            // are there children?
+            $children = array();
+            if ($results[0]['hasChildren']) {
+                $children = $this->getChildren($results[0]['menuItemID']);
+            }
+            // make a menuItem Object
             $menuItem = new menuItem($results[0]['menuID'],
                 $results[0]['menuItemID'],
                 $results[0]['linkText'],
-                $results[0]['href'],
+                new link($results[0]['href']),
                 $results[0]['weight'],
-                $results[0]['hasChildren'],
-                $results[0]['enabled'],
-                $results[0]['parent']);
+                !!$results[0]['hasChildren'], // !! as workaround for lack of boolval in php 5.3
+                !!$results[0]['enabled'],
+                $results[0]['parent'],
+                $children);
             return $menuItem;
         }
         catch (exception $ex) {
             return $ex->getMessage();
         }
+    }
+
+    public function getChildren($inID) {
+        if (!is_numeric($inID)) {
+            return false;
+        }
+
+        $results = $this->db->getData('*', 'menuItem', "parent = '$inID'");
+
+        if (!$results) {
+            return false;
+        }
+
+        foreach ($results as $row) {
+            $itemID = $row['menuItemID'];
+            if (!$this->menuItemIsVisible($itemID)) {
+                continue;
+            }
+            $children[] = $this->getMenuItem($itemID);
+        }
+
+        return $children;
     }
     //endregion
 
@@ -186,6 +237,42 @@ class menuEngine {
         catch (exception $ex) {
             return $ex->getMessage();
         }
+
+    }
+
+    private function menuItemIsVisible($inID) {
+        if (!is_numeric($inID)) {
+            return false;
+        }
+        // get the item from the visibility table
+        $results = $this->db->getData('referenceID, referenceType, visible', 'menuItemVisibility', "menuItemID = '$inID'");
+
+        // if it's false, there was an error. For safety, bail out.
+        if ($results === false) {
+            return false;
+        }
+        // if it's not there, by default we allow it.
+        if ($results === null) {
+            return true;
+        }
+        // it's in there. find out if it's visible
+
+        foreach ($results as $row) {
+            $referenceID = $row['referenceID'];
+            $referenceType = $row['referenceType'];
+            $visible = $row['visible'];
+
+            if (!$visible) {
+                continue;
+            }
+            if ($referenceType == 'roleID') {
+                if (currentUser::getUserSession()->getRoleID() == $referenceID) {
+                    return true;
+                }
+            }
+
+        }
+        return false;
     }
     //endregion
 }

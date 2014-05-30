@@ -103,38 +103,43 @@ body {
   background-color: transparent;
 }
 #titlebar {
+  position: relative;
   display: block;
   top: 0;
   left: 0;
   right: 0;
-  width: 100%;
+  height: 2em;
+  background-color: rgba(41, 39, 150, 0.97);
 }
 #titlebar ul {
   min-height: 25px;
-  box-sizing: border-box;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
   display: flex;
   flex-flow: row wrap;
+  -webkit-flex-flow: row wrap;
   z-index: 100;
-  height: 4%;
-  background-color: rgba(41, 39, 150, 0.97);
+  height: inherit;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
   list-style: none;
-  width: 100%;
 }
 #titlebar ul li {
-  padding-top: 3px;
-  min-width: 7em;
-  min-height: 29px;
+  z-index: 10;
+  position: relative;
   text-align: center;
   display: flex;
+  height: inherit;
 }
 #titlebar ul li #logo {
   background-image: url("../../../images/educasklogo.png");
   background-size: contain;
   min-height: 25px;
-  height: 25px;
-  width: 128.5px;
+  height: inherit;
+  width: auto;
   background-clip: border-box;
   background-repeat: no-repeat;
   z-index: 30;
@@ -145,9 +150,10 @@ body {
 #titlebar ul li a {
   display: block;
   color: #eeeeee;
-  font-size: large;
+  font-size: normal;
+  line-height: 2;
+  height: 2em;
   min-width: 12em;
-  width: 100%;
   text-decoration: none;
   text-align: center;
 }
@@ -156,6 +162,28 @@ body {
 }
 #titlebar ul li a:hover {
   background-color: rgba(39, 37, 142, 0.97);
+}
+#titlebar ul li ul {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  display: none;
+  height: inherit;
+  box-sizing: border-box;
+}
+#titlebar ul li ul li {
+  background-color: rgba(41, 39, 150, 0.97);
+  display: block;
+  height: inherit;
+}
+#titlebar ul li ul li a {
+  box-sizing: border-box;
+  height: inherit;
+  width: 100%;
+  height: 100%;
+}
+#titlebar ul li:hover ul {
+  display: block;
 }
 @media only screen and (max-width: 449px) {
   #titlebar ul {
@@ -169,8 +197,8 @@ body {
   display: block;
   text-align: center;
   float: left;
-  height: 92%;
-  margin-top: 4%;
+  height: 96%;
+  margin-top: 2em;
   background-color: rgba(239, 239, 251, 0.97);
   width: 10%;
   z-index: 1;
@@ -211,7 +239,7 @@ body {
   display: block;
   float: right;
   padding: 5px;
-  margin-top: 4%;
+  margin-top: 2em;
   margin-right: 10%;
   width: 79%;
   height: auto;

@@ -14,7 +14,11 @@ class default1 implements block {
     }
 
     public function getTitle() {
-        return 'default dummy';
+        return 'testPage';
+    }
+
+    public function getHref() {
+        return new link('test');
     }
 
     public function setTitle($inTitle) {
@@ -23,41 +27,5 @@ class default1 implements block {
 
     public function getContent() {
         // TODO: Implement getContent() method.
-    }
-
-    public function pageAuthorIsVisible() {
-        // TODO: Implement pageAuthorIsVisible() method.
-    }
-
-    public function datePagePublishedIsVisible() {
-        // TODO: Implement datePagePublishedIsVisible() method.
-    }
-
-    public function getDatePagePublished() {
-        // TODO: Implement getDatePagePublished() method.
-    }
-
-    public function getPageAuthor() {
-        // TODO: Implement getPageAuthor() method.
-    }
-
-    public static function getNodeType() {
-        // TODO: Implement getNodeType() method.
-    }
-
-    public function statusesAreVisible() {
-        // TODO: Implement statusesAreVisible() method.
-    }
-
-    public function getStatuses() {
-        // TODO: Implement getStatuses() method.
-    }
-
-    public function noGUI() {
-        // TODO: Implement noGUI() method.
-    }
-
-    public function getReturnPage() {
-        // TODO: Implement getReturnPage() method.
     }
 }

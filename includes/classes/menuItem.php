@@ -25,14 +25,19 @@ class menuItem {
     private $enabled;
     private $parent;
     private $children = array();
-    public function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, menuItem $inParent = null, array $inChildren = array()) {
+
+    public function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $parent, array $inChildren = array()) {
         //region constructor checks
         if (!is_numeric($inID)) {
             return;
         }
+        if (!is_numeric($parent)) {
+            return false;
+        }
         if ($inID < 1) {
             return;
         }
+
         if (!is_numeric($inMenuID)) {
             return;
         }
@@ -42,12 +47,15 @@ class menuItem {
         if (!is_string($inLinkText)) {
             return;
         }
+
         if (!is_numeric($inWeight)) {
             return;
         }
+
         if (!is_bool($inHasChildren)) {
             return;
         }
+
         if (!is_bool($inEnabled)) {
             return;
         }
@@ -59,7 +67,7 @@ class menuItem {
         $this->weight = $inWeight;
         $this->hasChildren = $inHasChildren;
         $this->enabled = $inEnabled;
-        $this->parent = $inParent;
+        $this->parent = $parent;
         $this->children = $inChildren;
     }
     //region get

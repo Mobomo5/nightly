@@ -17,9 +17,11 @@ class blockEngine {
         }
         return self::$instance;
     }
+
     private function __construct() {
         //Do nothing;
     }
+
     public function getBlocks($theme, $pageType, $roleID) {
         $database = database::getInstance();
         $database->connect();
@@ -43,33 +45,36 @@ class blockEngine {
                 continue;
             }
             $block = $this->getBlock($blockData['moduleName'], $blockData['blockName']);
-            if($block == false) {
+            if ($block == false) {
                 continue;
             }
-            if($blockData['title'] != '') {
+            if ($blockData['title'] != '') {
                 $block->setTitle($blockData['title']);
             }
             $blocks[$blockData['themeRegion']][] = $block;
         }
         return $blocks;
     }
+
     private function getBlock($moduleName, $blockName) {
         $this->includeBlock($blockName, $moduleName);
-        if(! $this->validateBlock($blockName)) {
+        if (!$this->validateBlock($blockName)) {
             return false;
         }
         $block = new $blockName();
         return $block;
     }
-    private function includeBlock($moduleName, $blockName){
+
+    private function includeBlock($moduleName, $blockName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
         $blockPath = $this->getPathToBlock($moduleName, $blockName);
-        if(! is_file($blockPath)) {
+        if (!is_file($blockPath)) {
             return;
         }
         require_once($blockPath);
     }
+
     private function validateBlock($blockName) {
         if (!class_exists($blockName)) {
             return false;
@@ -83,21 +88,23 @@ class blockEngine {
         }
         return true;
     }
+
     private function getPathToBlock($blockName, $moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
+
     private function blockVisible($blockID, $pageType, $roleID) {
-        if(! is_numeric($blockID)) {
+        if (!is_numeric($blockID)) {
             return false;
         }
-        if($blockID < 1) {
+        if ($blockID < 1) {
             return false;
         }
         $database = database::getInstance();
         $database->connect();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             return false;
         }
 
@@ -105,11 +112,11 @@ class blockEngine {
         $results = $database->getData('*', 'blockVisibility', 'blockID = ' . $blockID);
 
         //Default is to display the block unless specified.
-        if($results == null) {
+        if ($results === null) {
             return true;
         }
         //Query failed. Play it safe and don't display the block.
-        if($results == false) {
+        if ($results === false) {
             return false;
         }
 
@@ -119,14 +126,14 @@ class blockEngine {
         $comparators[] = array('referenceType' => 'pageType', 'referenceValue' => $pageType);
         $comparators[] = array('referenceType' => 'role', 'referenceValue' => $roleID);
         $finalComparators = array();
-        foreach($comparators as $comparator) {
-            if(! isset($comparator['referenceType'])) {
+        foreach ($comparators as $comparator) {
+            if (!isset($comparator['referenceType'])) {
                 continue;
             }
-            if(! isset($comparator['referenceValue'])) {
+            if (!isset($comparator['referenceValue'])) {
                 continue;
             }
-            if(isset($finalComparators[$comparator['referenceType']])) {
+            if (isset($finalComparators[$comparator['referenceType']])) {
                 continue;
             }
             $finalComparators[$comparator['referenceType']] = $comparator['referenceValue'];
@@ -134,55 +141,56 @@ class blockEngine {
         $countOfDoNotDisplays = 0;
         $countOfDoDisplays = 0;
 
-
-        foreach($results as $rule) {
-            if(! isset($finalComparators[$rule['referenceType']])) {
+        foreach ($results as $rule) {
+            if (!isset($finalComparators[$rule['referenceType']])) {
                 continue;
             }
-            if($finalComparators[$rule['referenceType']] != $rule['referenceID'])  {
+            if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
 
-            if($rule['visible'] == 0) {
+            if ($rule['visible'] == 0) {
                 $countOfDoNotDisplays += 1;
                 continue;
             }
             $countOfDoDisplays += 1;
         }
-        if($countOfDoNotDisplays >= $countOfDoDisplays) {
+        if ($countOfDoNotDisplays >= $countOfDoDisplays) {
             return false;
         }
         return true;
     }
+
     public function setBlockVisibility($inBlockID, $referenceID, $referenceType, $isVisible = false) {
-        if(! is_numeric($inBlockID)) {
+        if (!is_numeric($inBlockID)) {
             return false;
         }
-        if( $inBlockID < 1) {
+        if ($inBlockID < 1) {
             return false;
         }
-        if(! is_bool($isVisible)) {
+        if (!is_bool($isVisible)) {
             return false;
         }
         $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
         $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
         $database = database::getInstance();
-        if(! $database->isConnected()) {
+        if (!$database->isConnected()) {
             return false;
         }
         $exists = $database->getData('visible', 'blockVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}");
-        if($exists == false) {
+        if ($exists == false) {
             return false;
         }
-        if($exists != null) {
+        if ($exists != null) {
             $success = $this->insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible);
-            if($success == false) {
+            if ($success == false) {
                 return false;
             }
             return true;
         }
         $success = $database->updateTable('blockVisibility', "");
     }
+
     private function insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible = false) {
 
     }

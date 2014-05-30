@@ -89,6 +89,7 @@ class bootstrap {
         define('FILE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/file.php');
         define('FOLDER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/folder.php');
         define('FILE_SYSTEM_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/fileSystemEngine.php');
+        define('MENU_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
     }
 
     private function doRequires() {
@@ -97,6 +98,7 @@ class bootstrap {
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(MODULE_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
+        require_once(MENU_ENGINE_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
@@ -134,14 +136,14 @@ class bootstrap {
         date_default_timezone_set($this->site->getTimeZone());
 
         $blockEngine = blockEngine::getInstance();
-        $user = currentUser::getUserSession();
+        $user = currentUser::getUserSession()->toUser();
         $hookEngine = hookEngine::getInstance();
         $router = router::getInstance();
         $moduleEngine = moduleEngine::getInstance();
 
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
-        if(! $moduleEngine->includeModule($moduleInCharge)) {
+        if (!$moduleEngine->includeModule($moduleInCharge)) {
             require_once(EDUCASK_ROOT . '/includes/modules/500/main.php');
             $moduleInCharge = 'fiveHundred';
         }
@@ -150,9 +152,9 @@ class bootstrap {
             $this->noGUIWork($module);
         }
         $contentToPassToPageBlock = $module->getPageContent();
-
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID());
         $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
+        $this->blocks['menus'] = menuEngine::getInstance()->getMenu(1);
         noticeEngine::getInstance()->removeNotices();
 
         database::getInstance()->bootstrapDisconnect();
@@ -180,6 +182,7 @@ class bootstrap {
         $twig->addExtension(new Twig_Extension_Debug());
         echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
+
     private function noGUIWork($module) {
         $link = $module->getReturnPage();
         //verify the variable given is a link object. If it is not, go to the home page.

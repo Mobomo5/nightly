@@ -7,15 +7,15 @@
  */
 require_once(MODULE_INTERFACE_FILE);
 
-class userModule implements module {
+class users implements module {
     private $params;
     private $noGui = false;
     private $module;
-    private $subModule;
 
     public function __construct() {
         $this->params = router::getInstance()->getParameters(true);
         $this->module = $this->params[0];
+        // check the post
         if (!empty($_POST['login'])) {
             $this->doLogin();
             return;
@@ -25,6 +25,8 @@ class userModule implements module {
         } elseif (!empty($_POST[''])) {
 
         }
+
+        // nothing in the post. Check to see if there are second parameters
 
     }
 
@@ -41,7 +43,7 @@ class userModule implements module {
     }
 
     public static function getPageType() {
-        // TODO: Implement getPageType() method.
+        return 'user';
     }
 
     public function noGUI() {
@@ -50,5 +52,9 @@ class userModule implements module {
 
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
+    }
+
+    public function getPageContent() {
+        // TODO: Implement getPageContent() method.
     }
 }

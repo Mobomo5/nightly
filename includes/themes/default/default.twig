@@ -4,11 +4,7 @@
         <div id="titlebar">
             <ul>
                 <li><a id="logo" href="{{ site.getBaseDirectory }}"></a></li>
-                {#iterate through the supplied blocks looking for titlebar menu items. stick them here.#}
-                <li><a href="{{ blocks.menus.href }}">name1</a></li>
-                <li><a href="{{ href }}">name2</a></li>
-                <li><a href="{{ href }}">name3</a></li>
-                <li><a href="{{ href }}">name4</a></li>
+                {{ blocks.menus.HTML|raw }}
                 <li>
                     <form action="#" id="search-box" method="post">
                         <input name="text" type="text"/><input type="submit"/>

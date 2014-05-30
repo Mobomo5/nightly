@@ -25,4 +25,8 @@ class home implements module {
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
     }
+
+    public function getPageContent() {
+        // TODO: Implement getPageContent() method.
+    }
 }

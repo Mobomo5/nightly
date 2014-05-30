@@ -16,7 +16,7 @@
 @sidebarwidth: 10%;
 @sidebarcolor: lighten(@titlebarcolor, 59%);
 
-@titlebarheight: 4%;
+@titlebarheight: 2em;
 
 @titlemenucolor: #eee;
 
@@ -157,38 +157,39 @@ body {
 // index.twig
 #wrapper {
 }
+
 #titlebar {
+  position: relative;
   display: block;
   top: 0;
   left: 0;
   right: 0;
-  width: 100%;
+  height: @titlebarheight;
+  background-color: @titlebarcolor;
 
   ul {
     min-height: 25px;
-    box-sizing: border-box;
-    display: flex;
-    flex-flow: row wrap;
+    .flexDisplay();
+    .flexFlow(row, wrap);
     z-index: 100;
-    height: @titlebarheight;
-    background-color: @titlebarcolor;
+    height: inherit;
+    width: 100%;
     justify-content: space-between;
     align-items: center;
     list-style: none;
-    width: 100%;
 
     li {
-      padding-top: 3px;
-      min-width: 7em;
-      min-height: 29px;
+      z-index: 10;
+      position: relative;
       text-align: center;
       display: flex;
+      height: inherit;
       #logo {
         background-image: url("../../../images/educasklogo.png");
         background-size: contain;
         min-height: 25px;
-        height: 50px / 2;
-        width: 257px / 2;
+        height: inherit;
+        width: auto;
         background-clip: border-box;
         background-repeat: no-repeat;
         z-index: 30;
@@ -200,9 +201,10 @@ body {
       a {
         display: block;
         color: @titlemenucolor;
-        font-size: large;
+        font-size: normal;
+        line-height: 2;
+        height: @titlebarheight;
         min-width: 12em;
-        width: 100%;
         text-decoration: none;
         text-align: center;
         &:visited {
@@ -210,6 +212,32 @@ body {
         }
         &:hover {
           background-color: darken(@titlebarcolor, 2%);
+        }
+      }
+
+      ul {
+        position: absolute;
+        left: 0;
+        top: 100%;
+        display: none;
+        height: inherit;
+        box-sizing: border-box;
+        li {
+          background-color: @titlebarcolor;
+          display: block;
+          height: inherit;
+          a {
+            box-sizing: border-box;
+            height: inherit;
+            width: 100%;
+            height: 100%;
+
+          }
+        }
+      }
+      &:hover {
+        ul {
+          display: block;
         }
       }
 
