@@ -5,12 +5,12 @@
             <ul>
                 <li><a id="logo" href="{{ site.getBaseDirectory }}"></a></li>
                 {{ blocks.menus.HTML|raw }}
-                <li>
+                <li id="flex-end">
                     <form action="#" id="search-box" method="post">
                         <input name="text" type="text"/><input type="submit"/>
                     </form>
+                    {{ blocks.login.0.button|raw }}
                 </li>
-                <li>{{ blocks.login.0.button|raw }}</li>
             </ul>
 
         </div>
