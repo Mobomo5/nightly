@@ -155,7 +155,8 @@ class currentUser extends user {
         self::destroySession();
         self::setUserSession(new currentUser());
         $hookEngine->runAction('userLoggedOut');
-        header('Location: ' . new link(''));
+        $previousPage = new link(router::getInstance()->getPreviousParameters());
+        header('Location: ' . $previousPage);
     }
 
     public function toUser() {

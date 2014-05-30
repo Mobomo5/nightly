@@ -54,7 +54,7 @@ class permissionEngine {
     }
 
     public function checkPermission(permission $inPermission, $inRoleID = GUEST_ROLE_ID) {
-        if (!is_int($inRoleID)) {
+        if (!is_numeric($inRoleID)) {
             return false;
         }
         if ($inRoleID < 1) {
@@ -188,6 +188,7 @@ class permissionEngine {
             return false;
         }
         if (!$permEngine->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+
             return false;
         }
 
