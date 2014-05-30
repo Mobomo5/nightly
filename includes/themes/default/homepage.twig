@@ -4,17 +4,16 @@
             <a href="{{ item.href }}" class="{{ item.CssClass }}">
                 <span class="box" id="box-{{ loop.index }}">
                     <h2>{{ item.title|title }}</h2>
-                    {{ item.content }}
+                    <p>{{ item.content }}</p>
                 </span>
             </a>
         {% endfor %}
         <div id="homepage-footer">
-            <div id="homepage-logo">
+            <div id="footer-logo">
                 {% block logo %}
                 {% endblock %}
             </div>
         </div>
-
     </div>
     <div id="login-modal" style="display: none;">
     {{ blocks.login.0.content|raw }}

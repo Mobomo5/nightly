@@ -1,11 +1,12 @@
-@box1color: #ffdab9;
+@box1color: #3838ff;
 @box2color: #FF7F50;
-@box3color: #8FBC8F;
+@box3color: #349729;
 @box4color: #CD5C5C;
 @box5color: #9370DB;
 @box6color: #FFC0CB;
 
-@homepagebackground: #6495ED;
+@homepagebackground: #818bc7;
+@homepagetextcolor: #ede3e1;
 @loginformbackground: #dddddd;
 @loginformbackgroundborder: darken(@loginformbackground, 10%);
 @titlebarcolor: rgba(41, 39, 150, 0.97);
@@ -14,9 +15,35 @@
 @border: lighten(@titlebarcolor, 59.5%);
 @sidebarwidth: 10%;
 @sidebarcolor: lighten(@titlebarcolor, 59%);
+
 @titlebarheight: 4%;
+
 @titlemenucolor: #eee;
 
+
+// Vital Mixins
+
+.flexDisplay{
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+
+
+}
+.flexFlow(@rowColumn, @wrap){
+
+flex-flow: @rowColumn @wrap;
+-webkit-flex-flow: @rowColumn @wrap;
+}
+.flex(@in){
+  -webkit-box-flex: @in;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: @in;         /* OLD - Firefox 19- */
+  -webkit-flex: @in;          /* Chrome */
+  -ms-flex: @in;              /* IE 10 */
+  flex: @in;
+}
 * {
   font-family: consolas;
   margin: 0;
@@ -31,7 +58,7 @@ html {
 body {
   background-color: @background;
   height: 100%;
-  padding: 0 5% 0 5%;
+
   @media all and (max-width: 1138px) {
     a {
       justify-content: space-around;
@@ -44,46 +71,41 @@ body {
 }
 
 #homepage-background {
-  display: flex;
-  flex-flow: row wrap;
-  width: 100%;
+  .flexFlow(row, wrap);
+  .flexDisplay;
+  box-sizing: border-box;
+  align-content: flex-start;
+  justify-content: center;
+  min-width: 100%;
+  width: auto;
   height: 100%;
   background-color: @homepagebackground;
-  a {
-    white-space: nowrap;
-    display: inline-block;
-    width: 26%;
-    height: 31%;
-    margin: 2% 1.5% 0 1.5%;
-    box-shadow: 4px 4px 4px #366097;
-    text-align: center;
+  padding-top: 4%;
+  a {display: block;
+    margin: 0 .25% .5% .25%;
     text-decoration: none;
+    color: @homepagetextcolor;
     h2 {
       font-weight: normal;
     }
+    p{
+
+    }
 
   }
-  @media all and (max-width: 1138px) {
-  }
-  @media all and (max-device-width: 440px) {
-    padding: 0;
-    margin: 0;
-    a {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 20%;
-    }
+  a:visited{
+    color: @homepagetextcolor;
   }
 }
 
 .box {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  padding: 5%;
 
-  flex-grow: 1;
+  display: block;
+  min-width: 12em;
+  min-height: 10em;
+  padding: 5%;
+  box-sizing: border-box;
+  box-shadow: 4px 4px 4px darken(@homepagebackground, 5%);
 }
 
 #box-1 {
@@ -111,44 +133,59 @@ body {
 }
 
 #homepage-footer {
+  display: block;
   height: 8%;
   width: 100%;
+  #footer-logo{
+    margin: auto;
+    background-image: url("../../../images/educasklogo.png");
+    background-size: contain;
+    padding: 0 auto;
+    min-height: 25px;
+    height: 50px;
+    width: 257px;
+    background-clip: border-box;
+    background-repeat: no-repeat;
+    z-index: 30;
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
 }
 
 // index.twig
-
+#wrapper {
+}
 #titlebar {
-  position: fixed;
+  display: block;
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
   width: 100%;
 
   ul {
     min-height: 25px;
     box-sizing: border-box;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     z-index: 100;
     height: @titlebarheight;
     background-color: @titlebarcolor;
-    align-items: stretch;
+    justify-content: space-between;
+    align-items: center;
     list-style: none;
     width: 100%;
 
     li {
       padding-top: 3px;
-      flex-grow: 1;
-      background-color: inherit;
+      min-width: 7em;
       min-height: 29px;
       text-align: center;
       display: flex;
       #logo {
-        //flex-grow: 2;
         background-image: url("../../../images/educasklogo.png");
         background-size: contain;
-        padding: 0 auto;
         min-height: 25px;
         height: 50px / 2;
         width: 257px / 2;
@@ -161,10 +198,11 @@ body {
       }
 
       a {
-        color: @titlemenucolor;
-        padding: 0 3em;
-        font-size: large;
         display: block;
+        color: @titlemenucolor;
+        font-size: large;
+        min-width: 12em;
+        width: 100%;
         text-decoration: none;
         text-align: center;
         &:visited {
@@ -180,37 +218,11 @@ body {
 
   @media only screen and (max-width: 1138px) {
   }
-  @media only screen and (max-device-width: 440px) {
-    position: relative;
-    display: block;
-    margin-bottom: 60em;
-    & & {
-      margin: none;
-      padding: none;
+  @media only screen and (max-width: 449px) {
+    ul{
+      flex-direction: column;
     }
 
-    ul {
-      display: block;
-      width: 100%;
-      text-align: center;
-
-      li {
-        width: 100%;
-        height: 7em;
-        text-align: center;
-        a, form, #login {
-          font-size: xx-large;
-          padding-top: 1em;
-          width: 100%;
-          text-align: center;
-        }
-        #logo {
-          width: 100%;
-          background-position: center;
-        }
-      }
-
-    }
   }
 }
 

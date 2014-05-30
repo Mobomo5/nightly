@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ blocks.main.getTitle }} | {{ site.getTitle }}</title>
+    <title>{% if blocks.main.0.title is defined %}{{ blocks.main.0.getTitle }}{% else %}Home{% endif %} | {{ site.getTitle }}</title>
     <meta name="Generator" content="Educask version {{ site.getEducaskVersion }}">
     <meta http-equiv="X-FRAME-OPTIONS" content="DENY">
     <meta charset="UTF-8">

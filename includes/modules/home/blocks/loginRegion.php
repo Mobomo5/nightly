@@ -17,6 +17,7 @@ class loginRegion implements block {
     public function __construct() {
 
         $user = currentUser::getUserSession()->toUser();
+
         if ($user->getRoleID() == GUEST_ROLE_ID){
             // You ain't logged in. Convince them to log in.
             $this->title = 'Click here to log in';
@@ -30,14 +31,11 @@ class loginRegion implements block {
         $this->title = $user->getFirstName() . ' ' . $user->getLastName();
 
         // get news
-        //@todo: get
+        //@todo: news
         $this->content = 'Here\'s the news!';
 
         // get link to user page
         $this->href = new link('user/' . $user->getUserID());
-
-
-
     }
 
     public function getTitle() {
