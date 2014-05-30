@@ -28,6 +28,21 @@ class users implements module {
 
         // nothing in the post. Check to see if there are second parameters
 
+        if (empty($this->params[1])) {
+            return false;
+        }
+
+        $userID = $this->params[1];
+
+        if (!is_numeric($userID)) {
+            return false;
+        }
+
+//        check to see if the user has permission to see other users
+//        check to see if that is actually a user
+//        get the user
+//        $userObject =
+
     }
 
     private function doLogOut() {

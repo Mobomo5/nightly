@@ -179,4 +179,18 @@ class permissionEngine {
         }
         return true;
     }
+
+    public function currentUserCanDo($inPermissionName) {
+        $permEngine = permissionEngine::getInstance();
+        $perm = $permEngine->getPermission($inPermissionName);
+
+        if (!$perm) {
+            return false;
+        }
+        if (!$permEngine->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+            return false;
+        }
+
+        return true;
+    }
 }
