@@ -14,9 +14,10 @@ class user {
     private $userName;
     private $firstName;
     private $lastName;
+    private $birthday;
     private $email;
 
-    public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail) {
+    public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, $inBirthday) {
         if (!is_numeric($inUserID)) {
             return;
         }
@@ -33,6 +34,7 @@ class user {
         if (!$validator->validate($inEmail)) {
             return;
         }
+
         $this->userID = $inUserID;
         $this->userRole = $inUserRole;
         $this->givenIdentifier = $inGivenIdentifier;
@@ -40,6 +42,7 @@ class user {
         $this->firstName = $inFirstName;
         $this->lastName = $inLastName;
         $this->email = $inEmail;
+        $this->birthday = $inBirthday;
     }
 
     public function getUserID() {
@@ -90,6 +93,13 @@ class user {
 
     public function getLastName() {
         return $this->lastName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBirthday() {
+        return $this->birthday;
     }
 
     public function setLastName($inLastName) {
