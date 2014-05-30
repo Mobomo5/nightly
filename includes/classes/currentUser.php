@@ -164,4 +164,25 @@ class currentUser extends user {
         }
         return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getBirthday());
     }
+
+    public function updateCurrentUserPassword($newPass, $oldPass) {
+
+        if (!currentUser::getUserSession()->isLoggedIn()) {
+            return false;
+        }
+        if (empty($newPass)) {
+            return false;
+        }
+        if (empty($oldPass)) {
+            return false;
+        }
+        if (strlen($newPass) < 6) {
+            return false;
+        }
+
+        $user = currentUser::getUserSession()->toUser();
+        return userEngine::getInstance()->updateUserPassword($user, $newPass, $oldPass);
+
+    }
+
 }

@@ -84,27 +84,82 @@ class userEngine {
         return true;
     }
 
-    public function updateUserPassword(user $inUser, $hashedNewPassword, $hashedOldPassword) {
-
-    }
-
-    public function addUser(user $inUser, $hashedPassword) {
+    /**
+     * @param user $inUser
+     * @param      $password
+     * @return bool | int returns new user ID on success
+     */
+    public function addUser(user $inUser, $password) {
         if (!permissionEngine::getInstance()->currentUserCanDo('userCanAddUsersToDB')) { //@todo: add this perm to db
             return false;
         }
         $db = database::getInstance();
 
+        // hash pass
+        $hasher = new hasher();
+        $pass = $hasher->generateHash($password);
+
         $roleID = $db->escapeString($inUser->getRoleID());
         $firstName = $db->escapeString($inUser->getFirstName());
         $lastName = $db->escapeString($inUser->getLastName());
         $userName = $db->escapeString($inUser->getUserName());
+        $email = $db->escapeString($inUser->getEmail());
         $givenID = $db->escapeString($inUser->getGivenIdentifier());
-        $birthday = $db->escapeString($inUser->getBirthday());
+        $birthday = date("Y-m-d", $db->escapeString($inUser->getBirthday()));
+        $password = $db->escapeString($pass);
 
-        return true;
+        $results = $db->insertData('user', 'roleID, firstName,lastName, userName, email, givenIdentifier, birthday, password',
+            "'$roleID', '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$password'");
+
+        if (!$results) {
+            echo $db->getError();
+            return false;
+        }
+
+        $results = $db->getData('userID', 'user', "firstName = '$firstName' AND lastName = '$lastName' AND userName = '$userName'");
+        if (!$results) {
+            echo $db->getError();
+
+            return false;
+        }
+
+        $userID = $results[0]['userID'];
+        return $userID;
     }
 
     public function deleteUser(user $userToBeDeleted) {
+        return true;
+    }
+
+    public function updateUserPassword(user $inUser, $newPassword, $oldPassword) {
+
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanUpdatePassword')) { //@todo: add this perm to db
+            return false;
+        }
+
+        $userID = $inUser->getUserID();
+        $db = database::getInstance();
+        $results = $db->getData('password', 'user', "userID = '$userID'");
+
+        if (!$results) {
+            return false;
+        }
+        $storedPassword = $results[0]['password'];
+
+        $hasher = new hasher();
+        if (!$hasher->verifyHash($oldPassword, $storedPassword)) {
+            echo 'not the pass';
+            return false;
+        }
+        $newHashed = $hasher->generateHash($newPassword);
+
+        $results = $db->updateTable('user', "password = '$newHashed'", "userID = '$userID'");
+
+        if (!$results) {
+            echo $db->getError();
+            return false;
+        }
+
         return true;
     }
 } 
