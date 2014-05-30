@@ -128,12 +128,35 @@ class userEngine {
     }
 
     public function deleteUser(user $userToBeDeleted) {
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanDeleteUsers')) { //@todo: add this perm to db
+            return false;
+        }
+
+        $userID = $userToBeDeleted->getUserID();
+        $userName = $userToBeDeleted->getUserName();
+
+        $db = database::getInstance();
+
+        $userID = $db->escapeString($userID);
+        $userName = $db->escapeString($userName);
+
+        $results = $db->removeData('user', "userID = '$userID' AND userName = '$userName'");
+
+        if (!$results) {
+            echo $db->getError();
+            return false;
+        }
+
         return true;
     }
 
     public function updateUserPassword(user $inUser, $newPassword, $oldPassword) {
 
         if (!permissionEngine::getInstance()->currentUserCanDo('userCanUpdatePassword')) { //@todo: add this perm to db
+            return false;
+        }
+
+        if (strlen($newPassword) < 6) {
             return false;
         }
 
