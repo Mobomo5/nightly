@@ -32,9 +32,23 @@ class messageEngine
         $this->db = database::getInstance();
     }
 
-    public function getMessage()
+    public function getMessage($inID)
     {
-
+        if (!is_numeric($inID)) {
+            return;
+        }
+        try {
+            $results = $this->db->getData("messageID, trashed, isRead, statusID, senderID, nodeID", "message", "'messageID' = $inID");
+            $message = new message($results[0]['messageID'],
+                $results[0]['trashed'],
+                $results[0]['isRead'],
+                $results[0]['statusID'],
+                $results[0]['senderID'],
+                $results[0]['nodeID']);
+            return $message;
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 
     public function setMessage()
