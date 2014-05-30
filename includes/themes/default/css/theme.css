@@ -123,9 +123,13 @@ body {
   z-index: 100;
   height: inherit;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   list-style: none;
+}
+#titlebar ul #flex-end {
+  position: absolute;
+  right: 0;
 }
 #titlebar ul li {
   z-index: 10;
