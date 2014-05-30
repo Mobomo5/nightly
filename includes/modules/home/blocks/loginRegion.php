@@ -35,7 +35,7 @@ class loginRegion implements block {
         $this->content = 'Here\'s the news!';
 
         // get link to user page
-        $this->href = new link('user/' . $user->getUserID());
+        $this->href = new link('users/' . $user->getUserID());
     }
 
     public function getTitle() {

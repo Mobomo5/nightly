@@ -185,4 +185,18 @@ class userEngine {
 
         return true;
     }
+
+    public function getUserBio(user $inUser) {
+
+        $userID = $inUser->getUserID();
+
+        $db = database::getInstance();
+        $results = $db->getData('bio', 'user', "userID = '$userID'");
+
+        if (!$results) {
+            return false;
+        }
+
+        return $results[0]['bio'];
+    }
 } 

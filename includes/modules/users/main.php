@@ -11,6 +11,7 @@ class users implements module {
     private $params;
     private $noGui = false;
     private $module;
+    private $title;
 
     public function __construct() {
         $this->params = router::getInstance()->getParameters(true);
@@ -42,13 +43,12 @@ class users implements module {
 //        }
 //        check to see if that is actually a user
         $user = userEngine::getInstance()->getUser($userID);
-        var_dump($user);
         if (!$user) {
             return false;
         }
 //        get the user
-        var_dump($user);
-        exit;
+//        set the title
+        $this->title = $user->getFullName();
 
     }
 
@@ -81,7 +81,7 @@ class users implements module {
     }
 
     public function getTitle() {
-        return 'User';
+        return $this->title;
     }
 
     public function forceFourOhFour() {
