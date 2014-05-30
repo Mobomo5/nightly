@@ -90,4 +90,9 @@ class status {
     public function getNodeID() {
         return $this->nodeID;
     }
+
+    public function getPosterID()
+    {
+        return $this->posterID;
+    }
 }
