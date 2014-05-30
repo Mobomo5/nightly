@@ -51,18 +51,45 @@ class messageEngine
         }
     }
 
-    public function setMessage()
+    public function setMessage(message $msg)
+    {
+        if (!is_object($msg)) {
+            return;
+        }
+
+        $messageID = $msg->getID();
+        $trashed = $msg->isTrashed();
+        $isRead = $msg->isRead();
+        $statusID = $msg->getStatusID();
+        $senderID = $msg->getSenderID();
+        $nodeID = $msg->getNodeID();
+
+        try {
+            $results = $this->db->insertData("message", "messageID, trashed, isRead, statusID, senderID, nodeID",
+                "message",
+                "$messageID, $trashed, $isRead, $statusID, $senderID, $nodeID");
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
+
+
+    }
+
+    public function sendMessage(status $inStatus, $inSenderID, $inNodeID)
     {
 
     }
 
-    public function sendMessage()
+    public function deleteMessage($inID)
     {
+        if (!is_numeric($inID)) {
+            return;
+        }
 
-    }
-
-    public function deleteMessage()
-    {
-
+        try {
+            $results = $this->db->removeData("message", "'messageID' = $inID");
+        } catch (exception $ex) {
+            return $ex->getMessage();
+        }
     }
 }
