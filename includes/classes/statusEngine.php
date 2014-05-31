@@ -17,6 +17,7 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
+require_once(PERMISSION_ENGINE_OBJECT_FILE);
 
 class statusEngine {
     /* Checking to see if the instance variable is holding onto to status engine object
@@ -32,32 +33,34 @@ class statusEngine {
         return self::$instance;
     }
 
-    private function __construct() {
+    private $permissionObject;
+    private $db;
 
+    private function __construct() {
+        $this->permissionObject = permissionEngine::getInstance();
+        $this->db = database::getInstance();
     }
 
     public function addStatusToDatabase($inPosterID, $inParentStatus, $inSupporterCount, $inNodeID, $inStatus) {
         //inserts the status into the database
-        $db = database::getInstance();
-        $db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
+        $this->db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
 
         //Select query for getting StatusID for next insert
-        $results = $db->getData("statusID", "status", "'posterID' = $inPosterID");
+        $results = $this->db->getData("statusID", "status", "'posterID' = $inPosterID");
         $statusID = $results[0]['statusID'];
 
         //insert into the statusRevision table
-        $escapedStatus = $db->escapeString($inStatus);
+        $escapedStatus = $this->db->escapeString($inStatus);
         $timestamp = date("Y-m-d H:i:s");
-        $db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "$escapedStatus, $timestamp, $statusID, 1");
+        $this->db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "$escapedStatus, $timestamp, $statusID, 1");
     }
 
     //Get statuses from Database and create an array of status objects
     public function retrieveStatusFromDatabaseByUser($inUserID) {
         //Create status objects
-        $db = database::getInstance();
         $statusArray = array();
 
-        $results = $db->getData("*",
+        $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "'posterID' = $inUserID"); //<----
 
@@ -71,10 +74,9 @@ class statusEngine {
     //Get statuses from Database and create an array of status objects
     public function retrieveStatusFromDatabaseByNode($inNodeID) {
         //Create status objects
-        $db = database::getInstance();
         $statusArray = array();
 
-        $results = $db->getData("*",
+        $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "'nodeID' = $inNodeID");
 
@@ -87,14 +89,12 @@ class statusEngine {
 
     //Editing status's
     public function editStatusInDatabaseByID($inStatusID, $inUpdatedStatus) {
-        $db = database::getInstance();
-
-        $results = $db->getData("*",
+        $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "'statusID' = $inStatusID");
 
         //update statusRevision table
-        $db->updateTable("statusRevision", "isCurrent = 0", "statusID = $inStatusID");
+        $this->db->updateTable("statusRevision", "isCurrent = 0", "statusID = $inStatusID");
 
     }
 }

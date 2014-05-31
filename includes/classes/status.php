@@ -95,4 +95,9 @@ class status {
     {
         return $this->posterID;
     }
+
+    public function getChildStatus()
+    {
+        return $this->childStatus;
+    }
 }

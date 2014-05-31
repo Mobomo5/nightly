@@ -64,9 +64,18 @@ class messageEngine
         }
     }
 
-    public function sendMessage($inPosterID, $inParentStatus = null, $inNodeID, $inStatus)
+    public function sendMessage(status $inStatus, $inParentStatus = null)
     {
-        $this->statusEngine->addStatusToDatabase("$inPosterID", "$inParentStatus", 0, "$inNodeID", "$inStatus");
+        //if their is one
+        $statusID = $inStatus->getStatusID();
+
+        //store rest of status object
+        $statusMsg = $inStatus->getStatus();
+        $posterID = $inStatus->getPosterID();
+        $nodeID = $inStatus->getNodeID();
+        $votes = $inStatus->getUpVotes();
+
+        $this->statusEngine->addStatusToDatabase($posterID, $inParentStatus, $votes, $nodeID, $statusMsg);
         $status = $this->statusEngine->retrieveStatusFromDatabaseByUser($inPosterID);
 
         $this->setMessage($status->getStatusID(), $status->getPosterID(), $status->getNodeID());
