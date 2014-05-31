@@ -212,5 +212,7 @@ class database implements databaseInterface {
         return $this->dbObject->getError();
     }
 
-
+    function getLastInsertID() {
+        return $this->dbObject->getLastInsertID();
+    }
 }
