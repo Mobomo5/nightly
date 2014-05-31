@@ -161,4 +161,7 @@ class mySQL implements databaseInterface {
     function getError() {
         return $this->mysqli->error;
     }
+    function getLastInsertID() {
+        return $this->mysqli->insert_id;
+    }
 }

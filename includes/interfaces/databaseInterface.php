@@ -21,4 +21,5 @@ interface databaseInterface {
     function escapeString($inString);
     function removeData($from, $where);
     function getError();
+    function getLastInsertID();
 }

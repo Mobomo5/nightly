@@ -83,25 +83,22 @@ class hookEngine {
 
     private function pluginSort(array $plugins) {
         //Sort the array. The function is the comparison.
-        if (!uasort($plugins, 'comparePlugins')) {
-            //If the sorting failed, return false;
-            return false;
-        }
+        uasort($plugins, array('hookEngine', 'comparePlugins'));
         return $plugins;
     }
 
-    public function comparePlugins($a, $b) {
+    private function comparePlugins($a, $b) {
         if (!is_object($a)) {
-            return false;
+            return;
         }
         if (!in_array('plugin', class_implements($a))) {
-            return false;
+            return;
         }
         if (!is_object($b)) {
-            return false;
+            return;
         }
         if (!in_array('plugin', class_implements($b))) {
-            return false;
+            return;
         }
         //If the two plugins priority is the same, return 0;
         if ($a::getPriority() == $b::getPriority()) {
