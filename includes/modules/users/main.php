@@ -9,9 +9,11 @@ require_once(MODULE_INTERFACE_FILE);
 
 class users implements module {
     private $params;
-    private $noGui = false;
+    private $noGUI = false;
     private $module;
+    private $force404 = false;
     private $title;
+    private $content;
 
     public function __construct() {
         $this->params = router::getInstance()->getParameters(true);
@@ -28,27 +30,32 @@ class users implements module {
         // nothing in the post. Check to see if there are second parameters
 
         if (empty($this->params[1])) {
+            $this->force404 = true;
             return false;
         }
 
         $userID = $this->params[1];
 
         if (!is_numeric($userID)) {
+            $this->force404 = true;
             return false;
         }
 
 //        check to see if the user has permission to see other users
-//        if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewOtherUsers')){
-//            return false;
-//        }
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewOtherUsers')) {
+            $this->force404 = true;
+            return false;
+        }
 //        check to see if that is actually a user
         $user = userEngine::getInstance()->getUser($userID);
         if (!$user) {
+            $this->force404 = true;
             return false;
         }
 //        get the user
 //        set the title
         $this->title = $user->getFullName();
+        $this->content = userEngine::getInstance()->getUserBio($user);
 
     }
 
@@ -58,6 +65,7 @@ class users implements module {
 
     private function doLogIn() {
         if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
+            logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $_POST['username'] . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0), 0);
             noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'I couldn\'t log you in.'));
         }
 
@@ -69,15 +77,15 @@ class users implements module {
     }
 
     public function noGUI() {
-        // TODO: Implement noGUI() method.
+        return $this->noGUI;
     }
 
     public function getReturnPage() {
-        // TODO: Implement getReturnPage() method.
+        return new link('');
     }
 
     public function getPageContent() {
-        // TODO: Implement getPageContent() method.
+        return $this->content;
     }
 
     public function getTitle() {
@@ -85,6 +93,6 @@ class users implements module {
     }
 
     public function forceFourOhFour() {
-        return false;
+        return $this->force404;
     }
 }
