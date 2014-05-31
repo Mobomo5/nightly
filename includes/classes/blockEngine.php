@@ -148,6 +148,18 @@ class blockEngine {
             if (!isset($finalComparators[$rule['referenceType']])) {
                 continue;
             }
+            if($rule['referenceID'][0] == '!') {
+                $vote = $this->blockVisibileNegate($rule, $finalComparators);
+                if($vote == -1) {
+                    $countOfDoNotDisplays += 1;
+                    continue;
+                }
+                if($vote == 1) {
+                    $countOfDoDisplays += 1;
+                    continue;
+                }
+                continue;
+            }
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
@@ -161,6 +173,22 @@ class blockEngine {
             return false;
         }
         return true;
+    }
+    private function blockVisibileNegate($rule, $finalComparators) {
+        //Take the ! off
+        $rule['referenceID'] = substr($rule['referenceID'], 1);
+
+        if (!isset($finalComparators[$rule['referenceType']])) {
+            return 0;
+        }
+        //Negate means vote for anything that does not match. Move on if it matches; don't vote.
+        if ($finalComparators[$rule['referenceType']] == $rule['referenceID']) {
+            return 0;
+        }
+        if ($rule['visible'] == 0) {
+            return -1;
+        }
+        return 1;
     }
 
     public function setBlockVisibility($inBlockID, $referenceID, $referenceType, $isVisible = false) {
