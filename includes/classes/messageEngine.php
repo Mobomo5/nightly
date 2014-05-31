@@ -25,11 +25,13 @@ class messageEngine
     //Constructor Start -- Get database and permissions engine.
     private $db;
     private $permissionObject;
+    private $statusEngine;
 
     private function __construct()
     {
         $this->permissionObject = permissionEngine::getInstance();
         $this->db = database::getInstance();
+        $this->statusEngine = statusEngine::getInstance();
     }
 
     public function getMessage($inID)
@@ -51,33 +53,23 @@ class messageEngine
         }
     }
 
-    public function setMessage(message $msg)
+    public function setMessage($inStatusID, $inPosterID, $inNodeID)
     {
-        if (!is_object($msg)) {
-            return;
-        }
-
-        $messageID = $msg->getID();
-        $trashed = $msg->isTrashed();
-        $isRead = $msg->isRead();
-        $statusID = $msg->getStatusID();
-        $senderID = $msg->getSenderID();
-        $nodeID = $msg->getNodeID();
-
         try {
-            $results = $this->db->insertData("message", "messageID, trashed, isRead, statusID, senderID, nodeID",
-                "message",
-                "$messageID, $trashed, $isRead, $statusID, $senderID, $nodeID");
+            $results = $this->db->insertData("message",
+                "trashed, isRead, statusID, senderID, nodeID",
+                "false, false, $inStatusID, $inPosterID, $inNodeID");
         } catch (exception $ex) {
             return $ex->getMessage();
         }
-
-
     }
 
-    public function sendMessage(status $inStatus, $inSenderID, $inNodeID)
+    public function sendMessage($inPosterID, $inParentStatus = null, $inNodeID, $inStatus)
     {
+        $this->statusEngine->addStatusToDatabase("$inPosterID", "$inParentStatus", 0, "$inNodeID", "$inStatus");
+        $status = $this->statusEngine->retrieveStatusFromDatabaseByUser($inPosterID);
 
+        $this->setMessage($status->getStatusID(), $status->getPosterID(), $status->getNodeID());
     }
 
     public function deleteMessage($inID)
