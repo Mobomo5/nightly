@@ -196,4 +196,5 @@ class blockEngine {
     private function insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible = false) {
 
     }
+    //
 }
