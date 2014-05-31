@@ -16,7 +16,7 @@ class cleanString implements generalFunction {
             return;
         }
         $string = $inParams['stringToClean'];
-        $string = preg_replace('/[^A-Za-z0-9\-\&\/]/', '', htmlspecialchars($string));
+        $string = preg_replace('/[^A-Za-z0-9\-\&\/\.]/', '', htmlspecialchars($string));
         return $string;
     }
 

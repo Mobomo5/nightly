@@ -97,7 +97,7 @@ class router {
         $module = explode('/', $params);
         $module = $module[0];
         foreach ($this->staticRoutes as $route => $newModule) {
-            if (preg_match($route, $params)) {
+            if (preg_match('#' . $route . '#', $params)) {
                 $module = $newModule;
                 break;
             }

@@ -59,6 +59,7 @@ class bootstrap {
         define('LINK_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/link.php');
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
         define('HOOK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hookEngine.php');
+        define('PLUGIN_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/plugin.php');
         define('CURRENT_USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/currentUser.php');
         define('USER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/user.php');
         define('USER_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/userEngine.php');
@@ -168,6 +169,7 @@ class bootstrap {
         $this->blocks['menus'] = menuEngine::getInstance()->getMenu(1);
 
         noticeEngine::getInstance()->removeNotices();
+        router::moveCurrentParametersToPrevious();
 
         database::getInstance()->bootstrapDisconnect();
     }
