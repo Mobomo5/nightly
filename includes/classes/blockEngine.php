@@ -159,6 +159,7 @@ class blockEngine {
                     $countOfDoDisplays += 1;
                     continue;
                 }
+                //No vote on any other value.
                 continue;
             }
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
