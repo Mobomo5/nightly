@@ -34,6 +34,12 @@ class users implements module {
             return false;
         }
 
+        // handle the possibility of an href logout.
+        if ($this->params[1] == 'logout') {
+            $this->doLogOut();
+            return;
+        }
+
         $userID = $this->params[1];
 
         if (!is_numeric($userID)) {
