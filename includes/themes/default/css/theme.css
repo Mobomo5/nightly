@@ -107,7 +107,7 @@ body {
 
 #homepage-footer #footer-logo {
     margin: auto;
-    background-image: url("../../../images/educasklogo.png");
+    background-image: url("../../../images/educasklogoAlpha.png");
     background-size: contain;
     padding: 0 auto;
     min-height: 25px;
@@ -163,7 +163,7 @@ body {
 }
 
 #titlebar ul li #logo {
-    background-image: url("../../../images/educasklogo.png");
+    background-image: url("../../../images/educasklogoAlpha.png");
     background-size: contain;
     min-height: 25px;
     height: inherit;
