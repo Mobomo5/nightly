@@ -53,12 +53,12 @@ class messageEngine
         }
     }
 
-    public function setMessage($inStatusID, $inPosterID, $inNodeID)
+    public function setMessage(status $inStatus)
     {
         try {
             $results = $this->db->insertData("message",
                 "trashed, isRead, statusID, senderID, nodeID",
-                "false, false, $inStatusID, $inPosterID, $inNodeID");
+                "false, false, {$inStatus->getStatusID()}, {$inStatus->getPosterID()}, {$inStatus->getNodeID()}");
         } catch (exception $ex) {
             return $ex->getMessage();
         }
@@ -66,19 +66,20 @@ class messageEngine
 
     public function sendMessage(status $inStatus, $inParentStatus = null)
     {
-        //if their is one
-        $statusID = $inStatus->getStatusID();
-
         //store rest of status object
         $statusMsg = $inStatus->getStatus();
         $posterID = $inStatus->getPosterID();
         $nodeID = $inStatus->getNodeID();
         $votes = $inStatus->getUpVotes();
 
+        //adds the status to the database
         $this->statusEngine->addStatusToDatabase($posterID, $inParentStatus, $votes, $nodeID, $statusMsg);
-        $status = $this->statusEngine->retrieveStatusFromDatabaseByUser($inPosterID);
 
-        $this->setMessage($status->getStatusID(), $status->getPosterID(), $status->getNodeID());
+        //get a status object based off the poster ID, this may be a huge problem though.
+        $status = $this->statusEngine->retrieveStatusFromDatabaseByUser($posterID);
+
+        //insert message into db
+        $this->setMessage($status);
     }
 
     public function deleteMessage($inID)
