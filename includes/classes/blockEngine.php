@@ -150,7 +150,7 @@ class blockEngine {
             }
             //If the first character is an !, then negate the operation.
             if($rule['referenceID'][0] == '!') {
-                $vote = $this->blockVisibileNegate($rule, $finalComparators);
+                $vote = $this->blockVisibleNegate($rule, $finalComparators);
                 if($vote == -1) {
                     $countOfDoNotDisplays += 1;
                     continue;
@@ -171,12 +171,12 @@ class blockEngine {
             }
             $countOfDoDisplays += 1;
         }
-        if ($countOfDoNotDisplays >= $countOfDoDisplays) {
+        if ($countOfDoNotDisplays > $countOfDoDisplays) {
             return false;
         }
         return true;
     }
-    private function blockVisibileNegate($rule, $finalComparators) {
+    private function blockVisibleNegate($rule, $finalComparators) {
         //Take the ! off
         $rule['referenceID'] = substr($rule['referenceID'], 1);
 
