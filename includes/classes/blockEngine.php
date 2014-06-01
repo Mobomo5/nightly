@@ -209,21 +209,62 @@ class blockEngine {
         if (!$database->isConnected()) {
             return false;
         }
-        $exists = $database->getData('visible', 'blockVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}");
+        $referenceType = $database->escapeString($referenceType);
+        $referenceID = $database->escapeString($referenceID);
+        $inBlockID = $database->escapeString($inBlockID);
+        $whereClause = "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}";
+        $exists = $database->getData('ruleID', 'blockVisibility', $whereClause);
         if ($exists == false) {
             return false;
         }
         if ($exists != null) {
-            $success = $this->insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible);
-            if ($success == false) {
-                return false;
-            }
-            return true;
+            return $this->insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible);
         }
-        $success = $database->updateTable('blockVisibility', "");
+        if($isVisible == true) {
+            $visible = 1;
+        } else {
+            $visible = 0;
+        }
+        $success = $database->updateTable('blockVisibility', "visibile={$visible}", $whereClause);
+        if($success == false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
     }
-
     private function insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible = false) {
-
+        if (!is_numeric($inBlockID)) {
+            return false;
+        }
+        if ($inBlockID < 1) {
+            return false;
+        }
+        if (!is_bool($isVisible)) {
+            return false;
+        }
+        $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
+        $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
+        $database = database::getInstance();
+        if (!$database->isConnected()) {
+            return false;
+        }
+        $referenceType = $database->escapeString($referenceType);
+        $referenceID = $database->escapeString($referenceID);
+        $inBlockID = $database->escapeString($inBlockID);
+        if($isVisible == true) {
+            $visible = 1;
+        } else {
+            $visible = 0;
+        }
+        $success = $database->insertData('blockVisibility', 'referenceID, referenceType, visible, blockID', "'{$referenceID}', '{$referenceType}', {$visible}, {$inBlockID}");
+        if($success == false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
     }
 }
