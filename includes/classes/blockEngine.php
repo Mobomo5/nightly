@@ -267,4 +267,150 @@ class blockEngine {
         }
         return true;
     }
+    public function deleteVisibilityRule($inBlockID, $referenceID, $referenceType) {
+        if (!is_numeric($inBlockID)) {
+            return false;
+        }
+        if ($inBlockID < 1) {
+            return false;
+        }
+        $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
+        $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
+        $database = database::getInstance();
+        if (!$database->isConnected()) {
+            return false;
+        }
+        $referenceType = $database->escapeString($referenceType);
+        $referenceID = $database->escapeString($referenceID);
+        $inBlockID = $database->escapeString($inBlockID);
+        $success = $database->removeData('blockVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}");
+        if($success == false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
+    }
+    public function addBlock($blockName, $theme, $themeRegion, $weight, $moduleInCharge, $enabled = false) {
+        if(! is_numeric($weight)) {
+            return false;
+        }
+        if(! is_numeric($moduleInCharge)) {
+            return false;
+        }
+        if(! is_bool($enabled)) {
+            return false;
+        }
+        $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
+        $theme = preg_replace('/\s+/', '', strip_tags($theme));
+        $themeRegion = preg_replace('/\s+/', '', strip_tags($themeRegion));
+        if($enabled == true) {
+            $isEnabled = 1;
+        } else {
+            $isEnabled = 0;
+        }
+        $database = database::getInstance();
+        $blockName = $database->escapeString($blockName);
+        $theme = $database->escapeString($theme);
+        $themeRegion = $database->escapeString($themeRegion);
+        $success = $database->insertData('block', 'blockName, theme, themeRegion, weight, enabled, module', "'{$blockName}', '{$theme}', '{$themeRegion}', {$weight}, {$isEnabled}, {$moduleInCharge}");
+        if($success ==  false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
+    }
+    public function setBlockTitle($blockID, $title) {
+        if(! is_numeric($blockID)) {
+            return false;
+        }
+        $database = database::getInstance();
+        $title = $database->escapeString(strip_tags($title));
+        $success = $database->updateTable('block', "title='{$title}'", "blockID={$blockID}");
+        if($success ==  false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
+    }
+    public function setBlock($blockID, $blockName, $theme, $themeRegion, $weight, $moduleInCharge, $enabled = false) {
+        if(! is_numeric($blockID)) {
+            return false;
+        }
+        if(! is_numeric($weight)) {
+            return false;
+        }
+        if(! is_numeric($moduleInCharge)) {
+            return false;
+        }
+        if(! is_bool($enabled)) {
+            return false;
+        }
+        $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
+        $theme = preg_replace('/\s+/', '', strip_tags($theme));
+        $themeRegion = preg_replace('/\s+/', '', strip_tags($themeRegion));
+        if($enabled == true) {
+            $isEnabled = 1;
+        } else {
+            $isEnabled = 0;
+        }
+        $database = database::getInstance();
+        $blockName = $database->escapeString($blockName);
+        $theme = $database->escapeString($theme);
+        $themeRegion = $database->escapeString($themeRegion);
+        $success = $database->updateTable('block', "blockName='{$blockName}', theme='{$theme}', themeRegion='{$themeRegion}', weight={$weight}, enabled={$enabled}, module={$moduleInCharge}", "blockID={$blockID}");
+        if($success ==  false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteBlock($blockID) {
+        if(! is_numeric($blockID)) {
+            return false;
+        }
+        $database = database::getInstance();
+        $success = $database->removeData('block', "blockID={$blockID}");
+        if($success ==  false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        return true;
+    }
+    public function getRawBlockDataByName($blockName) {
+        $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
+        $database = database::getInstance();
+        $blockName = $database->escapeString($blockName);
+        $data = $database->getData('*', 'block', "blockName='{$blockName}'");
+        if($data == false) {
+            return false;
+        }
+        if($data == null) {
+            return false;
+        }
+        return $data;
+    }
+    public function getRawBlockDataByID($blockID) {
+        if(! is_numeric($blockID)) {
+            return false;
+        }
+        $database = database::getInstance();
+        $data = $database->getData('*', 'block', "blockID={$blockID}");
+        if($data == false) {
+            return false;
+        }
+        if($data == null) {
+            return false;
+        }
+        return $data;
+    }
 }
