@@ -1,7 +1,10 @@
 {% if blocks.statuses.0.content is not empty %}
     <div id="statuses">
         {% for status in blocks.statuses.0.content %}
-            <div class="status">By: {{ status.getPosterName }}{{ status.status }}</div>
+            <div class="status">By: <a href="{{ status.posterHref }}">{{ status.getPosterName }}</a>
+
+                <div class="status-body">{{ status.status }}</div>
+            </div>
         {% endfor %}
     </div>
 {% endif %}

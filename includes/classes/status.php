@@ -102,6 +102,10 @@ class status {
         return $this->posterName;
     }
 
+    public function getPosterHref() {
+        return new link('users/' . $this->posterID);
+    }
+
     public function getChildStatus() {
         if (empty($this->childStatus)) {
             return false;
