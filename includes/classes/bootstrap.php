@@ -99,6 +99,7 @@ class bootstrap {
         require_once(DATABASE_OBJECT_FILE);
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(MODULE_ENGINE_OBJECT_FILE);
+        require_once(STATUS_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(MENU_ENGINE_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
@@ -151,7 +152,7 @@ class bootstrap {
             $moduleInCharge = 'fiveHundred';
         }
         $module = new $moduleInCharge();
-        if($module->forceFourOhFour()) {
+        if ($module->forceFourOhFour()) {
             $moduleEngine->includeModule('fourOhFour');
             $module = new fourOhFour();
         }
@@ -165,9 +166,6 @@ class bootstrap {
         $pageBlock->setContent($contentToPassToPageBlock);
         $pageBlock->setTitle($titleToPassToPageBlock);
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID(), $pageBlock);
-        $this->blocks['notices'] = noticeEngine::getInstance()->getNotices(); //@ToDo: make a block module for this.
-        $this->blocks['menus'] = menuEngine::getInstance()->getMenu(1);
-
         noticeEngine::getInstance()->removeNotices();
         router::moveCurrentParametersToPrevious();
 

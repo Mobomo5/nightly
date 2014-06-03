@@ -4,7 +4,7 @@
         <div id="titlebar">
             <ul>
                 <li><a id="logo" href="{{ site.getBaseDirectory }}"></a></li>
-                {{ blocks.menus.HTML|raw }}
+                {{ blocks.menus.0.content|raw }}
                 <li id="flex-end">
                     <form action="#" id="search-box" method="post">
                         <input name="text" type="text"/><input type="submit"/>
@@ -18,17 +18,22 @@
 
 
     <div id="mainContent">
-        {% if blocks.notices.0 is defined %}
-            <div id="notices-modal">
-                {% for notice in blocks.notices %}
-                    <div class="{{ notice.style }}">Notice: {{ notice.message|capitalize }}</div>
-                {% endfor %}
-                <a id="notices-close" onClick="$(this).parent().remove()">Close</a>
-            </div>
-        {% endif %}
+
+        {#check for notices. Print any here.#}
+        {% block notices %}
+            {% include 'notices.twig' %}
+        {% endblock %}
+
+
         <h2>{{ blocks.main.0.title| raw | title }}</h2>
 
         <p>{{ blocks.main.0.content|raw }}</p>
+
+
+        {#check for statuses. Print any here.#}
+        {% block statuses %}
+            {% include 'statuses.twig' %}
+        {% endblock %}
 
     </div>
     <div id="login-modal" style="display: none;">
@@ -49,6 +54,5 @@
     {% endblock %}
 
 
-    {# check for notices. If there are any, print them into a modal, with a close button#}
     </div> {#// wrapper#}
 {% endblock %}
