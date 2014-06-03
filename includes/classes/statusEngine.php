@@ -18,6 +18,7 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
+require_once(STATUS_OBJECT_FILE);
 
 class statusEngine {
     /* Checking to see if the instance variable is holding onto to status engine object
@@ -78,10 +79,14 @@ class statusEngine {
 
         $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
-            "'nodeID' = $inNodeID");
+            "nodeID = $inNodeID");
+
+        if (!$results) {
+            return false;
+        }
 
         foreach ($results as $row) {
-            $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
+            $statusArray[] = new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
         return $statusArray;
