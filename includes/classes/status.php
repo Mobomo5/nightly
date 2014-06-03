@@ -15,6 +15,7 @@ class status {
     private $childStatus; //Array for child statuses
     private $votes; //counter for how many people like the posting
     private $voterArray; //array of voters to prevent duplicated vote spamming
+    private $posterName;
 
     public function __construct($inStatusID, $inString, $inUserID, $inNodeID) {
         $this->statusID = $inStatusID;
@@ -24,6 +25,7 @@ class status {
         $this->childStatus = array();
         $this->votes = 0;
         $this->voterArray = array();
+        $this->posterName = userEngine::getInstance()->getUser($inUserID)->getFullName();
     }
 
     public function addChildStatusTo(status $inChildStatus) {
@@ -96,8 +98,14 @@ class status {
         return $this->posterID;
     }
 
-    public function getChildStatus()
-    {
+    public function getPosterName() {
+        return $this->posterName;
+    }
+
+    public function getChildStatus() {
+        if (empty($this->childStatus)) {
+            return false;
+        }
         return $this->childStatus;
     }
 }

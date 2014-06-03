@@ -54,7 +54,6 @@ class statusEngine {
         $escapedStatus = $this->db->escapeString($inStatus);
         $timestamp = date("Y-m-d H:i:s");
         $this->db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "'{$escapedStatus}', '{$timestamp}', '{$statusID}', '1'");
-        echo $this->db->getError();
     }
 
     //Get statuses from Database and create an array of status objects
@@ -66,8 +65,12 @@ class statusEngine {
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "posterID = $inUserID"); //<----
 
+        if (!$results) {
+            return false;
+        }
+
         foreach ($results as $row) {
-            $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
+            $statusArray[] = new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
         return $statusArray;
