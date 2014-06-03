@@ -14,6 +14,10 @@ class statusBlock implements block {
 
     public function __construct() {
 
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewStatuses')) {
+            return false;
+        }
+
         // get params
         $params = router::getInstance()->getParameters(true);
         if (empty($params[1])) {
@@ -22,6 +26,7 @@ class statusBlock implements block {
         if (!is_numeric(end($params))) {
             return false;
         }
+
         // is it a user page?
         if (strtolower($params[0]) == 'users') {
 
