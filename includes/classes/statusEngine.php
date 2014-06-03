@@ -18,6 +18,7 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
+require_once(STATUS_OBJECT_FILE);
 
 class statusEngine {
     /* Checking to see if the instance variable is holding onto to status engine object
@@ -46,7 +47,7 @@ class statusEngine {
         $this->db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
 
         //Select query for getting StatusID for next insert
-        $results = $this->db->getData("statusID", "status", "'posterID' = $inPosterID");
+        $results = $this->db->getData("statusID", "status", "posterID = $inPosterID");
         $statusID = $results[0]['statusID'];
 
         //insert into the statusRevision table
@@ -62,7 +63,7 @@ class statusEngine {
 
         $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
-            "'posterID' = $inUserID"); //<----
+            "posterID = $inUserID"); //<----
 
         foreach ($results as $row) {
             $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
@@ -78,10 +79,14 @@ class statusEngine {
 
         $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
-            "'nodeID' = $inNodeID");
+            "nodeID = $inNodeID");
+
+        if (!$results) {
+            return false;
+        }
 
         foreach ($results as $row) {
-            $statusArray[] += new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
+            $statusArray[] = new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
         return $statusArray;
@@ -91,7 +96,7 @@ class statusEngine {
     public function editStatusInDatabaseByID($inStatusID, $inUpdatedStatus) {
         $results = $this->db->getData("*",
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
-            "'statusID' = $inStatusID");
+            "statusID = $inStatusID");
 
         //update statusRevision table
         $this->db->updateTable("statusRevision", "isCurrent = 0", "statusID = $inStatusID");
