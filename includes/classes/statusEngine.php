@@ -44,16 +44,17 @@ class statusEngine {
 
     public function addStatusToDatabase($inPosterID, $inParentStatus, $inSupporterCount, $inNodeID, $inStatus) {
         //inserts the status into the database
-        $this->db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "$inPosterID, $inParentStatus, $inSupporterCount, $inNodeID");
+        $this->db->insertData("status", "posterID, parentStatus,supporterCount, nodeID", "'$inPosterID', '$inParentStatus', '$inSupporterCount', '$inNodeID'");
 
         //Select query for getting StatusID for next insert
-        $results = $this->db->getData("statusID", "status", "posterID = $inPosterID");
+        $results = $this->db->getData("statusID", "status", "posterID = '$inPosterID'");
         $statusID = $results[0]['statusID'];
 
         //insert into the statusRevision table
         $escapedStatus = $this->db->escapeString($inStatus);
         $timestamp = date("Y-m-d H:i:s");
-        $this->db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "$escapedStatus, $timestamp, $statusID, 1");
+        $this->db->insertData("statusRevision", "status, timePosted, statusID, isCurrent", "'{$escapedStatus}', '{$timestamp}', '{$statusID}', '1'");
+        echo $this->db->getError();
     }
 
     //Get statuses from Database and create an array of status objects
