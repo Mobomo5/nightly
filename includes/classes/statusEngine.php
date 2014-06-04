@@ -70,7 +70,7 @@ class statusEngine {
         }
 
         foreach ($results as $row) {
-            $statusArray[] = new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
+            $statusArray[] = new status($row['statusID'], $results[0]['parentStatus'], $row['supporterCount'] $row['status'], $row['posterID'], $row['nodeID']);
         }
 
         return $statusArray;
@@ -90,7 +90,7 @@ class statusEngine {
         }
 
         foreach ($results as $row) {
-            $statusArray[] = new status($row['statusID'], $row['status'], $row['posterID'], $row['nodeID']);
+            $statusArray[] = new status($row['statusID'], $results[0]['parentStatus'], $row['supporterCount'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
         return $statusArray;
@@ -102,8 +102,14 @@ class statusEngine {
             "status INNER JOIN statusRevision ON status.statusID = statusRevision.statusID",
             "statusID = $inStatusID");
 
+        if (!$results) {
+            return false;
+        }
+
         //update statusRevision table
         $this->db->updateTable("statusRevision", "isCurrent = 0", "statusID = $inStatusID");
 
+        //add new status
+        $this->addStatusToDatabase(null, $results[0]['parentStatus'], $results[0]['supporterCount'], $results[0]['nodeID'], $inUpdatedStatus);
     }
 }

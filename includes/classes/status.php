@@ -11,19 +11,29 @@ class status {
     private $statusID; //ID of the status
     private $statusMsg; //Contents of the status
     private $posterID; //Who the status belongs too
+    private $parentID; //
     private $nodeID; //what node the status was posted too
     private $childStatus; //Array for child statuses
     private $votes; //counter for how many people like the posting
     private $voterArray; //array of voters to prevent duplicated vote spamming
     private $posterName;
 
-    public function __construct($inStatusID, $inString, $inUserID, $inNodeID) {
-        $this->statusID = $inStatusID;
+    public function __construct($inStatusID = null, $inParentStatusID = null, $inVotes = 0, $inString, $inUserID, $inNodeID)
+    {
+
+        if (is_numeric($inStatusID) && $inStatusID != null) {
+            $this->statusID = $inStatusID;
+        }
+
+        if (is_numeric($inParentStatusID) && $inParentStatusID != null) {
+            $this->parentID = $inParentStatusID;
+        }
+
         $this->statusMsg = $inString;
         $this->posterID = $inUserID;
         $this->nodeID = $inNodeID;
         $this->childStatus = array();
-        $this->votes = 0;
+        $this->votes = $inVotes;
         $this->voterArray = array();
         $this->posterName = userEngine::getInstance()->getUser($inUserID)->getFullName();
     }
@@ -100,6 +110,11 @@ class status {
 
     public function getPosterName() {
         return $this->posterName;
+    }
+
+    public function getParentStatusID()
+    {
+        return $this->parentID;
     }
 
     public function getPosterHref() {
