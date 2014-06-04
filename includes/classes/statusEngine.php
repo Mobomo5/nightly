@@ -112,4 +112,24 @@ class statusEngine {
         //add new status
         $this->addStatusToDatabase(null, $results[0]['parentStatus'], $results[0]['supporterCount'], $results[0]['nodeID'], $inUpdatedStatus);
     }
+
+    public function supportStatus($inStatusID, $inSupporterID)
+    {
+        //grab all supporters based off of the ID
+        $results = $this->db->getData("*", "statusSupporter", "statusID = $inStatusID");
+
+        //the count of the array will = supporter count
+        $supporterCount = count($results);
+
+        //see if supporter has already voted, and if he has break out
+        foreach ($results as $row) {
+            if ($row['supporterID'] == $inSupporterID) {
+                return;
+            }
+        }
+
+        //add them to the table and update the status in the status table with new support count
+        $this->db->insertData("statusSupporter", "supporterID, statusID", "$inSupporterID, $inStatusID");
+        $this->db->updateTable("status", "supporterCount = $supporterCount", "statusID = $inStatusID");
+    }
 }
