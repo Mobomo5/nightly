@@ -9,7 +9,7 @@
 @homepagetextcolor: #ede3e1;
 @loginformbackground: #dddddd;
 @loginformbackgroundborder: darken(@loginformbackground, 10%);
-@titlebarcolor: rgba(41, 39, 150, 0.97);
+@titlebarcolor: rgba(63, 65, 150, 0.97);
 @background: lighten(@titlebarcolor, 93%);
 @contentbackground: lighten(@titlebarcolor, 69%);
 @border: lighten(@titlebarcolor, 59.5%);
@@ -159,6 +159,7 @@ body {
 }
 
 #titlebar {
+  box-sizing: border-box;
   position: relative;
   display: block;
   top: 0;
@@ -168,18 +169,27 @@ body {
   background-color: @titlebarcolor;
 
   ul {
+    box-sizing: border-box;
     min-height: 25px;
     .flexDisplay();
     .flexFlow(row, wrap);
     z-index: 100;
-    height: inherit;
+    height: @titlebarheight;
     width: 100%;
     justify-content: flex-start;
     align-items: center;
     list-style: none;
     #flex-end {
+      box-sizing: border-box;
+      line-height: @titlebarheight;
+      vertical-align: middle;
+      height: @titlebarheight;
       position: absolute;
       right: 0;
+      button, input {
+        height: 2em;
+        box-sizing: border-box;
+      }
     }
 
     li {
@@ -200,10 +210,6 @@ body {
         &:hover {
           background-color: transparent;
         }
-      }
-      #login {
-        margin: 2px;
-        height: @titlebarheight;
       }
 
       a {
