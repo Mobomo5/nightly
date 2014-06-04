@@ -92,6 +92,10 @@ class bootstrap {
         define('FOLDER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/folder.php');
         define('FILE_SYSTEM_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/fileSystemEngine.php');
         define('MENU_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
+        define('NODE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/node.php');
+        define('NODE_TYPE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeType.php');
+        define('NODE_FIELD_REVISION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeFieldRevision.php');
+        define('NODE_FIELD_TYPE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeFieldType.php');
     }
 
     private function doRequires() {
