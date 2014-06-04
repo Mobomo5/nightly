@@ -70,7 +70,7 @@ class statusEngine {
         }
 
         foreach ($results as $row) {
-            $statusArray[] = new status($row['statusID'], $results[0]['parentStatus'], $row['supporterCount'] $row['status'], $row['posterID'], $row['nodeID']);
+            $statusArray[] = new status($row['statusID'], $results[0]['parentStatus'], $row['supporterCount'], $row['status'], $row['posterID'], $row['nodeID']);
         }
 
         return $statusArray;
