@@ -10,5 +10,5 @@ class nodeType {
     private $humanName;
     private $moduleInCharge;
     private $description;
-    private $nodeFieldTypes;
+    private $nodeFields;
 }

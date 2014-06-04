@@ -53,6 +53,7 @@ if(! validateAction()) {
     header('Location: install.php?action=welcome');
 }
 ?>
+<!DOCTYPE html>
 <html>
     <head>
         <title>Install | Educask Development Core</title>
@@ -63,11 +64,13 @@ if(! validateAction()) {
             }
             #sidebar {
                 position: absolute;
+                float:left;
                 width: 20%;
+                min-width: 300px;
                 height: 100%;
-                background-color: #166A8A;
                 margin: 0;
-                box-shadow: 2px 0px 2px #777777;
+                background-color: #166A8A;
+                box-shadow: 1px 1px 5px #777777;
             }
             #sidebar p, img {
                 padding: 5px;
@@ -83,15 +86,50 @@ if(! validateAction()) {
                 text-decoration: none;
             }
             #content {
-                width: 79%;
-                margin: 0;
-                padding: 5px;
                 float: right;
+                width: 79%;
+                max-width: calc(100% - 310px);
+                padding: 5px;
             }
             .current {
                 font-weight: bold;
                 background-color: #106383;
                 box-shadow: 1px 1px 1px #333 inset;
+            }
+            #footer {
+                position: absolute;
+                display: block;
+                bottom: 5px;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: 3em;
+                list-style: none;
+            }
+            #footer ul {
+                list-style: none;
+                display: inline-block;
+                margin: 0;
+            }
+            #footer ul li {
+                display: inline;
+                height: 3em;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin: 0;
+            }
+            #footer ul li img {
+                height: 2.5em;
+                width: auto;
+                padding-top: 3px;
+            }
+            #footer ul li img:hover {
+                -webkit-transition: all 0.2s ease-in;
+                -moz-transition: all 0.2s ease-in;
+                -ms-transition: all 0.2s ease-in;
+                -o-transition: all 0.2s ease-in;
+                transition: all 0.2s ease-in;
+                padding-top: 0;
             }
         </style>
     </head>
@@ -109,6 +147,19 @@ if(! validateAction()) {
                 <li <?php echo getCurrentCss('install') ;?>>Install</li>
                 <li <?php echo getCurrentCss('finish') ;?>>Finish</li>
             </ul>
+            <div id="footer">
+                <ul>
+                    <!--icons borrowed from http://simpleicons.org/-->
+                    <li><a href="https://www.educask.com" target="_blank"><img
+                                src="includes/images/educasklogo-e.png"/></a></li>
+                    <li><a href="https://www.facebook.com/Educask" target="_blank"><img
+                                src="includes/images/facebook.png"/></a></li>
+                    <li><a href="https://github.com/educask" target="_blank"><img
+                                src="includes/images/github.png"/></a></li>
+                    <li><a href="https://twitter.com/educask" target="_blank"><img
+                                src="includes/images/twitter.png"/></a></li>
+                </ul>
+            </div>
         </div>
         <div id="content">
             <?php echo getContent();?>

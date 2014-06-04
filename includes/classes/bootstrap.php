@@ -96,6 +96,7 @@ class bootstrap {
         define('NODE_TYPE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeType.php');
         define('NODE_FIELD_REVISION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeFieldRevision.php');
         define('NODE_FIELD_TYPE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeFieldType.php');
+        define('NODE_FIELD_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeField.php');
     }
 
     private function doRequires() {
