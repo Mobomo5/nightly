@@ -60,73 +60,58 @@ if(! validateAction()) {
             body{
                 margin: 0;
                 padding: 0;
-                background-color: #166A8A;
-            }
-            #titleBar {
-                background-color: #166A8A;
-                width: 25%;
-                margin-bottom: -16;
-            }
-            #main {
-                position: fixed;
-                height: 80%;
-                width: 80%;
-                top: 10%;
-                left: 10%;
-                background-color: white;
-                padding: 0;
-                margin: 0;
             }
             #sidebar {
-                width: 25%;
-                background-color: #C2C2C2;
+                position: absolute;
+                width: 20%;
                 height: 100%;
-                margin-top: 0;
-                margin-left: 0;
-            }
-            #versionBar {
-                padding: 5px;
-                width: 74%;
-                text-align: right;
+                background-color: #166A8A;
                 margin: 0;
-                float: right;
+                box-shadow: 2px 0px 2px #777777;
+            }
+            #sidebar p, img {
+                padding: 5px;
+                color: white;
+            }
+            #sidebar ul {
+                list-style-type: none;
+            }
+            #sidebar li {
+                display: block;
+                color: #FFF;
+                padding: 5px;
+                text-decoration: none;
             }
             #content {
-                width: 74%;
+                width: 79%;
                 margin: 0;
                 padding: 5px;
                 float: right;
             }
             .current {
                 font-weight: bold;
-            }
-            ul {
-                margin: 0;
-                padding: 0;
+                background-color: #106383;
+                box-shadow: 1px 1px 1px #333 inset;
             }
         </style>
     </head>
     <body>
-        <div id="titleBar">
-            <img src="includes/images/educasklogo.png">
+        <div id="sidebar">
+            <div id="titleBar">
+                <img src="includes/images/educasklogo.png">
+                <p>Educask 3.0 Alpha 9 - Developer Preview</p>
+            </div>
+            <ul>
+                <li <?php echo getCurrentCss('welcome') ;?>>Welcome</li>
+                <li <?php echo getCurrentCss('requirements') ;?>>Verify Requirements</li>
+                <li <?php echo getCurrentCss('database') ;?>>Set up Database</li>
+                <li <?php echo getCurrentCss('configure') ;?>>Configure Site</li>
+                <li <?php echo getCurrentCss('install') ;?>>Install</li>
+                <li <?php echo getCurrentCss('finish') ;?>>Finish</li>
+            </ul>
         </div>
-        <div id="main">
-            <div id="versionBar">
-                <p>Educask 3.0 Developer Preview Alpha 9</p>
-            </div>
-            <div id="content">
-                <?php echo getContent();?>
-            </div>
-            <div id="sidebar">
-                <ul>
-                    <li <?php echo getCurrentCss('welcome') ;?>>Welcome</li>
-                    <li <?php echo getCurrentCss('requirements') ;?>>Verify Requirements</li>
-                    <li <?php echo getCurrentCss('database') ;?>>Set up Database</li>
-                    <li <?php echo getCurrentCss('configure') ;?>>Configure Site</li>
-                    <li <?php echo getCurrentCss('install') ;?>>Install</li>
-                    <li <?php echo getCurrentCss('finish') ;?>>Finish</li>
-                </ul>
-            </div>
+        <div id="content">
+            <?php echo getContent();?>
         </div>
     </body>
 </html>
