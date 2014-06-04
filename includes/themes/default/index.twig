@@ -8,4 +8,8 @@
     {% else %}
         {% include "default.twig" %}
     {% endif %}
+
+    {% block footer %}
+        {% include 'footer.twig' %}
+    {% endblock %}
 {% endblock %}
