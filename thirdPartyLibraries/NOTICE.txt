@@ -1,0 +1,1 @@
+Any works distributed in this directory and sub-directories carry their own license and are are not part of the Educask license.
