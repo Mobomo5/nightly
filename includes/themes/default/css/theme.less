@@ -356,6 +356,7 @@ body {
 }
 
 #footer {
+  border-top: 3px outset lighten(@titlebarcolor, 10%);
   position: absolute;
   display: block;
   bottom: 0;
@@ -370,10 +371,22 @@ body {
     display: inline-block;
     li {
       display: inline;
+      height: 3em;
       img {
-        height: 3em;
+        height: 2.5em;
         width: auto;
+        padding-top: 3px;
+        &:hover {
+          -webkit-transition: all .2s ease-in;
+          -moz-transition: all .2s ease-in;
+          -ms-transition: all .2s ease-in;
+          -o-transition: all .2s ease-in;
+          transition: all .2s ease-in;
+          padding-top: 0;
+
+        }
       }
+
     }
   }
 
