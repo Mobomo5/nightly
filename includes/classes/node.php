@@ -10,10 +10,14 @@ require_once(NODE_FIELD_REVISION_OBJECT_FILE);
 class node {
     private $id;
     private $title;
+    private $author;
     private $nodeType;
     private $fieldRevisions;
-    public function __construct($id, $title, nodeType $nodeType, array $fieldRevisions = array()) {
+    public function __construct($id, $title, $author, nodeType $nodeType, array $fieldRevisions = array()) {
         if(! is_numeric($id)) {
+            return;
+        }
+        if(! is_numeric($author)) {
             return;
         }
         $title = strip_tags($title);
@@ -31,6 +35,7 @@ class node {
         unset($fieldRevisions);
         $this->id = $id;
         $this->title = $title;
+        $this->author = $author;
         $this->nodeType = $nodeType;
         $this->fieldRevisions = $validatedFieldRevisions;
     }
@@ -43,6 +48,9 @@ class node {
     public function setTitle($inTitle) {
         $inTitle = strip_tags($inTitle);
         $this->title = $inTitle;
+    }
+    public function getAuthorID() {
+        return $this->author;
     }
     public function getNodeType() {
         return $this->nodeType;

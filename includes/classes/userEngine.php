@@ -143,7 +143,6 @@ class userEngine {
         $results = $db->removeData('user', "userID = '$userID' AND userName = '$userName'");
 
         if (!$results) {
-            echo $db->getError();
             return false;
         }
 
