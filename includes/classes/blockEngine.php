@@ -110,7 +110,7 @@ class blockEngine {
         if (!$database->isConnected()) {
             return false;
         }
-
+        $blockID = $database->escapeString($blockID);
         // check to see if it's in the visibility table
         $results = $database->getData('*', 'blockVisibility', 'blockID = ' . $blockID);
 
@@ -329,6 +329,7 @@ class blockEngine {
         }
         $database = database::getInstance();
         $title = $database->escapeString(strip_tags($title));
+        $blockID = $database->escapeString($blockID);
         $success = $database->updateTable('block', "title='{$title}'", "blockID={$blockID}");
         if($success ==  false) {
             return false;
@@ -363,6 +364,7 @@ class blockEngine {
         $blockName = $database->escapeString($blockName);
         $theme = $database->escapeString($theme);
         $themeRegion = $database->escapeString($themeRegion);
+        $blockID = $database->escapeString($blockID);
         $success = $database->updateTable('block', "blockName='{$blockName}', theme='{$theme}', themeRegion='{$themeRegion}', weight={$weight}, enabled={$enabled}, module={$moduleInCharge}", "blockID={$blockID}");
         if($success ==  false) {
             return false;
@@ -377,6 +379,7 @@ class blockEngine {
             return false;
         }
         $database = database::getInstance();
+        $blockID = $database->escapeString($blockID);
         $success = $database->removeData('block', "blockID={$blockID}");
         if($success ==  false) {
             return false;
@@ -397,13 +400,17 @@ class blockEngine {
         if($data == null) {
             return false;
         }
-        return $data;
+        if(count($data) > 1) {
+            return false;
+        }
+        return $data[0];
     }
     public function getRawBlockDataByID($blockID) {
         if(! is_numeric($blockID)) {
             return false;
         }
         $database = database::getInstance();
+        $blockID= $database->escapeString($blockID);
         $data = $database->getData('*', 'block', "blockID={$blockID}");
         if($data == false) {
             return false;

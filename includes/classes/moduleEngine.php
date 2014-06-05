@@ -9,6 +9,7 @@ require_once(VALIDATOR_OBJECT_FILE);
 
 class moduleEngine {
     private static $instance;
+    private $foundModules;
 
     public static function getInstance() {
         if (!isset(self::$instance)) {
@@ -19,7 +20,7 @@ class moduleEngine {
     }
 
     private function __construct() {
-        //Do nothing.
+        $this->foundModules = array();
     }
 
     public function moduleExists($moduleName) {
@@ -31,6 +32,13 @@ class moduleEngine {
             return false;
         }
         if ($moduleName == null) {
+            return false;
+        }
+        $moduleData = $this->getRawModuleDataFromDatabase($moduleName);
+        if($moduleData == false) {
+            return false;
+        }
+        if($moduleData['enabled'] == '0') {
             return false;
         }
         $validator = new validator('dir');
@@ -69,7 +77,6 @@ class moduleEngine {
     }
 
     public function addModule($name, $humanName, $enabled = 1) {
-
         // check permissions
         $permEng = permissionEngine::getInstance();
         $perm = $permEng->getPermission('canAddModule');
@@ -95,5 +102,70 @@ class moduleEngine {
             return false;
         }
         return true;
+    }
+    public function getRawModuleDataFromDatabase($inModuleIdentifier) {
+        $inModuleIdentifier = preg_replace('/\s+/', '', strip_tags($inModuleIdentifier));
+        foreach($this->foundModules as $module) {
+            if($module['moduleID'] == $inModuleIdentifier) {
+                return $module;
+            }
+            if($module['moduleName'] == $inModuleIdentifier) {
+                return $module;
+            }
+        }
+        if(is_numeric($inModuleIdentifier)) {
+            $moduleData = $this->getRawDataBasedOnID($inModuleIdentifier);
+            if($moduleData == false) {
+                return false;
+            }
+            $this->foundModules[] = $moduleData;
+            return $moduleData;
+        }
+        $moduleData = $this->getRawDataBasedOnName($inModuleIdentifier);
+        if($moduleData == false) {
+            return false;
+        }
+        $this->foundModules[] = $moduleData;
+        return $moduleData;
+    }
+    private function getRawDataBasedOnID($inModuleID) {
+        if(! is_numeric($inModuleID)) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $inModuleID = $database->escapeString($inModuleID);
+        $success = $database->getData('moduleID, moduleName, humanName, enabled', 'module', "moduleID={$inModuleID}");
+        if($success == false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        if(count($success) > 1) {
+            return false;
+        }
+        return $success[0];
+    }
+    private function getRawDataBasedOnName($inModuleName) {
+        $inModuleName = preg_replace('/\s+/', '', strip_tags($inModuleName));
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $inModuleName = $database->escapeString($inModuleName);
+        $success = $database->getData('moduleID, moduleName, humanName, enabled', 'module', "moduleName='{$inModuleName}'");
+        if($success == false) {
+            return false;
+        }
+        if($success == null) {
+            return false;
+        }
+        if(count($success) > 1) {
+            return false;
+        }
+        return $success[0];
     }
 }

@@ -72,6 +72,9 @@ class node {
     public function getContent() {
         $toReturn = '';
         foreach($this->fieldRevisions as $fieldRevision) {
+            if(! $fieldRevision->isCurrent()) {
+                continue;
+            }
             $toReturn .= $fieldRevision->getContent();
         }
         return $toReturn;

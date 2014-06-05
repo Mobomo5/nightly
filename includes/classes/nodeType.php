@@ -14,7 +14,7 @@ class nodeType {
     private $nodeFields;
     private $addedFields;
     private $deletedFields;
-    public function __construct($inID, $inHumanName, $inModuleInCharge, $inDescription, array $inNodeFields) {
+    public function __construct($inID, $inHumanName, $inModuleInCharge, $inDescription, array $inNodeFieldTypes) {
         if(! is_numeric($inID)) {
             return;
         }
@@ -25,7 +25,7 @@ class nodeType {
         $inHumanName = strip_tags($inHumanName);
         $inDescription = strip_tags($inDescription);
         $validatedNodeFields = array();
-        foreach ($inNodeFields as $nodeField) {
+        foreach ($inNodeFieldTypes as $nodeField) {
             if(! is_object($nodeField)) {
                 continue;
             }
