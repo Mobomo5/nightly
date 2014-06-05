@@ -181,13 +181,12 @@ class permissionEngine {
     }
 
     public function currentUserCanDo($inPermissionName) {
-        $permEngine = permissionEngine::getInstance();
-        $perm = $permEngine->getPermission($inPermissionName);
+        $perm = $this->getPermission($inPermissionName);
 
         if (!$perm) {
             return false;
         }
-        if (!$permEngine->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+        if (!$this->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
 
             return false;
         }
