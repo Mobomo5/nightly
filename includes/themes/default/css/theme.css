@@ -157,6 +157,8 @@ body {
     vertical-align: middle;
     height: 2em;
     position: absolute;
+    text-align: center;
+    top: 0;
     right: 0;
 }
 
