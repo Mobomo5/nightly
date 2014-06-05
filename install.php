@@ -57,6 +57,7 @@ if(! validateAction()) {
 <html>
     <head>
         <title>Install | Educask Development Core</title>
+        <link rel="icon" type="image/png" href="includes/images/favicon.png">
         <style type="text/css">
             body{
                 margin: 0;
@@ -99,36 +100,38 @@ if(! validateAction()) {
             #footer {
                 position: absolute;
                 display: block;
-                bottom: 5px;
+                bottom: 20px;
                 left: 0;
                 right: 0;
                 width: 100%;
-                height: 3em;
+                height: 2.5em;
                 list-style: none;
             }
             #footer ul {
                 list-style: none;
-                display: inline-block;
+                display: -webkit-box;
+                display: -moz-box;
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+                flex-flow: row wrap;
+                -webkit-flex-flow: row wrap;
+                align-content: stretch;
+                justify-content: flex-start;
+                height: 100%;
+                width: 100%;
                 margin: 0;
             }
             #footer ul li {
-                display: inline;
-                height: 3em;
-                padding-top: 0;
-                padding-bottom: 0;
-                margin: 0;
+                height: 2.4em;
+                line-height: 2.4em;
             }
             #footer ul li img {
-                height: 2.5em;
+                height: 2.1em;
                 width: auto;
-                padding-top: 3px;
+                padding-top: 1px;
             }
             #footer ul li img:hover {
-                -webkit-transition: all 0.2s ease-in;
-                -moz-transition: all 0.2s ease-in;
-                -ms-transition: all 0.2s ease-in;
-                -o-transition: all 0.2s ease-in;
-                transition: all 0.2s ease-in;
                 padding-top: 0;
             }
         </style>
@@ -158,6 +161,8 @@ if(! validateAction()) {
                                 src="includes/images/github.png"/></a></li>
                     <li><a href="https://twitter.com/educask" target="_blank"><img
                                 src="includes/images/twitter.png"/></a></li>
+                    <li><a href="https://plus.google.com/+Educask/posts" target="_blank"><img
+                                src="includes/images/googleplus.png"/></a></li>
                 </ul>
             </div>
         </div>

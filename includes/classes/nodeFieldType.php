@@ -18,16 +18,12 @@ class nodeFieldType {
     public function __construct($inFieldName, $inDataType, $inValidator, array $inValidatorOptions, $inSanitizer, $inSanitizerParameterForData, array $inSanitizerOptions) {
         $inValidator = preg_replace('/\s+/', '', strip_tags($inValidator));
         $inSanitizer = preg_replace('/\s+/', '', strip_tags($inSanitizer));
-        $test = new validator($inValidator);
-        if(! $test->validatorExists()) {
+        if(! $this->validateValidator($inValidator)) {
             return;
         }
-        unset($test);
-        $test = new general($inSanitizer);
-        if(! $test->functionsExists()) {
+        if(! $this->validateSanitizer($inSanitizer)) {
             return;
         }
-        unset($test);
         $this->fieldName = preg_replace('/\s+/', '', strip_tags($inFieldName));
         $this->dataType = preg_replace('/\s+/', '', strip_tags($inDataType));
         $this->validator = $inValidator;
@@ -47,11 +43,9 @@ class nodeFieldType {
     }
     public function setValidator($inValidator) {
         $inValidator = preg_replace('/\s+/', '', strip_tags($inValidator));
-        $validator = new validator($inValidator);
-        if(! $validator->validatorExists()) {
+        if(! $this->validateValidator($inValidator)) {
             return;
         }
-        unset($validator);
         $this->validator = $inValidator;
     }
     public function getSanitizer() {
@@ -59,11 +53,9 @@ class nodeFieldType {
     }
     public function setSanitizer($inSanitizer) {
         $inSanitizer = preg_replace('/\s+/', '', strip_tags($inSanitizer));
-        $sanitizer = new general($inSanitizer);
-        if(! $sanitizer->functionsExists()) {
+        if(! $this->validateSanitizer($inSanitizer)) {
             return;
         }
-        unset($sanitizer);
         $this->sanitizer = $inSanitizer;
     }
     public function getValidatorOptions() {
@@ -103,5 +95,19 @@ class nodeFieldType {
         $toReturn = $sanitizer->run($this->sanitizerOptions);
         unset($this->sanitizerOptions[$this->sanitizerParameterForData]);
         return $toReturn;
+    }
+    private function validateValidator($inValidator) {
+        $test = new validator($inValidator);
+        if(! $test->validatorExists()) {
+            return false;
+        }
+        return true;
+    }
+    private function validateSanitizer($inSanitizer) {
+        $test = new general($inSanitizer);
+        if(! $test->functionsExists()) {
+            return false;
+        }
+        return true;
     }
 }

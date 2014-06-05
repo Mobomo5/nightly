@@ -112,6 +112,8 @@ class bootstrap {
         require_once(USER_ENGINE_OBJECT_FILE);
         require_once(CURRENT_USER_OBJECT_FILE);
         require_once(LINK_OBJECT_FILE);
+        require_once(PERMISSION_ENGINE_OBJECT_FILE);
+        require_once(PERMISSION_OBJECT_FILE);
     }
 
     private function connectDatabase() {
@@ -143,6 +145,12 @@ class bootstrap {
         define('SITE_EMAIL', $this->site->getEmail());
         define('SITE_TITLE', $this->site->getTitle());
         date_default_timezone_set($this->site->getTimeZone());
+
+        if($this->site->isInMaintenanceMode()) {
+            if(! permissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
+                return;
+            }
+        }
 
         $blockEngine = blockEngine::getInstance();
         $user = currentUser::getUserSession()->toUser();
@@ -196,6 +204,12 @@ class bootstrap {
         $loader->addPath(EDUCASK_ROOT . '/includes/baseThemes');
         $twig = new Twig_Environment($loader, array('debug' => true,));
         $twig->addExtension(new Twig_Extension_Debug());
+        if($this->site->isInMaintenanceMode()) {
+            if(! permissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
+                echo $twig->render('maintenance.twig', array('site' => $this->site));
+                return;
+            }
+        }
         echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
 

@@ -20,6 +20,7 @@ class site {
     private $guestRoleID;
     private $cleanURLs;
     private $timeZone;
+    private $maintenanceMode;
     //@TODO: Add Cron Stuff
     //@TODO: Add logo and favicon.
 
@@ -51,6 +52,7 @@ class site {
         $variablesWanted[] = 'guestRoleID';
         $variablesWanted[] = 'cleanURLsEnabled';
         $variablesWanted[] = 'siteTimeZone';
+        $variablesWanted[] = 'maintenanceMode';
         //@TODO: Add Cron Stuff
         $variables = $variableEngine->getVariables($variablesWanted);
         $this->title = $variables['siteTitle'];
@@ -63,6 +65,7 @@ class site {
         $this->guestRoleID = $variables['guestRoleID'];
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
+        $this->maintenanceMode = $variables['maintenanceMode'];
         //@TODO: Add Cron Stuff
     }
 
@@ -236,6 +239,31 @@ class site {
         }
         $this->timeZone->save();
         self::setInstance($this);
+    }
+    public function isInMaintenanceMode() {
+        if($this->maintenanceMode->getValue() != 'true') {
+            return false;
+        }
+        return true;
+    }
+    public function setMaintenanceMode($maintenanceMode = false) {
+        if(! is_bool($maintenanceMode)) {
+            return false;
+        }
+        if($maintenanceMode == false) {
+            if (!$this->timeZone->setValue('false')) {
+                return false;
+            }
+            $this->maintenanceMode->save();
+            self::setInstance($this);
+            return true;
+        }
+        if (!$this->timeZone->setValue('true')) {
+            return false;
+        }
+        $this->maintenanceMode->save();
+        self::setInstance($this);
+        return true;
     }
     //@TODO: Add Cron Stuff
 }

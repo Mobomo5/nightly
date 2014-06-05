@@ -4,11 +4,16 @@
     <link rel="icon" type="image/png" href="{{ site.getBaseDirectory }}includes/images/favicon.png">
 {% endblock %}
 {% block body %}
-    {% if blocks.home is defined %}
-        {% include "homepage.twig" %}
-    {% else %}
-        {% include "default.twig" %}
-    {% endif %}
+    <div id="mainContent">
+        {#check for notices. Print any here.#}
+        {% block notices %}
+            {% include 'notices.twig' %}
+        {% endblock %}
+
+        <h2>Down for Maintenance</h2>
+
+        <p>Sorry, but {{ site.getTitle() }} is down for maintenance. Please check back soon.</p>
+    </div>
 
     {% block footer %}
         {% include 'footer.twig' %}
