@@ -95,4 +95,7 @@ class login implements block {
 
     }
 
+    public function getType() {
+        return get_class(self);
+    }
 }

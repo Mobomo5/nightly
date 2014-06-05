@@ -28,4 +28,8 @@ class default1 implements block {
     public function getContent() {
         // TODO: Implement getContent() method.
     }
+
+    public function getType() {
+        return 'homepageBlock';
+    }
 }

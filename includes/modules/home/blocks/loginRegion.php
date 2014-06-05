@@ -18,7 +18,7 @@ class loginRegion implements block {
 
         $user = currentUser::getUserSession()->toUser();
 
-        if ($user->getRoleID() == GUEST_ROLE_ID){
+        if ($user->getRoleID() == GUEST_ROLE_ID) {
             // You ain't logged in. Convince them to log in.
             $this->title = 'Click here to log in';
             $this->href = '#login-modal';
@@ -42,11 +42,11 @@ class loginRegion implements block {
         return $this->title;
     }
 
-    public function getCssClass(){
+    public function getCssClass() {
         return $this->css;
     }
 
-    public function getHref(){
+    public function getHref() {
         return $this->href;
     }
 
@@ -56,5 +56,9 @@ class loginRegion implements block {
 
     public function getContent() {
         return $this->content;
+    }
+
+    public function getType() {
+        return 'homepageBlock';
     }
 }

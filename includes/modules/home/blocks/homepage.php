@@ -65,4 +65,8 @@ class homepage implements block {
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
     }
+
+    public function getType() {
+        return 'homepageBlock';
+    }
 }

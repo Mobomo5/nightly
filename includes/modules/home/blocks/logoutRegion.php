@@ -34,4 +34,8 @@ class logoutRegion implements block {
     public function getHref() {
         return $this->href->getHref();
     }
+
+    public function getType() {
+        return 'homepageBlock';
+    }
 }

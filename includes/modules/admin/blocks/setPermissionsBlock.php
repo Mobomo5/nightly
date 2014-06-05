@@ -3,19 +3,21 @@
 /**
  * Created by PhpStorm.
  * User: Craig
- * Date: 6/2/14
- * Time: 9:25 PM
+ * Date: 6/4/14
+ * Time: 10:54 PM
  */
-class menuBlock implements block {
-
+class setPermissionsBlock implements block {
+    //@todo: can we find a way to override the region in the block?
     private $content;
+    private $title;
 
     public function __construct() {
-        $this->content = menuEngine::getInstance()->getMenu(1);
+        $this->content = 'Here is how you control who can do what and how!';
+        $this->title = "Set Permissions";
     }
 
     public function getTitle() {
-        // TODO: Implement getTitle() method.
+        return $this->title;
     }
 
     public function setTitle($inTitle) {
@@ -27,6 +29,6 @@ class menuBlock implements block {
     }
 
     public function getType() {
-        return get_class(self);
+        return get_class($this);
     }
 }

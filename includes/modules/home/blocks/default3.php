@@ -61,4 +61,8 @@ class default3 implements block {
     public function getReturnPage() {
         // TODO: Implement getReturnPage() method.
     }
+
+    public function getType() {
+        return 'homepageBlock';
+    }
 }

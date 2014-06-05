@@ -53,4 +53,8 @@ class statusBlock implements block {
     public function getContent() {
         return $this->content;
     }
+
+    public function getType() {
+        return get_class($this);
+    }
 }

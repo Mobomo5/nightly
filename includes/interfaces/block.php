@@ -8,7 +8,12 @@
  */
 interface block {
     public function __construct();
+
     public function getTitle();
+
     public function setTitle($inTitle);
+
     public function getContent();
+
+    public function getType();
 }

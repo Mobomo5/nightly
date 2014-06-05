@@ -27,4 +27,8 @@ class noticeBlock implements block {
         }
         return $this->content;
     }
+
+    public function getType() {
+        return get_class($this);
+    }
 }

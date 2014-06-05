@@ -1,10 +1,11 @@
-{% if blocks.statuses.0.content is not empty %}
-    <div id="statuses">
-        {% for status in blocks.statuses.0.content %}
-            <div class="status">By: <a href="{{ status.posterHref }}">{{ status.getPosterName }}</a>
-
-                <div class="status-body">{{ status.status }}</div>
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+<div id="statuses">
+    {% for status in blocks.content %}
+        <div class="status">
+            <div class="status-upper">By: <a href="{{ status.posterHref }}">{{ status.getPosterName }}</a></div>
+            <div class="status-lower">{{ status.status }}</div>
+            {% for status in blocks.childStatus %}
+                {% include 'statuses.twig' %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

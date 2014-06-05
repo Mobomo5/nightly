@@ -3,19 +3,21 @@
 /**
  * Created by PhpStorm.
  * User: Craig
- * Date: 6/2/14
- * Time: 9:25 PM
+ * Date: 6/4/14
+ * Time: 10:46 PM
  */
-class menuBlock implements block {
+class addStudentBlock implements block {
 
     private $content;
+    private $title;
 
     public function __construct() {
-        $this->content = menuEngine::getInstance()->getMenu(1);
+        $this->content = 'Here is where you add a student';
+        $this->title = 'Add a student';
     }
 
     public function getTitle() {
-        // TODO: Implement getTitle() method.
+        return $this->title;
     }
 
     public function setTitle($inTitle) {
@@ -27,6 +29,6 @@ class menuBlock implements block {
     }
 
     public function getType() {
-        return get_class(self);
+        return get_class($this);
     }
 }

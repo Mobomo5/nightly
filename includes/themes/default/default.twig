@@ -1,61 +1,104 @@
 {% block body %}
-    <div id="wrapper">
-    {% block titlebar %}
-        <div id="titlebar">
-            <ul>
-                <li><a id="logo" href="{{ site.getBaseDirectory }}"></a></li>
-                {{ blocks.menus.0.content|raw }}
-                <li id="flex-end">
-                    <form action="#" id="search-box" method="post">
-                        <input name="text" type="text"/><input type="submit" value="Submit  "/>
-                    </form>
-                    {{ blocks.login.0.button|raw }}
-                </li>
-            </ul>
+    <div id="titlebar">
+        <ul>
+            <li><a id="logo" href="{{ site.getBaseDirectory }}"></a></li>
+            {{ blocks.menus.0.content|raw }}
+            <li id="flex-end">
+                <form action="#" id="search-box" method="post">
+                    <input name="text" type="text"/><input type="submit" value="Submit  "/>
+                </form>
+                {{ blocks.login.0.button|raw }}
+            </li>
+        </ul>
 
-        </div>
-    {% endblock %}
+    </div>
 
 
     <div id="mainContent">
 
-        {#check for notices. Print any here.#}
-        {% block notices %}
-            {% include 'notices.twig' %}
-        {% endblock %}
+        {#check for items in the top. Print any here.#}
+        {% if blocks.top.0.content is not empty %}
+            <div class="block-top">
+                {% for blocks in blocks.top %}
+                    {% if blocks.content is not empty %}
+                        {% if blocks.type == 'noticeBlock' %}
+                            {% include 'notices.twig' %}
+                        {% elseif blocks.type == 'imageBlock' %}
+                            {% include 'image.twig' %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
 
 
-        <h2>{{ blocks.main.0.title| raw | title }}</h2>
+        {#main block#}
+        {% if blocks.main is not empty %}
+            {% for blocks in blocks.main %}
+                {% if blocks.content is not empty %}
+                    <h2>{{ blocks.title| raw | title }}</h2>
+                    <p>{{ blocks.content|raw }}</p>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
 
-        <p>{{ blocks.main.0.content|raw }}</p>
 
+        {#split blocks#}
+        {% if blocks.left is not empty %}
+            <div class="block-split-left">
+                {% for blocks in blocks.left %}
+                    {% if blocks.content is not empty %}
+                        <h2>{{ blocks.title| raw | title }}</h2>
+                        <p>{{ blocks.content|raw }}</p>
+
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if blocks.right is not empty %}
+            <div class="block-split-right">
+                {% for blocks in blocks.right %}
+                    {% if blocks.content is not empty %}
+                        <h2>{{ blocks.title| raw | title }}</h2>
+                        <p>{{ blocks.content|raw }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {#check for statuses. Print any here.#}
-        {% for blocks in blocks.bottom %}
-            <p>{{ dump(blocks) }}</p>
-        {% endfor %}
-        {% block statuses %}
-            {% include 'statuses.twig' %}
-        {% endblock %}
+
+        {% if blocks.bottom.0.content is not empty %}
+            <div class="block-bottom">
+                {% for blocks in blocks.bottom %}
+                    {% if blocks.content is not empty %}
+                        {% if blocks.type == 'statusBlock' %}
+                            {% include 'statuses.twig' %}
+                        {% elseif blocks.type == 'imageBlock' %}
+                            {% include 'image.twig' %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
 
     </div>
+
+    {% if blocks.sidebar is not empty %}
+        <div id="sidebar">
+            <ul>
+                {% for block in blocks.sidebar %}
+                    {% for link in block.content %}
+                        <li><a href="{{ link.href }}">{{ link.title|title }}</a></li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
     <div id="login-modal" style="display: none;">
         {{ blocks.login.0.content|raw }}
     </div>
-    {% block sidebar %}
-        <div id="sidebar">
-            <ul>
-                <li>SIDEBAR!</li>
-                {# again, iterate through blocks to look for sidebar menu items.#}
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-                <li><a href="{{ href }}">List1</a></li>
-            </ul>
-        </div>
-    {% endblock %}
-
-
-    </div> {#// wrapper#}
 {% endblock %}

@@ -3,15 +3,17 @@
 /**
  * Created by PhpStorm.
  * User: Craig
- * Date: 6/2/14
- * Time: 9:25 PM
+ * Date: 6/4/14
+ * Time: 10:19 PM
  */
-class menuBlock implements block {
+class sidebarBlock implements block {
 
     private $content;
 
     public function __construct() {
-        $this->content = menuEngine::getInstance()->getMenu(1);
+        for ($i = 0; $i < 10; $i++) {
+            $this->content[] = array('href' => $i, 'title' => 'Title' . $i);
+        }
     }
 
     public function getTitle() {
@@ -27,6 +29,6 @@ class menuBlock implements block {
     }
 
     public function getType() {
-        return get_class(self);
+        return get_class($this);
     }
 }
