@@ -30,7 +30,7 @@ class nodeType {
                 continue;
             }
             $objectsClass = get_class($nodeField);
-            if($objectsClass != 'nodeField') {
+            if($objectsClass != 'nodeFieldType') {
                 continue;
             }
             $validatedNodeFields[] = $nodeField;
@@ -76,10 +76,10 @@ class nodeType {
     public function getAddedFields() {
         return $this->addedFields;
     }
-    public function addNodeField(nodeField $inNodeField) {
+    public function addNodeField(nodeFieldType $inNodeField) {
         //Get out of here if the field is already part of this nodeType.
         foreach($this->nodeFields as $nodeField) {
-            if($inNodeField->getID() != $nodeField->getID()) {
+            if($inNodeField->getFieldName() != $nodeField->getFieldName()) {
                 continue;
             }
             return;
@@ -90,9 +90,9 @@ class nodeType {
     public function getRemovedFields() {
         return $this->deletedFields;
     }
-    public function removeNodeField(nodeField $inNodeField) {
+    public function removeNodeField(nodeFieldType $inNodeField) {
         foreach($this->nodeFields as $nodeField) {
-            if($inNodeField->getID() != $nodeField->getID()) {
+            if($inNodeField->getFieldName() != $nodeField->getFieldName()) {
                 continue;
             }
             $this->deletedFields[] = $inNodeField;
