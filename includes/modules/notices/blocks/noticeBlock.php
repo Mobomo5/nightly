@@ -7,7 +7,7 @@
  * Time: 9:46 PM
  */
 class noticeBlock implements block {
-    private $content;
+    private $content = array();
 
     public function __construct() {
         $this->content = noticeEngine::getInstance()->getNotices();

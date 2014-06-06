@@ -17,7 +17,6 @@
     <div id="mainContent">
 
         {#check for items in the top. Print any here.#}
-        {{ dump(blocks.top) }}
         {% if blocks.top.0.content is not empty %}
             <div class="block-top">
                 {% for blocks in blocks.top %}
@@ -53,7 +52,7 @@
                             <h3>{{ blocks.title| raw | title }}</h3>
                             <p>{{ blocks.content|raw }}</p>
 
-                    {% endif %}
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -66,9 +65,9 @@
                         {% if blocks.content is not empty %}
                             <h3>{{ blocks.title| raw | title }}</h3>
                             <p>{{ blocks.content|raw }}</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         {% endif %}
 

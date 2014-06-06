@@ -105,6 +105,7 @@ class bootstrap {
         require_once(BLOCK_ENGINE_OBJECT_FILE);
         require_once(MODULE_ENGINE_OBJECT_FILE);
         require_once(STATUS_ENGINE_OBJECT_FILE);
+        require_once(NOTICE_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
         require_once(MENU_ENGINE_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);

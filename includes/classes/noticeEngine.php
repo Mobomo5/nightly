@@ -6,6 +6,9 @@
  * Date: 4/16/14
  * Time: 9:31 PM
  */
+
+require_once(NOTICE_OBJECT_FILE);
+
 class noticeEngine {
     private $notices;
 
