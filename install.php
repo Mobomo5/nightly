@@ -45,9 +45,6 @@ function getContent() {
     //if(is_file('includes/config.php')) {
     //    return '<p>Educask is already installed. If you wish to overwrite the install, please delete includes/config.php</p>';
     //}
-    if (! phpTest()) {
-        return '<h1>Please Update PHP</h1><p>Sorry, I can\'t make Educask work on your version of PHP. Please consider updating to the latest version of PHP.</p>';
-    }
     $action = getAction();
     $function = $action . 'Content';
     if(function_exists($function)) {
@@ -70,10 +67,12 @@ function welcomeContent() {
 function requirementContent() {
     $requirements = array(
         array('name' => 'PHP', 'testFunction' => 'phpTest', 'explanationFunction' => 'phpTestExp'),
-        array('name' => 'register_globals', 'testFunction' => 'registerGlobalsTest', 'explanationFunction' => 'registerGlobalsExp')
+        array('name' => 'register_globals', 'testFunction' => 'registerGlobalsTest', 'explanationFunction' => 'registerGlobalsExp'),
+        array('name' => 'PHP Extensions', 'testFunction' => 'phpExtensionTest', 'explanationFunction' => 'phpExtensionExp')
     );
     $anyFailed = false;
     $toReturn = '<h1>Requirements</h1>';
+    $toReturn .= '<p>Below is a list of requirements. All rows need to be green in order to continue. If any row is red, please read the appropriate documentation.</p>';
     $toReturn .= '<table>';
     $toReturn .= '<tr><td>Requirement:</td><td>Explanation:</td></tr>';
     foreach ($requirements as $requirement) {
@@ -85,7 +84,9 @@ function requirementContent() {
         }
         $success = $requirement['testFunction']();
         $explanation = $requirement['explanationFunction']();
+        $explanation = strip_tags($explanation, '<a> <ul> <li>');
         $name = $requirement['name'];
+        $name = strip_tags($name);
         if($success == false) {
             $anyFailed = true;
             $toReturn .= "<tr class=\"failed\"><td>{$name}</td><td>{$explanation}</td></tr>";
@@ -143,9 +144,42 @@ function registerGlobalsTest() {
 }
 function registerGlobalsExp() {
     if(! registerGlobalsTest()) {
-        return 'Please turn register_globals off in the php.ini file or in a .htaccess file. Please see <a href="http://ca1.php.net/manual/en/security.registerglobals.php">this page</a> for more information.';
+        return 'Please turn register_globals off in the php.ini file or in a .htaccess file. Please see <a href="http://ca1.php.net/manual/en/security.registerglobals.php" target="_blank">this page</a> for more information.';
     }
     return 'register_globals is turned off.';
+}
+function phpExtensionTest($returnArrayOfFailed = false) {
+    if(! is_bool($returnArrayOfFailed)) {
+        return false;
+    }
+    $extensionsToTest = array('xml', 'zip', 'session', 'hash', 'Core', 'calendar', 'json', 'date');
+    $failed = array();
+    foreach($extensionsToTest as $extension) {
+        if(extension_loaded($extension) == true) {
+            continue;
+        }
+        $failed[] = $extension;
+    }
+    if($returnArrayOfFailed == true) {
+        return $failed;
+    }
+    if(! empty($failed)) {
+        return false;
+    }
+    return true;
+}
+function phpExtensionExp() {
+    $extensionsFailed = phpExtensionTest(true);
+    if(empty($extensionsFailed)) {
+        return 'All needed PHP extensions are ready for use!';
+    }
+    $toReturn = 'I detected that some of the PHP extensions I need aren\'t available:';
+    $toReturn .= '<ul>';
+    foreach($extensionsFailed as $extension) {
+        $toReturn .= "<li>{$extension} is not installed or enabled.</li>";
+    }
+    $toReturn .= '</ul>';
+    return $toReturn;
 }
 if(! isset($_GET['action'])) {
     header('Location: install.php?action=welcome');
