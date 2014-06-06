@@ -26,9 +26,7 @@ class permissionEngine {
     }
 
     public function getPermission($inPermissionName) {
-        if (preg_match('/\s+/', $inPermissionName)) {
-            return false;
-        }
+        $inPermissionName = preg_replace('/\s+/', '', $inPermissionName);
         if (!empty($this->retrievedPermissions[$inPermissionName])) {
             return $this->retrievedPermissions[$inPermissionName];
         }

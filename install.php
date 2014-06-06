@@ -5,11 +5,29 @@
  * Date: 02/06/14
  * Time: 9:37 PM
  */
+ob_start();
+session_start();
 define('EDUCASK_ROOT', getcwd());
 define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
 define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
 require_once(DATABASE_OBJECT_FILE);
 require_once(DATABASE_INTERFACE_FILE);
+function getErrorDiv() {
+    if(! isset($_SESSION['errors'])) {
+        return '';
+    }
+    if(empty($_SESSION['errors'])) {
+        return '';
+    }
+    $toReturn = '<div id="errors"><ul>';
+    foreach($_SESSION['errors'] as $error) {
+        $error = strip_tags($error, '<a>');
+        $toReturn .= "<li>{$error}</li>";
+    }
+    $toReturn .= '</ul></div>';
+    unset($_SESSION['errors']);
+    return $toReturn;
+}
 function getDatabaseEngines() {
     $engines = array();
     foreach(glob('includes/databases/*.php') as $dbEngine) {
@@ -34,6 +52,9 @@ function validateAction() {
         return true;
     }
     if ($action == 'database') {
+        return true;
+    }
+    if ($action == 'doDatabase') {
         return true;
     }
     if ($action == 'configure') {
@@ -78,9 +99,14 @@ function welcomeContent() {
     }
     $toReturn .= "<div id=\"license\"><pre>{$license}</pre></div>";
     $toReturn .= '<p><a class="button" href="install.php?action=requirement">I Agree - Continue</a></p>';
+    $_SESSION['welcomeComplete'] = true;
     return $toReturn;
 }
 function requirementContent() {
+    if(! isset($_SESSION['welcomeComplete'])) {
+        header('Location: install.php?action=welcome');
+        return;
+    }
     $requirements = array(
         array('name' => 'PHP', 'testFunction' => 'phpTest', 'explanationFunction' => 'phpTestExp'),
         array('name' => 'Memory Limit', 'testFunction' => 'memoryLimitTest', 'explanationFunction' => 'memoryLimitExp'),
@@ -120,27 +146,146 @@ function requirementContent() {
         return $toReturn;
     }
     $toReturn .= '<p><a class="button" href="install.php?action=database">Continue</a></p>';
+    $_SESSION['requirementsComplete'] = true;
     return $toReturn;
 }
 function databaseContent() {
+    if(! isset($_SESSION['requirementsComplete'])) {
+        header('Location: install.php?action=requirement');
+        return;
+    }
     $toReturn = '<h1>Database</h1>';
-    $toReturn .= '<p><a class="button" href="install.php?action=configure">Continue</a></p>';
+    $toReturn .= getErrorDiv();
+    $toReturn .= '<p>This form prepares the database for Educask.</p>';
+    $toReturn .= '<form action="install.php?action=doDatabase" method="POST">';
+    $toReturn .= '<p>Database Engine:</p>';
+    $toReturn .= '<select class="formDrop" name="engine" id="engine">';
+    $engines = getDatabaseEngines();
+    foreach($engines as $engine) {
+        $canUse = testDatabaseModule($engine);
+        if(! $canUse) {
+            continue;
+        }
+        $toReturn .= "<option value=\"{$engine}\">{$engine}</option>";
+    }
+    $toReturn .= '</select>';
+    $toReturn .= '<p>Server:</p>';
+    $toReturn .= '<input type="text" id="server" name="server" value="localhost" class="formtext">';
+    $toReturn .= '<p>Database:</p>';
+    $toReturn .= '<input type="text" id="database" name="database" value="educask" class="formtext">';
+    $toReturn .= '<p>Username:</p>';
+    $toReturn .= '<input type="text" id="username" name="username" class="formtext">';
+    $toReturn .= '<p>Password:</p>';
+    $toReturn .= '<input type="password" id="password1" name="password1" class="formtext">';
+    $toReturn .= '<p>Confirm Password:</p>';
+    $toReturn .= '<input type="password" id="password2" name="password2" class="formtext">';
+    $toReturn .= '<br><input type="submit" class="formbutton" value="Save">';
+    $toReturn .= '</form>';
+    $_SESSION['databaseComplete'] = true;
     return $toReturn;
 }
+function doDatabaseContent() {
+    if(! isset($_POST['engine'])) {
+        unset($_SESSION['databaseComplete']);
+        header('Location: install.php?action=database');
+        return;
+    }
+    if(! isset($_POST['server'])) {
+        unset($_SESSION['databaseComplete']);
+        header('Location: install.php?action=database');
+        return;
+    }
+    if(! isset($_POST['database'])) {
+        unset($_SESSION['databaseComplete']);
+        header('Location: install.php?action=database');
+        return;
+    }
+    if(! isset($_POST['username'])) {
+        unset($_SESSION['databaseComplete']);
+        header('Location: install.php?action=database');
+        return;
+    }
+    if(! isset($_POST['password1'])) {
+        unset($_SESSION['databaseComplete']);
+        header('Location: install.php?action=database');
+        return;
+    }
+    if(! isset($_POST['password2'])) {
+        unset($_SESSION['databaseComplete']);
+        header('Location: install.php?action=database');
+        return;
+    }
+    if($_POST['password1'] != $_POST['password2']) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'The inputted passwords don\'t match.';
+        header('Location: install.php?action=database');
+        return;
+    }
+    $engine = str_replace('..', '', preg_replace('/\s+/', '', $_POST['engine']));
+    $server = preg_replace('/\s+/', '', $_POST['server']);
+    $database = preg_replace('/\s+/', '', $_POST['database']);
+    $userName =  preg_replace('/\s+/', '', $_POST['username']);
+    $password = preg_replace('/\s+/', '', $_POST['password1']);
+    $file = EDUCASK_ROOT . '/includes/config.php';
+    $content = '<?php
+                /**
+                * Created by PhpStorm.
+                * User: Keegan Laur
+                * Date: 4/9/14
+                * Time: 6:45 PM
+                */
+                //Basic site configuration - currently only contains variables needed to connect to the site\'s database
+                $dbServer = \'' . $server . '\';
+                $db = \'' . $database . '\';
+                $dbUserName = \'' . $userName . '\';
+                $dbPassword = \'' . $password . '\'; //Change password when account and database created.
+                $dbType = \'' . $engine . '\';';
+    //@ToDo: uncomment these lines
+    /*if(file_put_contents($file, $content) == false) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t write the config file. Please make sure that includes/config.php is a file that can be written to by PHP.';
+        header('Location: install.php?action=database');
+        return;
+    }*/
+    $database = database::getInstance();
+    $database->connect();
+    if(! $database->isConnected()) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t connect to the database. Please try again.';
+        header('Location: install.php?action=database');
+        return;
+    }
+    header('Location: install.php?action=configure');
+}
 function configureContent() {
+    if(! isset($_SESSION['databaseComplete'])) {
+        header('Location: install.php?action=database');
+        return;
+    }
     $toReturn = '<h1>Configure</h1>';
     $toReturn .= '<p><a class="button" href="install.php?action=install">Continue</a></p>';
+    $_SESSION['configureComplete'] = true;
     return $toReturn;
 }
 function installContent() {
+    if(! isset($_SESSION['configureComplete'])) {
+        header('Location: install.php?action=configure');
+        return;
+    }
     $toReturn = '<h1>Install</h1>';
     $toReturn .= '<p><a class="button" href="install.php?action=finish">Continue</a></p>';
+    $_SESSION['installComplete'] = true;
     return $toReturn;
 }
 function finishContent() {
+    if(! isset($_SESSION['installComplete'])) {
+        header('Location: install.php?action=install');
+        return;
+    }
     $toReturn = '<h1>All Done</h1>';
     $toReturn .= '<p>Congratulations! Educask is now installed!</p>';
     $toReturn .= '<p><a class="button" href="index.php">Visit the Site</a></p>';
+    destroy_session();
     return $toReturn;
 }
 function phpTest() {
@@ -307,6 +452,7 @@ function configFileExp() {
     }
     return 'The configuration file is ready for settings.';
 }
+//Function borrowed from http://www.php.net/manual/en/function.ini-get.php#106518
 function returnBytes($val) {
     if (empty($val)) {
         return 0;
@@ -455,7 +601,7 @@ if (!validateAction()) {
             cursor: pointer;
         }
 
-        .formtext, .formtextarea {
+        .formtext, .formtextarea, .formDrop {
             width: 762px;
             padding: 10px;
             font-size: 18px;
@@ -465,7 +611,7 @@ if (!validateAction()) {
             outline: none;
         }
 
-        .formtext:hover, .formtext:focus, .formtextarea:hover, .formtextarea:focus {
+        .formtext:hover, .formtext:focus, .formtextarea:hover, .formtextarea:focus, .formDrop:hover, .formDrop:focus {
             border: 2px #2580a2 solid;
             padding: 9px;
             color: black;
@@ -513,6 +659,12 @@ if (!validateAction()) {
         .failed {
             background-color: red;
         }
+
+        #errors {
+            color: white;
+            background-color: red;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -551,3 +703,4 @@ if (!validateAction()) {
 </div>
 </body>
 </html>
+<?php ob_flush();?>
