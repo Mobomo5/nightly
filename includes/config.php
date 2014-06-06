@@ -7,7 +7,7 @@
  */
 //Basic site configuration - currently only contains variables needed to connect to the site's database
 $dbServer = 'localhost';
-$db = 'test';
+$db = 'educask';
 $dbUserName = 'educaskDev';
 $dbPassword = 'jLzYawD9ERnnu9ma'; //Change password when account and database created.
 $dbType = 'mySQL';
