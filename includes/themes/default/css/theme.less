@@ -12,7 +12,7 @@
 @titlebarcolor: rgba(63, 65, 150, 0.97);
 @background: lighten(@titlebarcolor, 93%);
 @contentbackground: lighten(@titlebarcolor, 69%);
-@border: lighten(@titlebarcolor, 59.5%);
+@border: lighten(@titlebarcolor, 52.5%);
 @sidebarwidth: 10%;
 @sidebarcolor: lighten(@titlebarcolor, 59%);
 
@@ -348,12 +348,19 @@ body {
 
   }
   .block-split-left {
+    margin: 5px 0;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: solid 2px  @border;
+    background: @contentbackground;
     display: block;
     float: left;
-    background-color: red;
     width: 49.5%;
   }
   .block-split-right {
+    margin: 5px 0;
+    border-radius: 5px;
+    border: solid 2px  @border;
     display: block;
     float: right;
     background-color: yellow;

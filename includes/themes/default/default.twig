@@ -45,26 +45,26 @@
 
         {#split blocks#}
         {% if blocks.left is not empty %}
-            <div class="block-split-left">
                 {% for blocks in blocks.left %}
+                    <div class="block-split-left">
                     {% if blocks.content is not empty %}
                         <h2>{{ blocks.title| raw | title }}</h2>
                         <p>{{ blocks.content|raw }}</p>
 
                     {% endif %}
+                    </div>
                 {% endfor %}
-            </div>
         {% endif %}
 
         {% if blocks.right is not empty %}
-            <div class="block-split-right">
-                {% for blocks in blocks.right %}
-                    {% if blocks.content is not empty %}
+            {% for blocks in blocks.right %}
+                <div class="block-split-right">
+                {% if blocks.content is not empty %}
                         <h2>{{ blocks.title| raw | title }}</h2>
                         <p>{{ blocks.content|raw }}</p>
                     {% endif %}
-                {% endfor %}
-            </div>
+                </div>
+            {% endfor %}
         {% endif %}
 
         {#check for statuses. Print any here.#}
