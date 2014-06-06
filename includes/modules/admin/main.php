@@ -25,16 +25,15 @@ class admin implements module {
         }
 
         // check post. If there is anything in there, do it.
-        // if the doPost returns a false, throw a 404
-        if (!empty($_POST)) {
-            if (!$this->doPOST()) {
-                $this->forceFourOhFour = true;
-                return false;
-            }
-        }
+//        // if the doPost returns a false, throw a 404
+//        if (!empty($_POST)) {
+//            if (!$this->doPOST()) {
+//                $this->forceFourOhFour = true;
+//                return false;
+//            }
+//        }
 
         $this->title = 'Admin';
-        $this->content = 'content.';
 
     }
 
@@ -63,6 +62,5 @@ class admin implements module {
     }
 
     private function doPOST() {
-        $function = $_POST['function'];
     }
 }

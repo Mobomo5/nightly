@@ -17,6 +17,7 @@
     <div id="mainContent">
 
         {#check for items in the top. Print any here.#}
+        {{ dump(blocks.top) }}
         {% if blocks.top.0.content is not empty %}
             <div class="block-top">
                 {% for blocks in blocks.top %}
@@ -45,26 +46,30 @@
 
         {#split blocks#}
         {% if blocks.left is not empty %}
+            <div class="split-left">
                 {% for blocks in blocks.left %}
-                    <div class="block-split-left">
-                    {% if blocks.content is not empty %}
-                        <h2>{{ blocks.title| raw | title }}</h2>
-                        <p>{{ blocks.content|raw }}</p>
+                    <div class="block">
+                        {% if blocks.content is not empty %}
+                            <h3>{{ blocks.title| raw | title }}</h3>
+                            <p>{{ blocks.content|raw }}</p>
 
                     {% endif %}
                     </div>
                 {% endfor %}
+            </div>
         {% endif %}
 
         {% if blocks.right is not empty %}
-            {% for blocks in blocks.right %}
-                <div class="block-split-right">
-                {% if blocks.content is not empty %}
-                        <h2>{{ blocks.title| raw | title }}</h2>
-                        <p>{{ blocks.content|raw }}</p>
+            <div class="split-right">
+                {% for blocks in blocks.right %}
+                    <div class="block">
+                        {% if blocks.content is not empty %}
+                            <h3>{{ blocks.title| raw | title }}</h3>
+                            <p>{{ blocks.content|raw }}</p>
                     {% endif %}
                 </div>
             {% endfor %}
+            </div>
         {% endif %}
 
         {#check for statuses. Print any here.#}

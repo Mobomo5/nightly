@@ -4,12 +4,14 @@
     <link rel="icon" type="image/png" href="{{ site.getBaseDirectory }}includes/images/favicon.png">
 {% endblock %}
 {% block body %}
-    {% if blocks.home is defined %}
+    <div id="wrapper">
+        {% if blocks.home is defined %}
         {% include "homepage.twig" %}
     {% else %}
         {% include "default.twig" %}
     {% endif %}
-
+        <div id="push"></div>
+    </div>
     {% block footer %}
         {% include 'footer.twig' %}
     {% endblock %}
