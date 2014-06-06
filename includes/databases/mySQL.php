@@ -25,6 +25,9 @@ class mySQL implements databaseInterface {
         }
         return self::$instance;
     }
+    public static function getRequiredPHPDatabaseModule() {
+        return 'mysqli';
+    }
 
     private function __construct() {
         //Do nothing;

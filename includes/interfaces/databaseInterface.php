@@ -10,6 +10,7 @@
  */
 interface databaseInterface {
     public static function getInstance();
+    public static function getRequiredPHPDatabaseModule();
     public function isConnected();
     public function connect();
     function disconnect();
