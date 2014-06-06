@@ -1,8 +1,6 @@
 <?php
 
 require_once(DATABASE_INTERFACE_FILE);
-require_once(NOTICE_ENGINE_OBJECT_FILE);
-require_once(NOTICE_OBJECT_FILE);
 
 /**
  * Created by JetBrains PhpStorm.
@@ -32,6 +30,9 @@ class database implements databaseInterface {
             self::$instance = new database();
         }
         return self::$instance;
+    }
+    public static function getRequiredPHPDatabaseModule() {
+        return '';
     }
 
     private function __construct() {
