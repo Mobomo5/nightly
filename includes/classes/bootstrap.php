@@ -44,7 +44,7 @@ class bootstrap {
         $this->render();
     }
 
-    private function declareConstants() {
+    public function declareConstants() {
         define('SYSTEM_LOG_ANONYMOUS', 0);
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
         define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');

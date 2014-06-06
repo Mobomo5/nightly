@@ -8,8 +8,9 @@
 ob_start();
 session_start();
 define('EDUCASK_ROOT', getcwd());
-define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
-define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
+require_once(EDUCASK_ROOT . '/includes/classes/bootstrap.php');
+$boot = bootstrap::getInstance();
+$boot->declareConstants();
 require_once(DATABASE_OBJECT_FILE);
 require_once(DATABASE_INTERFACE_FILE);
 function getErrorDiv() {
