@@ -286,7 +286,7 @@ function finishContent() {
     $toReturn = '<h1>All Done</h1>';
     $toReturn .= '<p>Congratulations! Educask is now installed!</p>';
     $toReturn .= '<p><a class="button" href="index.php">Visit the Site</a></p>';
-    destroy_session();
+    session_destroy();
     return $toReturn;
 }
 function phpTest() {
