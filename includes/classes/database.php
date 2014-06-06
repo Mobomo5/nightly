@@ -113,7 +113,7 @@ class database implements databaseInterface {
      * @return bool
      */
     public function makeCustomQuery($inQuery) {
-        $result = $this->dbObject->query($inQuery);
+        $result = $this->dbObject->makeCustomQuery($inQuery);
         if (!$result) {
             return false;
         }

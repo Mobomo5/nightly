@@ -25,6 +25,7 @@ class mySQL implements databaseInterface {
         }
         return self::$instance;
     }
+
     public static function getRequiredPHPDatabaseModule() {
         return 'mysqli';
     }
@@ -85,8 +86,8 @@ class mySQL implements databaseInterface {
     /**
      * returns an associative array of values stored as $result[row][column]=>value
      *
-     * @param string $select
-     * @param string $from
+     * @param string       $select
+     * @param string       $from
      * @param mixed|string $where
      *
      * @throws Exception
@@ -109,6 +110,9 @@ class mySQL implements databaseInterface {
     public function makeCustomQuery($inQuery) {
         if (!($results = $this->mysqli->query($inQuery))) {
             return false;
+        }
+        if (!is_object($results)) {
+            return $results;
         }
         $resultsArray = $this->makeAssoc($results);
         return $resultsArray;
@@ -164,7 +168,9 @@ class mySQL implements databaseInterface {
     function getError() {
         return $this->mysqli->error;
     }
+
     function getLastInsertID() {
         return $this->mysqli->insert_id;
     }
+
 }

@@ -47,9 +47,13 @@ class setPermissionsBlock implements block {
     }
 
     private function getStepTwo() {
-        unset($_POST['permissionState']);
+        if (empty($_POST['permissionRole'])) {
+            $this->getStepOne();
+            return false;
+        }
 
         if (!is_numeric($_POST['permissionRole'])) {
+            $this->getStepOne();
             return false;
         }
 
@@ -60,25 +64,24 @@ class setPermissionsBlock implements block {
 
         $this->title .= ': ' . $results[0]['roleName'];
 
-        $this->content = '<table><tr><th>Permission</th><th>Allowed</th><th>Not Allowed</th></tr><form method="post">';
+        $this->content = '<table><tr><th>Permission</th><th>Allowed</th><th>Not Allowed</th></tr><form method="post" id="setPerm">';
         // display them with radio buttons
         foreach ($results as $permission) {
             if ($permission['canDo'] == 1) {
-                $this->content .= '<tr><td title="' . $permission['permissionDescription'] . '">' . $permission['humanName'] . '</td><td><input type="radio" name="' . $permission['permissionID'] . '" value = "1"checked></td><td><input type="radio" name="' . $permission['permissionID'] . '" value = "0"></td></tr>';
+                $this->content .= '<tr><td title="' . $permission['permissionDescription'] . '">' . $permission['humanName'] . '</td><td><input form="setPerm" type="radio" name="' . $permission['permissionID'] . '" value = "1"checked></td><td><input form="setPerm" type="radio" name="' . $permission['permissionID'] . '" value = "0"></td></tr>';
 
             } else {
-                $this->content .= '<tr><td title="' . $permission['permissionDescription'] . '">' . $permission['humanName'] . '</td><td><input type="radio" name="' . $permission['permissionID'] . '" value = "1"></td><td><input type="radio" name="' . $permission['permissionID'] . '" value = "0" checked></td></tr>';
+                $this->content .= '<tr><td title="' . $permission['permissionDescription'] . '">' . $permission['humanName'] . '</td><td><input form="setPerm" type="radio" name="' . $permission['permissionID'] . '" value = "1"></td><td><input form="setPerm" type="radio" name="' . $permission['permissionID'] . '" value = "0" checked></td></tr>';
             }
 
         }
 
-        $this->content .= '</table><input type="hidden" name="roleID" value="' . $roleID . '"><input type="hidden" name="permissionState" value="2"><input type="submit"><input type="reset" ><input type="button" value="Cancel" onclick="window.location.reload()" </form>';
-        return;
+        $this->content .= '</table><input form="setPerm" type="hidden" name="roleID" value="' . $roleID . '"><input form="setPerm" type="hidden" name="permissionState" value="2"><input form="setPerm" type="submit"><input form="setPerm" type="reset" ><input type="button" value="Cancel" onclick="window.location.reload()" </form>';
+
     }
 
     private function getStepThree() {
 
-        unset($_POST['permissionState']);
         $db = database::getInstance();
         $roleID = $db->escapeString($_POST['roleID']);
         foreach ($_POST as $permissionID => $canDo) {
@@ -96,19 +99,23 @@ class setPermissionsBlock implements block {
 
             // see if it should be changed?
 
-            $results = $db->getData('p.humanName', 'permissionSet s, permission p', "p.permissionID = s.permissionID AND s.permissionID = '$permissionID' AND s.roleID = '$roleID' AND s.canDo = '" . intval(!$canDo) . "'");
+            $results = $db->getData('p.humanName, r.roleName', 'permissionSet s, permission p, role r', "r.roleID = s.roleID AND p.permissionID = s.permissionID AND s.permissionID = '$permissionID' AND s.roleID = '$roleID' AND s.canDo = '" . intval(!$canDo) . "'");
             if (!$results) {
                 continue; // if it's in the results as above, that means it can be changed. This also allows us to use the permission name.
             }
 
+            $humanName = $results[0]['humanName'];
+            $roleName = $results[0]['roleName'];
+
             if (!$db->updateTable('permissionSet', "canDo =  '$canDo'", "roleID = '$roleID' AND permissionID ='$permissionID'")) {
-                noticeEngine::getInstance()->addNotice(new notice(noticeType::error, "'" . $results[0]['humanName'] . "' could not be updated."));
+                noticeEngine::getInstance()->addNotice(new notice(noticeType::error, "$humanName could not be updated for '$roleName'."));
             } else {
-                $notice = new notice(noticeType::positive, "'" . $results[0]['humanName'] . "' has been changed from " . intval(!$canDo) . " to " . intval($canDo) . '.');
+                $notice = new notice(noticeType::positive, "'$humanName' has been changed from " . intval(!$canDo) . " to " . intval($canDo) . " for '$roleName'.");
                 noticeEngine::getInstance()->addNotice($notice);
 
             }
         }
+        $this->getStepOne();
     }
 
     public function getTitle() {
