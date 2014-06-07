@@ -27,7 +27,7 @@ class addStudentBlock implements block {
                 $this->stepTwo();
                 break;
             case 2:
-                $this->stepThree();
+                $this->createUserFromSingle();
                 break;
             case 3:
                 $this->processCSV();
@@ -80,7 +80,35 @@ class addStudentBlock implements block {
         return true;
     }
 
-    private function stepThree() {
+    private function createUserFromSingle() {
+
+        $db = database::getInstance();
+        $results = $db->getData('roleID', 'role', "LOWER(roleName) = 'student'");
+        if (!$results) {
+            noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'Ensure the role "Student" has been created.'));
+            $this->stepOne();
+            return false;
+        }
+
+        $roleID = $results[0]['roleID'];
+
+        $firstName = $db->escapeString($_POST['firstName']);
+        $lastName = $db->escapeString($_POST['lastName']);
+        $email = $db->escapeString($_POST['email']); //@todo: validate email
+        $studentID = $db->escapeString($_POST['studentID']);
+        $birthday = date('Y-m-d', strtotime($_POST['birthday']));
+        $day = date('d', strtotime($_POST['birthday']));
+        $username = strtolower(substr($firstName, 0, 1) . $lastName . $day);
+
+        if (!$this->addUser($roleID, $studentID, $username, $firstName, $lastName, $email, $birthday)) {
+            $this->stepOne();
+            return false;
+        }
+
+        noticeEngine::getInstance()->addNotice(new notice(noticeType::positive, "User $firstName $lastName has been added as $username with the password $studentID."));
+        $this->stepOne();
+        return true;
+
     }
 
     private function getListForm() {
@@ -101,6 +129,7 @@ class addStudentBlock implements block {
                         <label for="firstName">First Name:</label><input type="text" form="singleForm" name="firstName"><br>
                         <label for="lastName">Last Name:</label><input type="text" name="lastName" form="singleForm"/><br>
                         <label for="email">Email:</label><input type="email" form="singleForm" name="email"/><br>
+                        <label for="birthday">Birthday:</label><input type="date" form="singleForm" name="birthday"/><br>
                         <label for="studentID">Student ID:</label><input type="text" name="studentID" form="singleForm"/>
                         <input type="hidden" name="addStudentState" form="singleForm" value="2">
                         <input type="submit" form="singleForm"></form>';
