@@ -348,6 +348,7 @@ body {
     width: 49%;
     margin: 5px 0;
     .block {
+      margin-bottom: 5px;
       box-sizing: border-box;
       padding: 0 2em;
       border-radius: 5px;
@@ -364,11 +365,15 @@ body {
     float: right;
     margin: 5px 0;
     .block {
+      margin-bottom: 5px;
       padding: 0 2em;
       box-sizing: border-box;
       border-radius: 5px;
       border: solid 2px  @border;
       background: @contentbackground;
+      input[type=checkbox] {
+        float: right;
+      }
     }
   }
   @media all and (max-device-width: 440px) {

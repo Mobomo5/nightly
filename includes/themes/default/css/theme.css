@@ -334,6 +334,7 @@ body {
 }
 
 #mainContent .split-left .block {
+    margin-bottom: 5px;
     box-sizing: border-box;
     padding: 0 2em;
     border-radius: 5px;
@@ -352,11 +353,16 @@ body {
 }
 
 #mainContent .split-right .block {
+    margin-bottom: 5px;
     padding: 0 2em;
     box-sizing: border-box;
     border-radius: 5px;
     border: solid 2px rgba(234, 235, 246, 0.97);
     background: rgba(255, 255, 255, 0.97);
+}
+
+#mainContent .split-right .block input[type=checkbox] {
+    float: right;
 }
 
 @media all and (max-device-width: 440px) {
