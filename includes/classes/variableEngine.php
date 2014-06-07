@@ -38,11 +38,11 @@ class variableEngine {
         if (count($variableValue) > 1) {
             return null;
         }
-        if ($variableValue == 1) {
-            $toReturn = new variable($variableName, $variableValue, true);
+        if ($variableValue[0]['readOnly'] == 1) {
+            $toReturn = new variable($variableName, $variableValue[0]['variableValue'], true);
             return $toReturn;
         }
-        $toReturn = new variable($variableName, $variableValue);
+        $toReturn = new variable($variableName, $variableValue[0]['variableValue']);
         return $toReturn;
     }
 
@@ -139,7 +139,7 @@ class variableEngine {
     }
 
     public function deleteVariable(variable $variableToDelete) {
-        if (!$variableToDelete->isReadOnly()) {
+        if ($variableToDelete->isReadOnly()) {
             return false;
         }
         $database = database::getInstance();
