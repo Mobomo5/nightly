@@ -30,7 +30,8 @@ class variableEngine {
             return null;
         }
         $variableName = $database->escapeString(htmlspecialchars($variableName));
-        $variableValue = $database->getData('variableValue, readOnly', 'variable', 'WHERE variableName=\'' . $variableName . '\'');
+
+        $variableValue = $database->getData('variableValue, readOnly', 'variable', 'variableName=\'' . $variableName . '\'');
         if ($variableValue == false) {
             return null;
         }
