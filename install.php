@@ -312,8 +312,34 @@ function configureContent() {
         header('Location: install.php?action=database');
         return;
     }
+    $address = $_SERVER['HTTP_HOST'];
+    $webDirectory = dirname($_SERVER['SCRIPT_NAME']);
     $toReturn = '<h1>Configure</h1>';
-    $toReturn .= '<p><a class="button" href="install.php?action=install">Continue</a></p>';
+    $toReturn .= getErrorDiv();
+    $toReturn .= '<p>This form prepares the first-time values for Educask.</p>';
+    $toReturn .= '<form action="install.php?action=doConfigure" method="POST">';
+    $toReturn .= '<p>Site name:</p>';
+    $toReturn .= '<input type="text" id="siteName" name="siteName" class="formtext" value="School Districts Educask">';
+    $toReturn .= '<p>Site email address:</p>';
+    $toReturn .= "<input type=\"email\" id=\"siteEmail\" name=\"siteEmail\" class=\"formtext\" value=\"noreply@{$address}\">";
+    $toReturn .= '<p>Non-secure web address:</p>';
+    $toReturn .= "<input type=\"url\" id=\"nonSecureURL\" name=\"nonSecureURL\" class=\"formtext\" value=\"http://{$address}\">";
+    $toReturn .= '<p>Secure web address:</p>';
+    $toReturn .= "<input type=\"url\" id=\"secureURL\" name=\"secureURL\" class=\"formtext\" value=\"https://{$address}\">";
+    $toReturn .= '<p>Site web directory:</p>';
+    $toReturn .= "<input type=\"text\" id=\"webDirectory\" name=\"webDirectory\" class=\"formtext\" value=\"{$webDirectory}\">";
+    $timeZones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
+    $toReturn .= '<p>The timezone for your website:</p>';
+    $toReturn .= '<select class="formDrop" name="timeZone" id="timeZone">';
+    foreach($timeZones as $timeZone) {
+        if($timeZone == 'America/Vancouver') {
+            $toReturn .= "<option value=\"{$timeZone}\" selected>{$timeZone}</option>";
+            continue;
+        }
+        $toReturn .= "<option value=\"{$timeZone}\">{$timeZone}</option>";
+    }
+    $toReturn .= '</select>';
+    $toReturn .= '</form>';
     $_SESSION['configureComplete'] = true;
     return $toReturn;
 }
