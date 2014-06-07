@@ -75,6 +75,9 @@ function getCurrentCss($step) {
     if ($action == $step) {
         return 'class="current"';
     }
+    if($action == 'do' . ucfirst($step)) {
+        return 'class="current"';
+    }
     return '';
 }
 function getContent() {
@@ -256,6 +259,52 @@ function doDatabaseContent() {
         header('Location: install.php?action=database');
         return;
     }
+    $sqlScript = EDUCASK_ROOT . '/educaskInstallSafe.sql';
+    if(! is_file($sqlScript)) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t find the SQL script to create the needed tables. Please make sure that educaskInstallSafe.sql exists and is readable by PHP.';
+        header('Location: install.php?action=database');
+        return;
+    }
+    $sql = file_get_contents($sqlScript);
+    if(! $sql) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t read the SQL script in order to create the needed tables. Please make sure PHP can read the file educaskInstallSafe.sql';
+        header('Location: install.php?action=database');
+        return;
+    }
+    $sqlStatements = explode(';', $sql);
+    $noErrors  = true;
+    foreach($sqlStatements as $sqlStatement) {
+        $sqlStatement = trim($sqlStatement);
+        if($sqlStatement == '') {
+            continue;
+        }
+        $success = $database->makeCustomQuery($sqlStatement);
+        if($success == true) {
+            continue;
+        }
+        $noErrors = false;
+        $table= array();
+        if(! preg_match('/EXISTS \b([a-z]|[A-Z])+\b\s\(/', $sqlStatement, $table)) {
+            $error = $database->getError();
+            $_SESSION['errors'][] = "I couldn't create an unknown table. The database said: {$error}.";
+            continue;
+        }
+        $table = $table[0];
+        $table = str_replace('EXISTS ', '', $table);
+        $table = str_replace(' (', '', $table);
+        $table = trim($table);
+        $error = $database->getError();
+        $_SESSION['errors'][] = "I couldn't create the {$table} table. The database said: {$error}.";
+    }
+    var_dump('CREATE TABLE');
+    if($noErrors == false) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t create all of the needed tables. Please try again. If this keeps happening, please see <a href="https://www.educask.com" target="_blank">educask.com for help</a>.';
+        header('Location: install.php?action=database');
+        return;
+    }
     header('Location: install.php?action=configure');
 }
 function configureContent() {
@@ -286,7 +335,7 @@ function finishContent() {
     $toReturn = '<h1>All Done</h1>';
     $toReturn .= '<p>Congratulations! Educask is now installed!</p>';
     $toReturn .= '<p><a class="button" href="index.php">Visit the Site</a></p>';
-    destroy_session();
+    session_destroy();
     return $toReturn;
 }
 function phpTest() {
