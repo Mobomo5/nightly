@@ -112,7 +112,6 @@ class userEngine {
             "'$roleID', '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$password'");
 
         if (!$results) {
-            echo $db->getError();
             return false;
         }
 
@@ -191,9 +190,11 @@ class userEngine {
 
         $db = database::getInstance();
         $results = $db->getData('bio', 'user', "userID = '$userID'");
-
         if (!$results) {
             return false;
+        }
+        if (empty($results[0]['bio'])) {
+            return 'No bio yet!';
         }
 
         return $results[0]['bio'];

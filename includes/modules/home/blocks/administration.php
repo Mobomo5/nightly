@@ -8,14 +8,14 @@
 
 require_once(BLOCK_INTERFACE_FILE);
 
-class default2 implements block {
+class administration implements block {
 
     public function __construct() {
         // TODO: Implement __construct() method.
     }
 
     public function getTitle() {
-        return 'title';
+        return 'Administration';
     }
 
     public function setTitle($inTitle) {
@@ -24,6 +24,10 @@ class default2 implements block {
 
     public function getContent() {
         // TODO: Implement getContent() method.
+    }
+
+    public function getHref() {
+        return new link('admin');
     }
 
     public function getType() {
