@@ -61,7 +61,13 @@ function validateAction() {
     if ($action == 'configure') {
         return true;
     }
+    if ($action == 'doConfigure') {
+        return true;
+    }
     if ($action == 'install') {
+        return true;
+    }
+    if ($action == 'doInstall') {
         return true;
     }
     if ($action == 'finish') {
@@ -122,7 +128,7 @@ function requirementContent() {
         array('name' => 'Configuration File', 'testFunction' => 'configFileTest', 'explanationFunction' => 'configFileExp')
     );
     $anyFailed = false;
-    $toReturn = '<h1>Requirements</h1>';
+    $toReturn = '<h1>Verify the Requirements</h1>';
     $toReturn .= '<p>Below is a list of requirements. All rows need to be green in order to continue. If any row is red, please read the appropriate documentation.</p>';
     $toReturn .= '<table>';
     $toReturn .= '<tr><td>Requirement:</td><td>Explanation:</td></tr>';
@@ -158,7 +164,7 @@ function databaseContent() {
         header('Location: install.php?action=requirement');
         return;
     }
-    $toReturn = '<h1>Database</h1>';
+    $toReturn = '<h1>Setup the Database</h1>';
     $toReturn .= getErrorDiv();
     $toReturn .= '<p>This form prepares the database for Educask.</p>';
     $toReturn .= '<form action="install.php?action=doDatabase" method="POST">';
@@ -174,15 +180,15 @@ function databaseContent() {
     }
     $toReturn .= '</select>';
     $toReturn .= '<p>Server:</p>';
-    $toReturn .= '<input type="text" id="server" name="server" value="localhost" class="formtext">';
+    $toReturn .= '<input type="text" id="server" name="server" value="localhost" class="formtext" required>';
     $toReturn .= '<p>Database:</p>';
-    $toReturn .= '<input type="text" id="database" name="database" value="educask" class="formtext">';
+    $toReturn .= '<input type="text" id="database" name="database" value="educask" class="formtext" required>';
     $toReturn .= '<p>Username:</p>';
-    $toReturn .= '<input type="text" id="username" name="username" class="formtext">';
+    $toReturn .= '<input type="text" id="username" name="username" class="formtext" required>';
     $toReturn .= '<p>Password:</p>';
-    $toReturn .= '<input type="password" id="password1" name="password1" class="formtext">';
+    $toReturn .= '<input type="password" id="password1" name="password1" class="formtext" required>';
     $toReturn .= '<p>Confirm Password:</p>';
-    $toReturn .= '<input type="password" id="password2" name="password2" class="formtext">';
+    $toReturn .= '<input type="password" id="password2" name="password2" class="formtext" required>';
     $toReturn .= '<br><input type="submit" class="formbutton" value="Save">';
     $toReturn .= '</form>';
     $_SESSION['databaseComplete'] = true;
@@ -298,7 +304,6 @@ function doDatabaseContent() {
         $error = $database->getError();
         $_SESSION['errors'][] = "I couldn't create the {$table} table. The database said: {$error}.";
     }
-    var_dump('CREATE TABLE');
     if($noErrors == false) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t create all of the needed tables. Please try again. If this keeps happening, please see <a href="https://www.educask.com" target="_blank">educask.com for help</a>.';
@@ -314,20 +319,22 @@ function configureContent() {
     }
     $address = $_SERVER['HTTP_HOST'];
     $webDirectory = dirname($_SERVER['SCRIPT_NAME']);
-    $toReturn = '<h1>Configure</h1>';
+    $toReturn = '<h1>Configure your Site</h1>';
     $toReturn .= getErrorDiv();
-    $toReturn .= '<p>This form prepares the first-time values for Educask.</p>';
+    $toReturn .= '<p>This form gathers the basic information for the site and prepares the first account.</p>';
     $toReturn .= '<form action="install.php?action=doConfigure" method="POST">';
+    $toReturn .= '<fieldset>';
+    $toReturn .= '<legend>Basic Site Information:</legend>';
     $toReturn .= '<p>Site name:</p>';
-    $toReturn .= '<input type="text" id="siteName" name="siteName" class="formtext" value="School Districts Educask">';
+    $toReturn .= '<input type="text" id="siteName" name="siteName" class="formtext" value="Educask" required>';
     $toReturn .= '<p>Site email address:</p>';
-    $toReturn .= "<input type=\"email\" id=\"siteEmail\" name=\"siteEmail\" class=\"formtext\" value=\"noreply@{$address}\">";
+    $toReturn .= "<input type=\"email\" id=\"siteEmail\" name=\"siteEmail\" class=\"formtext\" value=\"noreply@{$address}\" required>";
     $toReturn .= '<p>Non-secure web address:</p>';
-    $toReturn .= "<input type=\"url\" id=\"nonSecureURL\" name=\"nonSecureURL\" class=\"formtext\" value=\"http://{$address}\">";
+    $toReturn .= "<input type=\"url\" id=\"nonSecureURL\" name=\"nonSecureURL\" class=\"formtext\" value=\"http://{$address}\" required>";
     $toReturn .= '<p>Secure web address:</p>';
-    $toReturn .= "<input type=\"url\" id=\"secureURL\" name=\"secureURL\" class=\"formtext\" value=\"https://{$address}\">";
+    $toReturn .= "<input type=\"url\" id=\"secureURL\" name=\"secureURL\" class=\"formtext\" value=\"https://{$address}\" required>";
     $toReturn .= '<p>Site web directory:</p>';
-    $toReturn .= "<input type=\"text\" id=\"webDirectory\" name=\"webDirectory\" class=\"formtext\" value=\"{$webDirectory}\">";
+    $toReturn .= "<input type=\"text\" id=\"webDirectory\" name=\"webDirectory\" class=\"formtext\" value=\"{$webDirectory}\" required>";
     $timeZones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
     $toReturn .= '<p>The timezone for your website:</p>';
     $toReturn .= '<select class="formDrop" name="timeZone" id="timeZone">';
@@ -339,16 +346,103 @@ function configureContent() {
         $toReturn .= "<option value=\"{$timeZone}\">{$timeZone}</option>";
     }
     $toReturn .= '</select>';
+    $toReturn .= '</fieldset>';
+    $toReturn .= '<fieldset>';
+    $toReturn .= '<legend>First Account:</legend>';
+    $toReturn .= '<p>Username:</p>';
+    $toReturn .= '<input type="text" id="username" name="username" class="formtext" value="admin" required>';
+    $toReturn .= '<p>First name:</p>';
+    $toReturn .= '<input type="text" id="firstName" name="firstName" class="formtext" required>';
+    $toReturn .= '<p>Last name:</p>';
+    $toReturn .= '<input type="text" id="lastName" name="lastName" class="formtext" required>';
+    $toReturn .= '<p>Email address:</p>';
+    $toReturn .= '<input type="email" id="email" name="email" class="formtext" required>';
+    $toReturn .= '<p>Password:</p>';
+    $toReturn .= '<input type="password" id="password1" name="password1" class="formtext" required>';
+    $toReturn .= '<p>Confirm password:</p>';
+    $toReturn .= '<input type="password" id="password2" name="password2" class="formtext" required>';
+    $toReturn .= '</fieldset>';
+    $toReturn .= '<br><input type="submit" class="formbutton" value="Save">';
     $toReturn .= '</form>';
     $_SESSION['configureComplete'] = true;
     return $toReturn;
+}
+function doConfigureContent() {
+    if(! isset($_POST['siteName'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['siteEmail'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['nonSecureURL'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['secureURL'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['webDirectory'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['timeZone'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['username'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['firstName'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['lastName'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['email'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['password1'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! isset($_POST['password2'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if($_POST['password1'] != $_POST['password2']) {
+        unset($_SESSION['databaseComplete']);
+        $_SESSION['errors'][] = 'The inputted passwords for the first account don\'t match.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    //@ToDo save config settings.
+    header('Location: install.php?action=install');
 }
 function installContent() {
     if(! isset($_SESSION['configureComplete'])) {
         header('Location: install.php?action=configure');
         return;
     }
-    $toReturn = '<h1>Install</h1>';
+    $toReturn = '<h1>Installing Educask</h1>';
     $toReturn .= '<p><a class="button" href="install.php?action=finish">Continue</a></p>';
     $_SESSION['installComplete'] = true;
     return $toReturn;
