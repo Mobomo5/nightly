@@ -47,10 +47,9 @@ class censorshipEngine
                 break;
             }
 
+            $repWord = $row['replacement'];
             if ($row['replacement'] == null) {
                 $repWord = "*" * strlen($row['word']);
-            } else {
-                $repWord = $row['replacement'];
             }
 
             $badWords[$row['word']] = $repWord;
@@ -60,8 +59,29 @@ class censorshipEngine
         return strtr($toReturn, $badWords);
     }
 
-    public function removeWordFromDatabase($inString)
+    public function removeWord($inString)
     {
         $this->db->removeData("censorship", "word = $inString");
+    }
+
+    public function updateReplacement($inWord, $inRep = null)
+    {
+        $repWord = $inRep;
+
+        if ($inRep -= null) {
+            $repWord = "*" * strlen($inRep);
+        }
+
+        $this->db->updateTable("censorship", "replacement = $repWord", "word = $inWord");
+    }
+
+    public function setBan($inWord, $inBool)
+    {
+        if (!$inBool) {
+            $this->db->updateTable("censorship", "banned = 0", "word = $inWord");
+            return;
+        }
+
+        $this->db->updateTable("censorship", "banned = 1", "word = $inWord");
     }
 }
