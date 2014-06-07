@@ -9,7 +9,7 @@ require_once(MODULE_INTERFACE_FILE);
 require_once(ROUTER_OBJECT_FILE);
 class fourOhFour implements module {
     public function __construct() {
-        header("HTTP/1.0 404 Not Found");
+        header("HTTP/1.1 404 Not Found");
     }
     public static function getPageType() {
         return 'fourOhFour';
