@@ -110,6 +110,12 @@ class addStudentBlock implements block {
     }
 
     //@todo: THere is a problem creating > 300 users at a time. The crypt() function times out.
+
+    /**
+     *
+     * Accepts csv file in the format "firstName, lastName, Email, StudentID, Birthday"
+     * @return bool
+     */
     private function processCSV() {
         if ($_FILES["csvFile"]["error"] > 0) {
             echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
@@ -132,10 +138,11 @@ class addStudentBlock implements block {
         }
 
         $roleID = $results[0]['roleID'];
-
         $count = 0;
         if (($handle = fopen($filename, 'r')) !== false) {
+
             while (($row = fgetcsv($handle)) !== false) {
+                // get credentials from the csv
                 $firstName = $db->escapeString($row[0]);
                 $lastName = $db->escapeString($row[1]);
                 $email = $db->escapeString($row[2]);
@@ -143,14 +150,11 @@ class addStudentBlock implements block {
                 $birthday = date('Y-m-d', strtotime($row[4]));
                 $day = date('d', strtotime($row[4]));
                 $username = strtolower(substr($firstName, 0, 1) . $lastName . $day);
-                // make the user
-                $user = new user('1', $roleID, $studentID, $username, $firstName, $lastName, $email, $birthday);
 
-                // set the password
-                if (!userEngine::getInstance()->addUser($user, $studentID)) { //@todo: handle duplicates and errors in insertion.
-                    noticeEngine::getInstance()->addNotice(new notice(noticeType::error, "The student $username couldn't be created for some reason."));
+                if (!$this->addUser($roleID, $studentID, $username, $firstName, $lastName, $email, $birthday)) {
                     continue;
                 }
+
                 $count++;
 
             }
@@ -158,6 +162,18 @@ class addStudentBlock implements block {
         }
         noticeEngine::getInstance()->addNotice(new notice(noticeType::positive, "Created $count Students!"));
         $this->stepOne();
+        return true;
+    }
+
+    private function addUser($roleID, $studentID, $username, $firstName, $lastName, $email, $birthday) {
+
+        $user = new user('1', $roleID, $studentID, $username, $firstName, $lastName, $email, $birthday);
+
+        // set the password
+        if (!userEngine::getInstance()->addUser($user, $studentID)) { //@todo: handle duplicates and errors in insertion.
+            noticeEngine::getInstance()->addNotice(new notice(noticeType::error, "The student $username couldn't be created for some reason."));
+            return false;
+        }
         return true;
     }
 }
