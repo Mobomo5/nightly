@@ -5,7 +5,7 @@
  * Date: 4/9/14
  * Time: 8:07 PM
  */
-require_once(EDUCASK_ROOT . '/thirdPartyLibraries/password/password.php');
+require_once(PASSWORD_FUNCTIONS_FILE);
 
 class hasher {
     public function generateHash($thingToHash) {

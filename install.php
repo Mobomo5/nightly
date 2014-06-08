@@ -195,6 +195,10 @@ function databaseContent() {
     return $toReturn;
 }
 function doDatabaseContent() {
+    if(! isset($_SESSION['databaseComplete'])) {
+        header('Location: install.php?action=database');
+        return;
+    }
     if(! isset($_POST['engine'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
@@ -368,6 +372,10 @@ function configureContent() {
     return $toReturn;
 }
 function doConfigureContent() {
+    if(! isset($_SESSION['configureComplete'])) {
+        header('Location: install.php?action=configure');
+        return;
+    }
     if(! isset($_POST['siteName'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
@@ -434,7 +442,156 @@ function doConfigureContent() {
         header('Location: install.php?action=configure');
         return;
     }
-    //@ToDo save config settings.
+    $siteName = strip_tags(trim($_POST['siteName']));
+    $siteEmail = strip_tags(trim($_POST['siteEmail']));
+    $nonSecureURL = strip_tags(trim($_POST['nonSecureURL']));
+    $secureURL = strip_tags(trim($_POST['secureURL']));
+    $webDirectory = strip_tags(trim($_POST['webDirectory']));
+    $timeZone = strip_tags(trim($_POST['timeZone']));
+    $username = strip_tags(trim($_POST['username']));
+    $firstName = strip_tags(trim($_POST['firstName']));
+    $lastName = strip_tags(trim($_POST['lastName']));
+    $email = strip_tags(trim($_POST['email']));
+    $password = $_POST['password1'];
+    require_once(VALIDATOR_OBJECT_FILE);
+    require_once(VALIDATOR_INTERFACE_FILE);
+    require_once(HASHER_OBJECT_FILE);
+    $emailValidator = new validator('email');
+    if(! $emailValidator->validatorExists()) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t validate all of the data. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! $emailValidator->validate($siteEmail)) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'The site email isn\'t a valid email address.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! $emailValidator->validate($email)) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'The email address for the first user isn\'t valid.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    unset($emailValidator);
+    $urlValidator = new validator('url');
+    if(! $urlValidator->validatorExists()) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t validate all of the data. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    $options = array('noDirectories', 'mightBeIP');
+    $nonSecureOptions = array_merge($options, array('httpOnly'));
+    $secureOptions = array_merge($options, array('httpsOnly'));
+    if(! $urlValidator->validate($nonSecureURL, $nonSecureOptions)) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'The non-secure URL isn\'t valid. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! $urlValidator->validate($secureURL, $secureOptions)) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'The secure URL isn\'t valid. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    unset($urlValidator);
+    if($webDirectory[0] != '/') {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t validate the web directory. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    $timeZoneValidator = new validator('phpTimeZone');
+    if(! $timeZoneValidator->validatorExists()) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t validate all of the data. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if(! $timeZoneValidator->validate($timeZone)) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t validate the selected time zone. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    unset($timeZoneValidator);
+    $hasher = new hasher();
+    $password = $hasher->generateHash($password);
+    if($password == false) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t properly hash your password. Please try again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    $database = database::getInstance();
+    $database->connect();
+    if(! $database->isConnected()) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t establish a connection to the database. Please try again. If you keep receiving this error, please delete the config.php and start the installer again.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    $siteName = $database->escapeString($siteName);
+    $siteEmail = $database->escapeString($siteEmail);
+    $nonSecureURL = $database->escapeString($nonSecureURL);
+    $secureURL = $database->escapeString($secureURL);
+    $webDirectory = $database->escapeString($webDirectory);
+    $timeZone = $database->escapeString($timeZone);
+    $username = $database->escapeString($username);
+    $firstName = $database->escapeString($firstName);
+    $lastName = $database->escapeString($lastName);
+    $email = $database->escapeString($email);
+    $password = $database->escapeString($password);
+    $variables = array(
+        'cleanURLsEnabled' => 0,
+        'educaskVersion' => '3.0Alpha3.1',
+        'guestRoleID' => 1,
+        'maintenanceMode' => 'false',
+        'siteEmail' => $siteEmail,
+        'siteTheme' => 'default',
+        'siteTimeZone' => $timeZone,
+        'siteTitle' => $siteName,
+        'siteWebAddress' => $nonSecureURL,
+        'siteWebAddressSecure' => $secureURL,
+        'siteWebDirectory' => $webDirectory
+    );
+    foreach($variables as $name => $value) {
+        $name = $database->escapeString($name);
+        $value = $database->escapeString($value);
+        if(! $database->insertData('variable', 'variableName, variableValue', "'{$name}', '{$value}'")) {
+            $_SESSION['errors'][] = "I wasn't able to insert the variable {$name} with a value of {$value} into the variable table. You may want to manually add this row to the variable table in the database. For help on this, please see <a href=\"https://www.educask.com\" target=\"_blank\">this page</a>."; //@ToDo: make the link point to actual help
+            continue;
+        }
+    }
+    $database->updateTable('variable', 'readOnly=1', "variableName='educaskVersion'");
+    $sqlScript = EDUCASK_ROOT . '/defaultRolesInstallSafe.sql';
+    if(! is_file($sqlScript)) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t find the SQL script to create the needed roles. Please make sure that defaultRolesInstallSafe.sql exists and is readable by PHP.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    $sql = file_get_contents($sqlScript);
+    if(! $sql) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t read the SQL script in order to create the needed roles. Please make sure PHP can read the file defaultRolesInstallSafe.sql';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    $sqlStatements = explode(';', $sql);
+    $noErrors  = true;
+    foreach($sqlStatements as $sqlStatement) {
+        $sqlStatement = trim($sqlStatement);
+        if($sqlStatement == '') {
+            continue;
+        }
+        $database->makeCustomQuery($sqlStatement);
+    }
+
     header('Location: install.php?action=install');
 }
 function installContent() {

@@ -6,6 +6,7 @@
  * Date: 18/12/13
  * Time: 3:36 PM
  */
+require_once(VALIDATOR_INTERFACE_FILE);
 class validator {
     private $subValidator;
 

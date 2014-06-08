@@ -11,31 +11,31 @@ require_once(VALIDATOR_OBJECT_FILE);
 class url implements subValidator {
     public function validate($inValue, array $inOptions = array()) {
         $options = array();
-        foreach ($inOptions as $option) {
+        foreach($inOptions as $option) {
             $options[$option] = $this->$option($inValue);
         }
-        if (!empty($options['noDirectories'])) {
-            if (!$options['noDirectories']) {
+        if(isset($options['noDirectories'])) {
+            if($options['noDirectories'] == false) {
                 return false;
             }
         }
-        if (!empty($options['httpOrHttpsOnly'])) {
-            if (!$options['httpOrHttpsOnly']) {
+        if(isset($options['httpOrHttpsOnly'])) {
+            if($options['httpOrHttpsOnly'] == false) {
                 return false;
             }
         }
-        if (!empty($options['httpOnly'])) {
-            if (!$options['httpOnly']) {
+        if(isset($options['httpOnly'])) {
+            if($options['httpOnly'] == false) {
                 return false;
             }
         }
-        if (!empty($options['httpsOnly'])) {
-            if (!$options['httpsOnly']) {
+        if(isset($options['httpsOnly'])) {
+            if($options['httpsOnly'] == false) {
                 return false;
             }
         }
-        if (!empty($options['mightBeIP'])) {
-            if ($options['mightBeIP'] == true) {
+        if(isset($options['mightBeIP'])) {
+            if($options['mightBeIP'] == true) {
                 return true;
             }
         }
@@ -48,15 +48,16 @@ class url implements subValidator {
 
     private function mightBeIP($inValue) {
         $validator = new validator('ip');
-        if (!$validator->validatorExists()) {
+        if(!$validator->validatorExists()) {
             return false;
         }
-        return $validator->validate($inValue);
+        $parsed = parse_url($inValue);
+        return $validator->validate($parsed['host']);
     }
 
     private function noDirectories($inValue) {
         $parsed = parse_url($inValue);
-        if (!empty($parsed['path'])) {
+        if(!empty($parsed['path'])) {
             return false;
         }
         return true;
@@ -64,10 +65,10 @@ class url implements subValidator {
 
     private function httpOrHttpsOnly($inValue) {
         $parsed = parse_url($inValue);
-        if (empty($parsed['scheme'])) {
+        if(empty($parsed['scheme'])) {
             return false;
         }
-        if ($parsed['scheme'] != 'http' || $parsed['scheme'] != 'https') {
+        if($parsed['scheme'] != 'http' || $parsed['scheme'] != 'https') {
             return false;
         }
         return true;
@@ -75,10 +76,10 @@ class url implements subValidator {
 
     private function httpOnly($inValue) {
         $parsed = parse_url($inValue);
-        if (empty($parsed['scheme'])) {
+        if(empty($parsed['scheme'])) {
             return false;
         }
-        if ($parsed['scheme'] != 'http') {
+        if($parsed['scheme'] != 'http') {
             return false;
         }
         return true;
@@ -86,10 +87,10 @@ class url implements subValidator {
 
     private function httpsOnly($inValue) {
         $parsed = parse_url($inValue);
-        if (empty($parsed['scheme'])) {
+        if(empty($parsed['scheme'])) {
             return false;
         }
-        if ($parsed['scheme'] != 'https') {
+        if($parsed['scheme'] != 'https') {
             return false;
         }
         return true;
