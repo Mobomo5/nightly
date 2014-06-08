@@ -84,4 +84,15 @@ class censorshipEngine
 
         $this->db->updateTable("censorship", "banned = 1", "word = $inWord");
     }
+
+    public function fillDatabaseWithObnoxiouslyHighLevelOfCensorship()
+    {
+        $handle = fopen("censorship.txt", "r");
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                $this->addWordToDatabase($line);
+            }
+        }
+        fclose($handle);
+    }
 }
