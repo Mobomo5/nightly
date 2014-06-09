@@ -32,7 +32,7 @@ class link {
         if (substr($this->href, 0, 4) == "http") {
             return $this->href;
         }
-        if (!$this->cleanURLEnabled) {
+        if ($this->cleanURLEnabled == 'false') {
             return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
         }
 

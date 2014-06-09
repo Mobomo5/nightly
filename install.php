@@ -437,7 +437,7 @@ function doConfigureContent() {
         return;
     }
     if($_POST['password1'] != $_POST['password2']) {
-        unset($_SESSION['databaseComplete']);
+        unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'The inputted passwords for the first account don\'t match.';
         header('Location: install.php?action=configure');
         return;
@@ -535,21 +535,10 @@ function doConfigureContent() {
         header('Location: install.php?action=configure');
         return;
     }
-    $siteName = $database->escapeString($siteName);
-    $siteEmail = $database->escapeString($siteEmail);
-    $nonSecureURL = $database->escapeString($nonSecureURL);
-    $secureURL = $database->escapeString($secureURL);
-    $webDirectory = $database->escapeString($webDirectory);
-    $timeZone = $database->escapeString($timeZone);
-    $username = $database->escapeString($username);
-    $firstName = $database->escapeString($firstName);
-    $lastName = $database->escapeString($lastName);
-    $email = $database->escapeString($email);
-    $password = $database->escapeString($password);
     $variables = array(
-        'cleanURLsEnabled' => 0,
+        'cleanURLsEnabled' => 'false',
         'educaskVersion' => '3.0Alpha3.1',
-        'guestRoleID' => 1,
+        'guestRoleID' => '1',
         'maintenanceMode' => 'false',
         'siteEmail' => $siteEmail,
         'siteTheme' => 'default',
@@ -557,7 +546,7 @@ function doConfigureContent() {
         'siteTitle' => $siteName,
         'siteWebAddress' => $nonSecureURL,
         'siteWebAddressSecure' => $secureURL,
-        'siteWebDirectory' => $webDirectory
+        'siteWebDirectory' => $webDirectory . '/'
     );
     foreach($variables as $name => $value) {
         $name = $database->escapeString($name);
@@ -583,7 +572,6 @@ function doConfigureContent() {
         return;
     }
     $sqlStatements = explode(';', $sql);
-    $noErrors  = true;
     foreach($sqlStatements as $sqlStatement) {
         $sqlStatement = trim($sqlStatement);
         if($sqlStatement == '') {
@@ -591,7 +579,18 @@ function doConfigureContent() {
         }
         $database->makeCustomQuery($sqlStatement);
     }
-
+    $username = $database->escapeString($username);
+    $firstName = $database->escapeString($firstName);
+    $lastName = $database->escapeString($lastName);
+    $email = $database->escapeString($email);
+    $password = $database->escapeString($password);
+    $success = $database->insertData('user', 'userName, firstName, lastName, email, password, roleID', "'{$username}', '{$firstName}', '{$lastName}', '{$email}', '{$password}', 4");
+    if(! $success) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'I couldn\'t create the new user account. Please try again. For help on this, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: make the link point to actual help
+        header('Location: install.php?action=configure');
+        return;
+    }
     header('Location: install.php?action=install');
 }
 function installContent() {
@@ -623,7 +622,7 @@ function phpTest() {
 }
 function phpTestExp() {
     if (!phpTest()) {
-        return 'Your PHP version is ' . PHP_VERSION . ' and it\'s too old. Please upgrade to the latest PHP. Educask needs PHP newer than 5.2.4.';
+        return 'Your PHP version is ' . PHP_VERSION . ' and it\'s too old. Please upgrade to the latest PHP version. Educask needs PHP newer than 5.2.4.';
     }
     return 'Your PHP version is ' . PHP_VERSION;
 }

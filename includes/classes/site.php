@@ -185,7 +185,6 @@ class site {
     }
 
     public function getEducaskVersion() {
-
         return $this->educaskVersion;
     }
 
@@ -209,13 +208,18 @@ class site {
     }
 
     public function setCleanURLs($areEnabled = true) {
+        if(! is_bool($areEnabled)) {
+            return false;
+        }
         if ($areEnabled == false) {
-            if (!$this->cleanURLs->setValue(0)) {
+            if (!$this->cleanURLs->setValue('false')) {
                 return false;
             }
+            $this->cleanURLs->save();
+            self::setInstance($this);
             return;
         }
-        if (!$this->cleanURLs->setValue(1)) {
+        if (!$this->cleanURLs->setValue('true')) {
             return false;
         }
         $this->cleanURLs->save();
