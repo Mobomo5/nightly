@@ -8,6 +8,7 @@
 ob_start();
 session_start();
 define('EDUCASK_ROOT', getcwd());
+define('EDUCASK_VERSION', '3.0Alpha3.1');
 require_once(EDUCASK_ROOT . '/includes/classes/bootstrap.php');
 $boot = bootstrap::getInstance();
 $boot->declareConstants();
@@ -270,6 +271,7 @@ function doDatabaseContent() {
         header('Location: install.php?action=database');
         return;
     }*/
+    chmod($file, 664);
     $database = database::getInstance();
     $database->connect();
     if(!$database->isConnected()) {
@@ -548,7 +550,7 @@ function doConfigureContent() {
     }
     $variables = array(
         'cleanURLsEnabled' => 'false',
-        'educaskVersion' => '3.0Alpha3.1',
+        'educaskVersion' => EDUCASK_VERSION,
         'guestRoleID' => '1',
         'maintenanceMode' => 'false',
         'siteEmail' => $siteEmail,
@@ -1140,7 +1142,7 @@ if(!validateAction()) {
         <div id="titleBar">
             <img src="includes/images/educasklogo.png">
 
-            <p>Educask 3.0 Alpha 9 - Developer Preview</p>
+            <p>Educask <?php echo EDUCASK_VERSION?> - Developer Preview</p>
         </div>
         <ul>
             <li <?php echo getCurrentCss('welcome'); ?>>Welcome</li>
