@@ -29,6 +29,7 @@ class variableEngine {
         if (!$database->isConnected()) {
             return null;
         }
+        $variableName = preg_replace('/\s+/', '', $variableName);
         $variableName = $database->escapeString(htmlspecialchars($variableName));
 
         $variableValue = $database->getData('variableValue, readOnly', 'variable', 'variableName=\'' . $variableName . '\'');
@@ -62,6 +63,7 @@ class variableEngine {
             if ($variable == '') {
                 continue;
             }
+            $variable = preg_replace('/\s+/', '', $variable);
             $variable = $database->escapeString(htmlspecialchars($variable));
             if ($where == '') {
                 $where .= 'variableName = \'' . $variable . '\'';

@@ -630,6 +630,7 @@ function installContent() {
     $toReturn .= '<p id="addLink"></p>';
     $toReturn .= "<script type=\"text/javascript\">
                         var updateInt = setInterval(function(){doUpdate()}, 1000);
+                        <!--  AJAXInteraction class from dev.fyicenter.com/Interview-Questions/AJAX/How_do_I_handle_concurrent_AJAX_requests_.html -->
                         function AJAXInteraction(url, callback) {
                             var req = init();
                             req.onreadystatechange = processRequest;
