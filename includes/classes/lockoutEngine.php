@@ -12,6 +12,7 @@ require_once(VARIABLE_OBJECT_FILE);
 require_once(LOCKOUT_OBJECT_FILE);
 class lockoutEngine {
     private static $instance;
+    private $foundLockouts;
     public static function getInstance() {
         if(! isset(self::$instance)) {
             self::$instance = new lockoutEngine();
@@ -19,7 +20,7 @@ class lockoutEngine {
         return self::$instance;
     }
     private function __construct() {
-        //Do nothing.
+        $this->foundLockouts = array();
     }
     public function getLockout($ipAddress) {
         $val = new validator('ip');
@@ -28,6 +29,9 @@ class lockoutEngine {
         }
         if(! $val->validate($ipAddress)) {
             return false;
+        }
+        if(isset($this->foundLockouts[$ipAddress])) {
+            return $this->foundLockouts[$ipAddress];
         }
         $database = database::getInstance();
         if(! $database->isConnected()) {
@@ -46,6 +50,7 @@ class lockoutEngine {
         }
         $lastUpdate = new DateTime($results[0]['lastUpdate']);
         $lockout = new lockout($ipAddress, $results[0]['numberOfFailedAttempts'], $lastUpdate, $results[0]['attemptsLeft']);
+        $this->foundLockouts[$ipAddress] = $lockout;
         return $lockout;
     }
     public function addLockout(lockout $lockoutToAdd) {
@@ -57,8 +62,12 @@ class lockoutEngine {
             return false;
         }
         $ip = $database->escapeString($ip);
-        $failedAttempts = $database->escapeString($failedAttempts);
-        $attemptsLeft = $database->escapeString($attemptsLeft);
+        if(! is_int($failedAttempts)) {
+            $failedAttempts = $database->escapeString($failedAttempts);
+        }
+        if(! is_int($attemptsLeft)) {
+            $attemptsLeft = $database->escapeString($attemptsLeft);
+        }
         $success = $database->insertData('lockout', 'ipAddress, numberOfFailedAttempts, attemptsLeft', "'{$ip}', {$failedAttempts}, {$attemptsLeft}");
         if($success == false) {
             return false;
@@ -74,8 +83,12 @@ class lockoutEngine {
             return false;
         }
         $ip = $database->escapeString($ip);
-        $failedAttempts = $database->escapeString($failedAttempts);
-        $attemptsLeft = $database->escapeString($attemptsLeft);
+        if(! is_int($failedAttempts)) {
+            $failedAttempts = $database->escapeString($failedAttempts);
+        }
+        if(! is_int($attemptsLeft)) {
+            $attemptsLeft = $database->escapeString($attemptsLeft);
+        }
         $success = $database->updateTable('lockout', "numberOfFailedAttempts={$failedAttempts}, attemptsLeft={$attemptsLeft}", "ipAddress='{$ip}'");
         if($success == false) {
             return false;
@@ -103,17 +116,14 @@ class lockoutEngine {
         if($lockout->getNumberOfAttemptsLeft() > 0) {
             return false;
         }
-        $variableEngine = variableEngine::getInstance();
-        $lockoutPeriod = $variableEngine->getVariable('lockoutPeriod');
-        $lockoutPeriodInt = 10;
-        if($lockoutPeriod != null) {
-            $lockoutPeriodInt = intval($lockoutPeriod->getValue());
-        }
-        $totalLockoutLength = $lockout->getNumberOfFailedAttempts() * $lockoutPeriodInt;
-        $lastUpdate = $lockout->lastUpdated();
+        $lockoutPeriod = $this->getLockoutPeriod();
+        $totalLockoutLength = $lockout->getNumberOfFailedAttempts() * $lockoutPeriod;
+        $lastUpdate = clone $lockout->lastUpdated();
         $lockedOutUntil = $lastUpdate->add(DateInterval::createFromDateString($totalLockoutLength . ' minutes'));
         $currentTime = new DateTime();
-        if($currentTime > $lockedOutUntil) {
+        if($currentTime >= $lockedOutUntil) {
+            $lockout->reEnable($this->getNumberOfAttemptsBeforeLockout());
+            $this->setLockout($lockout);
             return false;
         }
         return true;
@@ -122,7 +132,7 @@ class lockoutEngine {
         $variableEngine = variableEngine::getInstance();
         $lockoutPeriod = $variableEngine->getVariable('lockoutPeriod');
         if($lockoutPeriod == null) {
-            return false;
+            return 10;
         }
         return intval($lockoutPeriod->getValue());
     }
@@ -143,7 +153,7 @@ class lockoutEngine {
         $variableEngine = variableEngine::getInstance();
         $numberOfAttemptsBeforeLockout = $variableEngine->getVariable('numberOfAttemptsBeforeLockout');
         if($numberOfAttemptsBeforeLockout == null) {
-            return false;
+            return 3;
         }
         return intval($numberOfAttemptsBeforeLockout->getValue());
     }

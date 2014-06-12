@@ -12,19 +12,19 @@ class lockout {
     private $lastUpdate;
     private $attemptsLeft;
     public function __construct($ipAddress, $numberOfFailedAttempts, DateTime $lastUpdate, $numberOfAttemptsLeft) {
-        if(! is_int($numberOfFailedAttempts)) {
+        if(! is_numeric($numberOfFailedAttempts)) {
             return;
         }
-        if(! is_int($numberOfAttemptsLeft)) {
+        if(! is_numeric($numberOfAttemptsLeft)) {
             return;
         }
         if(! $this->validateIP($ipAddress)) {
             return;
         }
         $this->ipAddress = $ipAddress;
-        $this->numberOfFailedAttempts = $numberOfFailedAttempts;
+        $this->numberOfFailedAttempts = intval($numberOfFailedAttempts);
         $this->lastUpdate = $lastUpdate;
-        $this->attemptsLeft = $numberOfAttemptsLeft;
+        $this->attemptsLeft = intval($numberOfAttemptsLeft);
     }
     public function getIP() {
         return $this->ipAddress;
@@ -38,10 +38,16 @@ class lockout {
     public function lastUpdated() {
         return $this->lastUpdate;
     }
-    public function failedAttempt() {
-        $this->numberOfFailedAttempts += 1;
+    public function failedAttemptMade() {
         $this->attemptsLeft -= 1;
         $this->lastUpdate = new DateTime();
+    }
+    public function reEnable($attemptsLeft) {
+        if(! is_int($attemptsLeft)) {
+            return;
+        }
+        $this->attemptsLeft = $attemptsLeft;
+        $this->numberOfFailedAttempts += 1;
     }
     private function validateIP($ip) {
         $val = new validator('ip');

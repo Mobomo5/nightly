@@ -7,6 +7,7 @@ require_once(SYSTEM_LOGGER_OBJET_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
 require_once(LINK_OBJECT_FILE);
 require_once(USER_OBJECT_FILE);
+require_once(LOCKOUT_ENGINE_OBJECT_FILE);
 
 class currentUser extends user {
     private $isLoggedIn;
@@ -69,6 +70,9 @@ class currentUser extends user {
         if ($this->isLoggedIn) {
             return true;
         }
+        if(lockoutEngine::getInstance()->isLockedOut($_SERVER['REMOTE_ADDR'])) {
+            return false;
+        }
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('userLoggingIn');
         //repeated twice just in case a plugin logs the user in
@@ -78,10 +82,6 @@ class currentUser extends user {
 
         $perm = permissionEngine::getInstance()->getPermission('userCanLogIn');
         if (!permissionEngine::getInstance()->checkPermission($perm, $this->getRoleID())) {
-            return false;
-        }
-
-        if (isset($_SESSION['userCanLogIn']) && $_SESSION['userCanLogIn'] == false) {
             return false;
         }
 

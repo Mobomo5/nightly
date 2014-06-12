@@ -7,13 +7,16 @@
  * Time: 2:50 PM
  */
 require_once(BLOCK_INTERFACE_FILE);
+require_once(LOCKOUT_ENGINE_OBJECT_FILE);
 
 class login implements block {
+    private $title;
     private $content;
     private $button;
     private $noGUI;
 
     public function __construct() {
+        $this->title = 'Login';
         $this->noGUI = false;
         if (!currentUser::getUserSession()->isLoggedIn()) {
             $this->content = $this->getLogIn();
@@ -24,60 +27,44 @@ class login implements block {
         }
 
     }
-
     public function getTitle() {
-        // TODO: Implement getTitle() method.
+        return $this->title;
     }
-
     public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
+        $this->title = strip_tags($inTitle);
     }
-
     public function getContent() {
         return $this->content;
     }
-
-    public function pageAuthorIsVisible() {
-        // TODO: Implement pageAuthorIsVisible() method.
-    }
-
-    public function datePagePublishedIsVisible() {
-        // TODO: Implement datePagePublishedIsVisible() method.
-    }
-
-    public function getDatePagePublished() {
-        // TODO: Implement getDatePagePublished() method.
-    }
-
-    public function getPageAuthor() {
-        // TODO: Implement getPageAuthor() method.
-    }
-
-    public static function getNodeType() {
-        // TODO: Implement getNodeType() method.
-    }
-
-    public function statusesAreVisible() {
-        // TODO: Implement statusesAreVisible() method.
-    }
-
-    public function getStatuses() {
-        // TODO: Implement getStatuses() method.
-    }
-
     public function noGUI() {
         return $this->noGUI;
     }
-
     public function getReturnPage() {
-        // TODO: Implement getReturnPage() method.
+        return 'home';
     }
-
     public function getButton() {
         return $this->button;
     }
-
     private function getLogIn() {
+        $lockoutEngine = lockoutEngine::getInstance();
+        if($lockoutEngine->isLockedOut($_SERVER['REMOTE_ADDR'])) {
+            $content = '<div id="login-form-background">';
+            $content .= '<h2>You\'re Locked Out</h2>';
+            $lockout = $lockoutEngine->getLockout($_SERVER['REMOTE_ADDR']);
+            if($lockout == false) {
+                $content .= '</div>';
+                return $content;
+            }
+            $totalLockoutLength = $lockout->getNumberOfFailedAttempts() * $lockoutEngine->getLockoutPeriod();
+            $lockoutStart = clone $lockout->lastUpdated();
+            $lockedOutUntil = $lockoutStart->add(DateInterval::createFromDateString($totalLockoutLength . ' minutes'));
+            $currentTime = new DateTime();
+            $minutesLeft = $currentTime->diff($lockedOutUntil);
+            $minutesLeft = ($minutesLeft->days * 24 * 60) + ($minutesLeft->h * 60) + $minutesLeft->i;
+            $content .= "<p>Please wait {$minutesLeft} minutes before trying to log in again.</p>";
+            $content .= '</div>';
+            return $content;
+        }
         $content = '<div id="login-form-background">
             <h2>Please log in</h2>
 
@@ -90,12 +77,9 @@ class login implements block {
         </div>';
         return $content;
     }
-
     private function getLogOut() {
-
     }
-
     public function getType() {
-        return get_class(self);
+        return 'user';
     }
 }

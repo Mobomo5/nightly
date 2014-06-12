@@ -94,10 +94,9 @@ function getCurrentCss($step) {
 
 function getContent() {
     //Comment the following three lines if you wish to overwrite an Educask install. You can also delete config.php.
-    //@ToDo: Uncomment these lines later.
-    //if(is_file('includes/config.php')) {
-    //    return '<p>Educask is already installed. If you wish to overwrite the install, please delete includes/config.php</p>';
-    //}
+    if(is_file('includes/config.php')) {
+        return '<p>Educask is already installed. If you wish to overwrite the install, please delete includes/config.php</p>';
+    }
     $action = getAction();
     $function = $action . 'Content';
     if(function_exists($function)) {
@@ -264,13 +263,12 @@ function doDatabaseContent() {
                 $dbUserName = \'' . $userName . '\';
                 $dbPassword = \'' . $password . '\'; //Change password when account and database created.
                 $dbType = \'' . $engine . '\';';
-    //@ToDo: uncomment these lines
-    /*if(file_put_contents($file, $content) == false) {
+    if(file_put_contents($file, $content) == false) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t write the config file. Please make sure that includes/config.php is a file that can be written to by PHP.';
         header('Location: install.php?action=database');
         return;
-    }*/
+    }
     chmod($file, 664);
     $database = database::getInstance();
     $database->connect();
@@ -894,12 +892,10 @@ function configFileTest() {
         if(!$couldWrite) {
             return false;
         }
-    }
-    //@ToDo: Uncomment these lines.
-    /*$couldWrite = file_put_contents($config, 'Test Write');
+    }$couldWrite = file_put_contents($config, 'Test Write');
     if(! $couldWrite) {
         return false;
-    }*/
+    }
     return true;
 }
 
