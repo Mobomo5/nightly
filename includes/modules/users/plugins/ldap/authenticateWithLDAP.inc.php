@@ -80,17 +80,18 @@ class authenticateWithLDAP implements plugin{
         $userName = $database->escapeString($userName);
         $haveSeenBefore = $database->getData('userID', 'activeDirectory', 'WHERE adUsername=\'' . $userName . '\'');
         if($haveSeenBefore == null) {
-            $dn = '';
+            $ou = $variableEngine->getVariable('ldapOrganizationUnit');
+            if($ou == null) {
+                ldap_close($ldapConnection);
+                return;
+            }
+            $dn = 'cn=' . $userName . ',ou=' . $ou->getValue();
             $domain = explode('.', $ldapDomain->getValue());
             $numberOfSubServers = count($domain);
             for($i=0;$i<$numberOfSubServers;$i++) {
-                if($i == 0) {
-                    $dn = 'dc=' . $domain[$i];
-                    continue;
-                }
                 $dn .= ',dc=' . $domain[$i];
             }
-            $search = ldap_search($ldapConnection, $dn, '(sAMAccountName=' . $userName . ')', array('sn', 'givenname', 'mail'));
+            $search = ldap_read($ldapConnection, $dn, '(objectclass=*)', array('sn', 'givenname', 'mail'));
             if(! $search) {
                 ldap_close($ldapConnection);
                 return;
