@@ -55,11 +55,9 @@ class user {
     public function getUserID() {
         return $this->userID;
     }
-
     public function getRoleID() {
         return $this->userRole;
     }
-
     public function setRoleID($inRoleID) {
         if (!is_numeric($inRoleID)) {
             return;

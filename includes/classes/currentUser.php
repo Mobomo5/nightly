@@ -61,11 +61,21 @@ class currentUser extends user {
     public function getUserID() {
         return $this->tempID;
     }
-
+    public function setUserID($inID) {
+        if(! is_int($inID)) {
+            return;
+        }
+        $this->tempID = $inID;
+    }
     public function isLoggedIn() {
         return $this->isLoggedIn;
     }
-
+    public function setLoggedIn($isLoggedIn = true) {
+        if(! is_bool($isLoggedIn)) {
+            return;
+        }
+        $this->isLoggedIn =$isLoggedIn;
+    }
     public function logIn($userName, $password) {
         if ($this->isLoggedIn) {
             return true;
