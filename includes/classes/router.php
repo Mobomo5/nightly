@@ -34,12 +34,10 @@ class router {
         self::$currentURL = $cleanURL;
         return self::$instance;
     }
-
     private function __construct() {
         $this->staticRoutes = array();
         $this->sourceURL = '';
     }
-
     public function addRoute($parametersPattern, $moduleToRouteTo) {
         $parametersPattern = filter_var($parametersPattern, FILTER_SANITIZE_URL);
         if (!moduleEngine::getInstance()->moduleExists($moduleToRouteTo)) {
@@ -47,7 +45,6 @@ class router {
         }
         $this->staticRoutes[$parametersPattern] = $moduleToRouteTo;
     }
-
     private function determineAlias() {
         $database = database::getInstance();
         $page = self::$currentURL;
@@ -63,7 +60,6 @@ class router {
         $this->sourceURL = $results[0]['source'];
         return true;
     }
-
     public function getDecodedParameters($asArray = false) {
         $this->determineAlias();
         if ($asArray == true) {
@@ -71,14 +67,12 @@ class router {
         }
         return $this->sourceURL;
     }
-
     public function getParameters($asArray = false) {
         if ($asArray == true) {
             return explode('/', self::$currentURL);
         }
         return self::$currentURL;
     }
-
     public function getPreviousParameters($asArray = false) {
         if (self::$previousURL == null) {
             return null;
@@ -88,7 +82,6 @@ class router {
         }
         return self::$previousURL;
     }
-
     public function whichModuleHandlesRequest() {
         $params = $this->getDecodedParameters();
         if (isset($this->staticRoutes[$params])) {
@@ -107,7 +100,6 @@ class router {
         }
         return $module;
     }
-
     public static function moveCurrentParametersToPrevious() {
         $_SESSION['educaskPreviousPage'] = self::$currentURL;
     }
