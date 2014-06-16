@@ -99,6 +99,8 @@ class bootstrap {
         define('NODE_FIELD_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeField.php');
         define('LOCKOUT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/lockout.php');
         define('LOCKOUT_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/lockoutEngine.php');
+        define('URL_ALIAS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/urlAlias.php');
+        define('URL_ALIAS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/urlAliasEngine.php');
     }
 
     private function doRequires() {
