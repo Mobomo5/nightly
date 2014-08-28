@@ -110,4 +110,10 @@ class nodeFieldType {
         }
         return true;
     }
+    public function validatorIsValid() {
+        return $this->validateValidator($this->validator);
+    }
+    public function sanitizerIsValid() {
+        return $this->validateSanitizer($this->sanitizer);
+    }
 }

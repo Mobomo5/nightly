@@ -341,7 +341,7 @@ class nodeEngine {
         }
         $permissionEngine = permissionEngine::getInstance();
         if(! $permissionEngine->currentUserCanDo('revertAllRevisionsOfNodeType' . $nodeType->getID())) {
-            if(! $permissionEngine->currentUserCanDo('reviseOwnRevisionsOfNodeType' . $nodeType->getID())) {
+            if(! $permissionEngine->currentUserCanDo('revertOwnRevisionsOfNodeType' . $nodeType->getID())) {
                 return false;
             }
             $currentUser = currentUser::getUserSession();
@@ -361,9 +361,73 @@ class nodeEngine {
         }
         return true;
     }
-    public function addNodeFieldType() {
-
+    public function addNodeFieldType(nodeFieldType $nodeFieldType) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canAddNodeFieldTypes')) {
+            return false;
+        }
+        if(! $nodeFieldType->validatorIsValid()) {
+            return false;
+        }
+        if(! $nodeFieldType->sanitizerIsValid()) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldType->getFieldName())));
+        $dataType = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldType->getDataType())));
+        $validator = $nodeFieldType->getValidator();
+        $validatorOptions = $nodeFieldType->getValidatorOptions();
+        $sanitizer = $nodeFieldType->getSanitizer();
+        $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldType->getSanitizerParameterForData())));
+        $sanitizerOptions = $nodeFieldType->getSanitizerOptions();
+        if (! is_array($validatorOptions)) {
+            return false;
+        }
+        if(! is_array($sanitizerOptions)) {
+            return false;
+        }
+        $validatorOptions = serialize($validatorOptions);
+        $sanitizerOptions = serialize($sanitizerOptions);
+        $results = $database->insertData('nodeFieldType', 'fieldName, dataType, validator, validatorOptions, sanitizer, parameterForData, sanitizerOptions', "'{$fieldName}', '{$dataType}', '{$validator}', '{$validatorOptions}', '{$sanitizer}', '{$sanitizerParameterForData}', '{$sanitizerOptions}'");
+        if($results == false) {
+            return false;
+        }
+        return true;
     }
-
+    public function getNodeFieldType($fieldName) {
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($fieldName)));
+        $results = $database->getData('*', 'nodeFieldType', "fieldName='{$fieldName}'");
+        if ($results == false) {
+            return false;
+        }
+        if ($results == null) {
+            return false;
+        }
+        if (count($results) > 1) {
+            return false;
+        }
+        $validatorOptions = unserialize($results['validatorOptions']);
+        if($validatorOptions == false) {
+            return false;
+        }
+        if(! is_array($validatorOptions)) {
+            return false;
+        }
+        $sanitizerOptions = unserialize($results['sanitizerOptions']);
+        if($sanitizerOptions == false) {
+            return false;
+        }
+        if(! is_array($sanitizerOptions)) {
+            return false;
+        }
+        return new nodeFieldType($results['fieldName'], $results['dataType'], $results['validator'], $validatorOptions, $results['sanitizer'], $results['parameterForData'], $sanitizerOptions);
+    }
     //@ToDo: getting, saving, deleting, and adding every kind of node object.
 }
