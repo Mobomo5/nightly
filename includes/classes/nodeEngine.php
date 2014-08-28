@@ -280,6 +280,10 @@ class nodeEngine {
         }
         $content = $revisionToAdd->getContent();
         $content = $database->escapeString($content);
+        if(! $revisionToAdd->getFieldType()->validateData($content)) {
+            return false;
+        }
+        $content = $revisionToAdd->getFieldType()->sanitizeData($content);
         $timePosted = $revisionToAdd->getTimePosted();
         $authorID = $revisionToAdd->getAuthorID();
         $authorID = $database->escapeString($authorID);
@@ -321,6 +325,10 @@ class nodeEngine {
         $id = $revisionToSave->getID();
         $id = $database->escapeString($id);
         $content = $revisionToSave->getContent();
+        if(! $revisionToSave->getFieldType()->validateData($content)) {
+            return false;
+        }
+        $content = $revisionToSave->getFieldType()->sanitizeData($content);
         $content = $database->escapeString($content);
         $boolIsCurrent = $revisionToSave->isCurrent();
         if($boolIsCurrent == true) {
@@ -428,6 +436,66 @@ class nodeEngine {
             return false;
         }
         return new nodeFieldType($results['fieldName'], $results['dataType'], $results['validator'], $validatorOptions, $results['sanitizer'], $results['parameterForData'], $sanitizerOptions);
+    }
+    public function editNodeFieldType(nodeFieldType $nodeFieldTypeToSave) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canEditNodeFieldTypes')) {
+            return false;
+        }
+        if(! $nodeFieldTypeToSave->validatorIsValid()) {
+            return false;
+        }
+        if(! $nodeFieldTypeToSave->sanitizerIsValid()) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeToSave->getFieldName())));
+        $dataType = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeToSave->getDataType())));
+        $validator = $nodeFieldTypeToSave->getValidator();
+        $validatorOptions = $nodeFieldTypeToSave->getValidatorOptions();
+        $sanitizer = $nodeFieldTypeToSave->getSanitizer();
+        $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeToSave->getSanitizerParameterForData())));
+        $sanitizerOptions = $nodeFieldTypeToSave->getSanitizerOptions();
+        if (! is_array($validatorOptions)) {
+            return false;
+        }
+        if(! is_array($sanitizerOptions)) {
+            return false;
+        }
+        $validatorOptions = serialize($validatorOptions);
+        $sanitizerOptions = serialize($sanitizerOptions);
+        $results = $database->updateTable('nodeFieldType', "validator='{$validator}', validatorOptions='{$validatorOptions}', sanitizer='{$sanitizer}', parameterForData='{$sanitizerParameterForData}', sanitizerOptions='{$sanitizerOptions}'", "fieldName='{$fieldName}' AND dataType='{$dataType}'");
+        if($results == false) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteNodeFieldType(nodeFieldType $toDelete) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canDeleteNodeFieldTypes')) {
+            return false;
+        }
+        $fieldName = $toDelete->getFieldName();
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $dataExists = $database->getData('relationID', 'nodeFieldRevision', "nodeFieldType='{$fieldName}'");
+        if($dataExists != null) {
+            return false;
+        }
+        $dataExists = $database->getData('id', 'nodeField', "nodeFieldType='{$fieldName}'");
+        if($dataExists != null) {
+            return false;
+        }
+        $result = $database->removeData('nodeFieldType', "fieldName='{$fieldName}'");
+        if(! $result) {
+            return false;
+        }
+        return true;
     }
     //@ToDo: getting, saving, deleting, and adding every kind of node object.
 }
