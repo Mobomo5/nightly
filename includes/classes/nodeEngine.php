@@ -26,385 +26,6 @@ class nodeEngine {
     private function __construct() {
         //Do nothing.
     }
-    public function getNode($nodeID) {
-        if (!is_numeric($nodeID)) {
-            return false;
-        }
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
-            return false;
-        }
-        $nodeID = $database->escapeString($nodeID);
-        $results = $database->getData('title, nodeType', 'node', "nodeID={$nodeID}");
-        if ($results == false) {
-            return false;
-        }
-        if ($results == null) {
-            return false;
-        }
-        if(count($results) > 1) {
-            return false;
-        }
-        $nodeType = $this->getNodeType($results[0]['nodeType']);
-        if($nodeType == false) {
-            return false;
-        }
-        $fieldRevisions = array();
-        foreach($nodeType->getNodeFields() as $nodeFieldType) {
-            $fieldRevision = $this->getNodeFieldRevisionsForNode($nodeID, $nodeType);
-            if($fieldRevisions == false) {
-                continue;
-            }
-            $fieldRevisions = array_merge($fieldRevisions, $fieldRevision);
-        }
-        return new node($nodeID, $results[0]['title'], $nodeType, $fieldRevisions);
-    }
-    public function deleteNode(node $nodeToDelete) {
-        $nodeType = $nodeToDelete->getNodeType()->getID();
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('deleteAllNodesOfType' . $nodeType)) {
-            if(! $permissionEngine->currentUserCanDo('deleteOwnNodesOfType' . $nodeType)) {
-                return false;
-            }
-            $currentUser = currentUser::getUserSession();
-            if($currentUser->getUserID() != $nodeToDelete->getAuthorID()) {
-                return false;
-            }
-        }
-        $fieldRevisions = $nodeToDelete->getFields();
-        //Remove all fields first.
-        foreach($fieldRevisions as $field) {
-            $deleted = $this->deleteFieldRevision($field);
-            if($deleted == true) {
-                continue;
-            }
-            return false;
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $id = $nodeToDelete->getID();
-        $id = $database->escapeString($id);
-        $success = $database->removeData('node', "nodeID={$id}");
-        if(! $success) {
-            return false;
-        }
-        return true;
-    }
-    public function getNodeType($inNodeTypeID) {
-        if (!is_numeric($inNodeTypeID)) {
-            return false;
-        }
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
-            return false;
-        }
-        $inNodeTypeID = $database->escapeString($inNodeTypeID);
-        $results = $database->getData('nodeTypeID, humanName, module, description', 'nodeType', "nodeTypeID={$inNodeTypeID}");
-        if ($results == false) {
-            return false;
-        }
-        if ($results == null) {
-            return false;
-        }
-        if (count($results) > 1) {
-            return false;
-        }
-        $moduleEngine = moduleEngine::getInstance();
-        $moduleData = $moduleEngine->getRawModuleDataFromDatabase($results[0]['module']);
-        if ($moduleData == false) {
-            return false;
-        }
-        $moduleName = $moduleData['moduleName'];
-        if (!$moduleEngine->moduleExists($moduleName)) {
-            $moduleName = 'node';
-        }
-        $nodeFieldTypes = $this->getNodeFieldTypesForNodeType($results[0]['nodeTypeID']);
-        if($nodeFieldTypes == false) {
-            return false;
-        }
-        return new nodeType($results[0]['nodeTypeID'], $results[0]['humanName'], $moduleName, $results[0]['inDescription'], $nodeFieldTypes);
-    }
-    public function getNodeTypeOfNode($nodeID) {
-        if(! is_numeric($nodeID)) {
-            return false;
-        }
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
-            return false;
-        }
-        $nodeID = $database->escapeString($nodeID);
-        $results = $database->getData('nodeType', 'node', "nodeID={$nodeID}");
-        if ($results == false) {
-            return false;
-        }
-        if ($results == null) {
-            return false;
-        }
-        if (count($results) > 1) {
-            return false;
-        }
-        return $this->getNodeType($results[0]['nodeType']);
-    }
-    public function getNodeFieldTypesForNodeType($inNodeTypeID) {
-        if (!is_numeric($inNodeTypeID)) {
-            return false;
-        }
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
-            return false;
-        }
-        $inNodeTypeID = $database->escapeString($inNodeTypeID);
-        $results = $database->getData('nft.fieldName, nft.dataType, nft.validator, nft.validatorOptions, nft.sanitizer, nft.parameterForData, nft.sanitizerOptions', 'nodeFieldType nft, nodeField nf', "nf.nodeFieldType = nft.fieldName AND nf.nodeType={$inNodeTypeID} ORDER BY nf.weight DESC");
-        if ($results == false) {
-            return false;
-        }
-        if ($results == null) {
-            return false;
-        }
-        $toReturn = array();
-        foreach ($results as $row) {
-            $validatorOptions = unserialize($row['validatorOptions']);
-            if($validatorOptions == false) {
-                continue;
-            }
-            if(! is_array($validatorOptions)) {
-                continue;
-            }
-            $sanitizerOptions = unserialize($row['sanitizerOptions']);
-            if($sanitizerOptions == false) {
-                continue;
-            }
-            if(! is_array($sanitizerOptions)) {
-                continue;
-            }
-            $toReturn[] = new nodeFieldType($row['fieldName'], $row['dataType'], $row['validator'], $validatorOptions, $row['sanitizer'], $row['parameterForData'], $sanitizerOptions);
-        }
-        return $toReturn;
-    }
-    public function getNodeFieldRevisionsForNode($inNodeID, nodeFieldType $nodeFieldType) {
-        if(! is_numeric($inNodeID)) {
-            return false;
-        }
-        $database = database::getInstance();
-        if (!$database->isConnected()) {
-            return false;
-        }
-        $inNodeID = $database->escapeString($inNodeID);
-        $nodeFieldName = $nodeFieldType->getFieldName();
-        $nodeFieldName = $database->escapeString($nodeFieldName);
-        $results = $database->getData('revisionID, content, timePosted, authorID, nodeID, nodeFieldType, isCurrent', 'nodeFieldRevisions', "nodeID={$inNodeID} AND nodeFieldType='{$nodeFieldName}'");
-        if($results == false) {
-            return false;
-        }
-        if($results == null) {
-            return false;
-        }
-        $toReturn = array();
-        foreach($results as $row) {
-            if($row['isCurrent'] == 1) {
-                $isCurrent = true;
-            } else {
-                $isCurrent = false;
-            }
-            $toReturn[] = new nodeFieldRevision($row['revisionID'], $row['content'], new DateTime($row['timePosted']), $row['authorID'], $row['nodeID'], $nodeFieldType, $isCurrent);
-        }
-        return $toReturn;
-    }
-    public function addNode(node $nodeToAdd) {
-        $nodeType = $nodeToAdd->getNodeType()->getID();
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('addNodesOfType' . $nodeType)) {
-            return false;
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $title = $nodeToAdd->getTitle();
-        $title = $database->escapeString($title);
-        $nodeType = $nodeToAdd->getNodeType();
-        $nodeTypeID = $nodeType->getID();
-        $nodeTypeID = $database->escapeString($nodeTypeID);
-        $success = $database->insertData('node', 'title, nodeType', "'{$title}', {$nodeTypeID}");
-        if(! $success) {
-            return false;
-        }
-        return true;
-    }
-    public function saveNode(node $nodeToSave) {
-        $nodeType = $nodeToSave->getNodeType()->getID();
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('saveAllNodesOfType' . $nodeType)) {
-            if(! $permissionEngine->currentUserCanDo('saveOwnNodesOfType' . $nodeType)) {
-                return false;
-            }
-            $currentUser = currentUser::getUserSession();
-            if($currentUser->getUserID() != $nodeToSave->getAuthorID()) {
-                return false;
-            }
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $title = $nodeToSave->getTitle();
-        $title = $database->escapeString($title);
-        $id = $nodeToSave->getID();
-        $id = $database->escapeString($id);
-        $success = $database->updateTable('node', "title='{$title}'", "nodeID={$id}");
-        if(! $success) {
-            return false;
-        }
-        return true;
-    }
-    public function addFieldRevision(nodeFieldRevision $revisionToAdd) {
-        $nodeType = $this->getNodeTypeOfNode($revisionToAdd->getNodeID());
-        if($nodeType == false) {
-            return false;
-        }
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('reviseAllNodesOfType' . $nodeType->getID())) {
-            if(! $permissionEngine->currentUserCanDo('reviseOwnNodesOfType' . $nodeType->getID())) {
-                return false;
-            }
-            $currentUser = currentUser::getUserSession();
-            if($currentUser->getUserID() != $revisionToAdd->getAuthorID()) {
-                return false;
-            }
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $content = $revisionToAdd->getContent();
-        $content = $database->escapeString($content);
-        if(! $revisionToAdd->getFieldType()->validateData($content)) {
-            return false;
-        }
-        $content = $revisionToAdd->getFieldType()->sanitizeData($content);
-        $timePosted = $revisionToAdd->getTimePosted();
-        $authorID = $revisionToAdd->getAuthorID();
-        $authorID = $database->escapeString($authorID);
-        $nodeID = $revisionToAdd->getNodeID();
-        $nodeID = $database->escapeString($nodeID);
-        $nodeFieldType = $revisionToAdd->getFieldType()->getFieldName();
-        $nodeFieldType = $database->escapeString($nodeFieldType);
-        $boolIsCurrent = $revisionToAdd->isCurrent();
-        if($boolIsCurrent == true) {
-            $isCurrent = 1;
-        } else {
-            $isCurrent = 0;
-        }
-        $success = $database->insertData('nodeFieldRevision', 'content, timePosted, authorID, nodeID, nodeFieldType, isCurrent', "'{$content}', '{$timePosted}', {$authorID}, {$nodeID}, '{$nodeFieldType}', {$isCurrent}");
-        if($success == false) {
-            return false;
-        }
-        return true;
-    }
-    public function saveFieldRevision(nodeFieldRevision $revisionToSave) {
-        $nodeType = $this->getNodeTypeOfNode($revisionToSave->getNodeID());
-        if($nodeType == false) {
-            return false;
-        }
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('reviseAllNodesOfType' . $nodeType->getID())) {
-            if(! $permissionEngine->currentUserCanDo('reviseOwnNodesOfType' . $nodeType->getID())) {
-                return false;
-            }
-            $currentUser = currentUser::getUserSession();
-            if($currentUser->getUserID() != $revisionToSave->getAuthorID()) {
-                return false;
-            }
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $id = $revisionToSave->getID();
-        $id = $database->escapeString($id);
-        $content = $revisionToSave->getContent();
-        if(! $revisionToSave->getFieldType()->validateData($content)) {
-            return false;
-        }
-        $content = $revisionToSave->getFieldType()->sanitizeData($content);
-        $content = $database->escapeString($content);
-        $boolIsCurrent = $revisionToSave->isCurrent();
-        if($boolIsCurrent == true) {
-            $isCurrent = 1;
-        } else {
-            $isCurrent = 0;
-        }
-        $success = $database->updateTable('nodeFieldRevision', "content='{$content}', isCurrent={$isCurrent}", "revisionID={$id}");
-        if($success == false) {
-            return false;
-        }
-        return true;
-    }
-    public function deleteFieldRevision(nodeFieldRevision $revisionToDelete) {
-        $nodeType = $this->getNodeTypeOfNode($revisionToDelete->getNodeID());
-        if($nodeType == false) {
-            return false;
-        }
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('revertAllRevisionsOfNodeType' . $nodeType->getID())) {
-            if(! $permissionEngine->currentUserCanDo('revertOwnRevisionsOfNodeType' . $nodeType->getID())) {
-                return false;
-            }
-            $currentUser = currentUser::getUserSession();
-            if($currentUser->getUserID() != $revisionToDelete->getAuthorID()) {
-                return false;
-            }
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $id = $revisionToDelete->getID();
-        $id = $database->escapeString($id);
-        $success = $database->removeData('nodeFieldRevision', "revisionID={$id}");
-        if(! $success) {
-            return false;
-        }
-        return true;
-    }
-    public function addNodeFieldType(nodeFieldType $nodeFieldType) {
-        $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('canAddNodeFieldTypes')) {
-            return false;
-        }
-        if(! $nodeFieldType->validatorIsValid()) {
-            return false;
-        }
-        if(! $nodeFieldType->sanitizerIsValid()) {
-            return false;
-        }
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldType->getFieldName())));
-        $dataType = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldType->getDataType())));
-        $validator = $nodeFieldType->getValidator();
-        $validatorOptions = $nodeFieldType->getValidatorOptions();
-        $sanitizer = $nodeFieldType->getSanitizer();
-        $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldType->getSanitizerParameterForData())));
-        $sanitizerOptions = $nodeFieldType->getSanitizerOptions();
-        if (! is_array($validatorOptions)) {
-            return false;
-        }
-        if(! is_array($sanitizerOptions)) {
-            return false;
-        }
-        $validatorOptions = serialize($validatorOptions);
-        $sanitizerOptions = serialize($sanitizerOptions);
-        $results = $database->insertData('nodeFieldType', 'fieldName, dataType, validator, validatorOptions, sanitizer, parameterForData, sanitizerOptions', "'{$fieldName}', '{$dataType}', '{$validator}', '{$validatorOptions}', '{$sanitizer}', '{$sanitizerParameterForData}', '{$sanitizerOptions}'");
-        if($results == false) {
-            return false;
-        }
-        return true;
-    }
     public function getNodeFieldType($fieldName) {
         $database = database::getInstance();
         if(! $database->isConnected()) {
@@ -412,61 +33,80 @@ class nodeEngine {
         }
         $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($fieldName)));
         $results = $database->getData('*', 'nodeFieldType', "fieldName='{$fieldName}'");
-        if ($results == false) {
+        if($results == false) {
             return false;
         }
-        if ($results == null) {
+        if($results == null) {
             return false;
         }
-        if (count($results) > 1) {
+        if(count($results) > 1) {
             return false;
         }
-        $validatorOptions = unserialize($results['validatorOptions']);
-        if($validatorOptions == false) {
+        $fieldTypeData = $results[0];
+        $validatorArray = unserialize($fieldTypeData['validatorOptions']);
+        if(! is_array($validatorArray)) {
             return false;
         }
-        if(! is_array($validatorOptions)) {
+        $sanitizerArray = unserialize($fieldTypeData['sanitizerOptions']);
+        if(! is_array($sanitizerArray)) {
             return false;
         }
-        $sanitizerOptions = unserialize($results['sanitizerOptions']);
-        if($sanitizerOptions == false) {
-            return false;
-        }
-        if(! is_array($sanitizerOptions)) {
-            return false;
-        }
-        return new nodeFieldType($results['fieldName'], $results['dataType'], $results['validator'], $validatorOptions, $results['sanitizer'], $results['parameterForData'], $sanitizerOptions);
+        return new nodeFieldType($fieldTypeData['fieldName'], $fieldTypeData['dataType'], $fieldTypeData['validator'], $validatorArray, $fieldTypeData['sanitizer'], $fieldTypeData['parameterForData'], $sanitizerArray);
     }
-    public function editNodeFieldType(nodeFieldType $nodeFieldTypeToSave) {
+    public function addNodeFieldType(nodeFieldType $toAdd) {
         $permissionEngine = permissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo('canEditNodeFieldTypes')) {
-            return false;
-        }
-        if(! $nodeFieldTypeToSave->validatorIsValid()) {
-            return false;
-        }
-        if(! $nodeFieldTypeToSave->sanitizerIsValid()) {
+        if(! $permissionEngine->currentUserCanDo('canAddNodeFieldTypes')) {
             return false;
         }
         $database = database::getInstance();
         if(! $database->isConnected()) {
             return false;
         }
-        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeToSave->getFieldName())));
-        $dataType = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeToSave->getDataType())));
-        $validator = $nodeFieldTypeToSave->getValidator();
-        $validatorOptions = $nodeFieldTypeToSave->getValidatorOptions();
-        $sanitizer = $nodeFieldTypeToSave->getSanitizer();
-        $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeToSave->getSanitizerParameterForData())));
-        $sanitizerOptions = $nodeFieldTypeToSave->getSanitizerOptions();
-        if (! is_array($validatorOptions)) {
+        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toAdd->getFieldName())));
+        $dataType = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toAdd->getDataType())));
+        $validator = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toAdd->getValidator())));
+        $sanitizer = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toAdd->getSanitizer())));
+        $validatorOptions = $toAdd->getValidatorOptions();
+        if(! is_array($validatorOptions)) {
             return false;
         }
+        $validatorOptions = $database->escapeString(serialize($validatorOptions));
+        $sanitizerOptions = $toAdd->getSanitizerOptions();
         if(! is_array($sanitizerOptions)) {
             return false;
         }
-        $validatorOptions = serialize($validatorOptions);
-        $sanitizerOptions = serialize($sanitizerOptions);
+        $sanitizerOptions = $database->escapeString(serialize($sanitizerOptions));
+        $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toAdd->getSanitizerParameterForData())));
+        $results = $database->insertData('nodeFieldType', 'fieldName, dataType, validator, validatorOptions, sanitizer, parameterForData, sanitizerOptions', "'{$fieldName}', '{$dataType}', '{$validator}', '{$validatorOptions}', '{$sanitizer}', '{$sanitizerParameterForData}', {$sanitizerOptions}'");
+        if(! $results) {
+            return false;
+        }
+        return true;
+    }
+    public function editNodeFieldType(nodeFieldType $toEdit) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canEditNodeFieldTypes')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toEdit->getFieldName())));
+        $dataType = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toEdit->getDataType())));
+        $validator = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toEdit->getValidator())));
+        $sanitizer = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toEdit->getSanitizer())));
+        $validatorOptions = $toEdit->getValidatorOptions();
+        if(! is_array($validatorOptions)) {
+            return false;
+        }
+        $validatorOptions = $database->escapeString(serialize($validatorOptions));
+        $sanitizerOptions = $toEdit->getSanitizerOptions();
+        if(! is_array($sanitizerOptions)) {
+            return false;
+        }
+        $sanitizerOptions = $database->escapeString(serialize($sanitizerOptions));
+        $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toEdit->getSanitizerParameterForData())));
         $results = $database->updateTable('nodeFieldType', "validator='{$validator}', validatorOptions='{$validatorOptions}', sanitizer='{$sanitizer}', parameterForData='{$sanitizerParameterForData}', sanitizerOptions='{$sanitizerOptions}'", "fieldName='{$fieldName}' AND dataType='{$dataType}'");
         if($results == false) {
             return false;
@@ -478,24 +118,23 @@ class nodeEngine {
         if(! $permissionEngine->currentUserCanDo('canDeleteNodeFieldTypes')) {
             return false;
         }
-        $fieldName = $toDelete->getFieldName();
         $database = database::getInstance();
         if(! $database->isConnected()) {
             return false;
         }
-        $dataExists = $database->getData('relationID', 'nodeFieldRevision', "nodeFieldType='{$fieldName}'");
-        if($dataExists != null) {
+        $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toDelete->getFieldName())));
+        $results = $database->getData('revisionID', 'nodeFieldRevision', "nodeFieldType='{$fieldName}'");
+        if($results != null) {
             return false;
         }
-        $dataExists = $database->getData('id', 'nodeField', "nodeFieldType='{$fieldName}'");
-        if($dataExists != null) {
+        $results = $database->getData('id', 'nodeField', "nodeFieldType='{$fieldName}'");
+        if($results != null) {
             return false;
         }
-        $result = $database->removeData('nodeFieldType', "fieldName='{$fieldName}'");
-        if(! $result) {
+        $results = $database->removeData('nodeFieldType', "fieldName='{$fieldName}'");
+        if($results == false) {
             return false;
         }
         return true;
     }
-    //@ToDo: getting, saving, deleting, and adding every kind of node object.
 }
