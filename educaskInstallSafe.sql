@@ -119,12 +119,18 @@ CREATE TABLE IF NOT EXISTS `node` (
   `nodeID` INT NOT NULL AUTO_INCREMENT COMMENT 'The unique identifier for the node.',
   `title` VARCHAR(75) NOT NULL COMMENT 'The title for the node.',
   `nodeType` INT NOT NULL COMMENT 'The type of the node. Example: page.',
+  `authorID` INT NOT NULL COMMENT 'The original author of the node.',
   PRIMARY KEY (`nodeID`),
   UNIQUE INDEX `nodeID_UNIQUE` (`nodeID` ASC),
   INDEX `fk_nodes_nodeType1_idx` (`nodeType` ASC),
   CONSTRAINT `fk_nodes_nodeType1`
     FOREIGN KEY (`nodeType`)
     REFERENCES `nodeType` (`nodeTypeID`)
+    ON DELETE NO ACTION
+	  ON UPDATE NO ACTION,
+	CONSTRAINT `fk_node_user1`
+	  FOREIGN KEY (`authorID`)
+	  REFERENCES `user` (`userID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

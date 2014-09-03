@@ -33,18 +33,11 @@ class logger {
         if (!$results) {
             return false;
         }
-        // get EventID and return it
-        $results = $db->getData('eventID', 'systemLog', 'message = \'' . $message . '\' AND type = \'' . $type . '\' AND userID = \'' . $userID . '\'');
-        if (!$results) {
-
-            return false;
-        }
-        return $results[0]['eventID'];
-
+        return true;
     }
 
     public function getLog($level = 'all') {
-        if (!permissionEngine::getInstance()->checkPermissionByName('userCanViewLog')) {
+        if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewLog')) {
             return false;
         }
         $db = database::getInstance();
