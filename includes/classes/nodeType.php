@@ -12,8 +12,6 @@ class nodeType {
     private $moduleInCharge;
     private $description;
     private $nodeFields;
-    private $addedFields;
-    private $deletedFields;
     public function __construct($inID, $inHumanName, $inModuleInCharge, $inDescription, array $inNodeFieldTypes) {
         if(! is_numeric($inID)) {
             return;
@@ -41,8 +39,6 @@ class nodeType {
         $this->moduleInCharge = $inModuleInCharge;
         $this->description = $inDescription;
         $this->nodeFields = $validatedNodeFields;
-        $this->addedFields = array();
-        $this->deletedFields = array();
     }
     public function getID() {
         return $this->id;
@@ -73,37 +69,14 @@ class nodeType {
     public function getNodeFields() {
         return $this->nodeFields;
     }
-    public function getAddedFields() {
-        return $this->addedFields;
-    }
-    public function addNodeField(nodeFieldType $inNodeField) {
-        //Get out of here if the field is already part of this nodeType.
-        foreach($this->nodeFields as $nodeField) {
-            if($inNodeField->getFieldName() != $nodeField->getFieldName()) {
-                continue;
-            }
-            return;
-        }
-        $this->nodeFields[] = $inNodeField;
-        $this->addedFields[] = $inNodeField;
-    }
-    public function getRemovedFields() {
-        return $this->deletedFields;
-    }
-    public function removeNodeField(nodeFieldType $inNodeField) {
-        foreach($this->nodeFields as $nodeField) {
-            if($inNodeField->getFieldName() != $nodeField->getFieldName()) {
-                continue;
-            }
-            $this->deletedFields[] = $inNodeField;
-            unset($nodeField);
-        }
-    }
     private function validateModule($inModuleName) {
         $test = moduleEngine::getInstance();
         if(! $test->moduleExists($inModuleName)) {
             return false;
         }
         return true;
+    }
+    public function moduleIsValid() {
+        return $this->validateModule($this->moduleInCharge);
     }
  }

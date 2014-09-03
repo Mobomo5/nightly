@@ -17,6 +17,9 @@ require_once(PERMISSION_ENGINE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 class nodeEngine {
     private static $instance;
+    private $foundNodeFieldTypes;
+    private $foundNodeFieldRevisions;
+    private $foundNodeTypes;
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new nodeEngine();
@@ -24,9 +27,14 @@ class nodeEngine {
         return self::$instance;
     }
     private function __construct() {
-        //Do nothing.
+        $this->foundNodeFieldTypes = array();
+        $this->foundNodeFieldRevisions = array();
+        $this->foundNodeTypes = array();
     }
     public function getNodeFieldType($fieldName) {
+        if(isset($this->foundNodeFieldTypes[$fieldName])) {
+            return $this->foundNodeFieldTypes[$fieldName];
+        }
         $database = database::getInstance();
         if(! $database->isConnected()) {
             return false;
@@ -51,9 +59,17 @@ class nodeEngine {
         if(! is_array($sanitizerArray)) {
             return false;
         }
-        return new nodeFieldType($fieldTypeData['fieldName'], $fieldTypeData['dataType'], $fieldTypeData['validator'], $validatorArray, $fieldTypeData['sanitizer'], $fieldTypeData['parameterForData'], $sanitizerArray);
+        $toReturn = new nodeFieldType($fieldTypeData['fieldName'], $fieldTypeData['dataType'], $fieldTypeData['validator'], $validatorArray, $fieldTypeData['sanitizer'], $fieldTypeData['parameterForData'], $sanitizerArray);
+        $this->foundNodeFieldTypes[$toReturn->getFieldName()] = $toReturn;
+        return $toReturn;
     }
     public function addNodeFieldType(nodeFieldType $toAdd) {
+        if(! $toAdd->validatorIsValid()) {
+            return false;
+        }
+        if(! $toAdd->sanitizerIsValid()) {
+            return false;
+        }
         $permissionEngine = permissionEngine::getInstance();
         if(! $permissionEngine->currentUserCanDo('canAddNodeFieldTypes')) {
             return false;
@@ -84,6 +100,12 @@ class nodeEngine {
         return true;
     }
     public function editNodeFieldType(nodeFieldType $toEdit) {
+        if(! $toEdit->validatorIsValid()) {
+            return false;
+        }
+        if(! $toEdit->sanitizerIsValid()) {
+            return false;
+        }
         $permissionEngine = permissionEngine::getInstance();
         if(! $permissionEngine->currentUserCanDo('canEditNodeFieldTypes')) {
             return false;
@@ -138,11 +160,14 @@ class nodeEngine {
         return true;
     }
     public function getNodeFieldRevision($revisionID) {
-        $database = database::getInstance();
-        if(! $database->isConnected()) {
+        if(! is_numeric($revisionID)) {
             return false;
         }
-        if(! is_numeric($revisionID)) {
+        if(isset($this->foundNodeFieldRevisions[$revisionID])) {
+            return $this->foundNodeFieldRevisions[$revisionID];
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
             return false;
         }
         $revisionID = $database->escapeString($revisionID);
@@ -165,7 +190,9 @@ class nodeEngine {
         if($fieldRevisionData['isCurrent'] == 1) {
             return new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType);
         }
-        return new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType, false);
+        $toReturn = new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType, false);
+        $this->foundNodeFieldRevisions[$toReturn->getID()] = $toReturn;
+        return $toReturn;
     }
     public function addNodeFieldRevision(nodeFieldRevision $toAdd) {
         $database = database::getInstance();
@@ -288,4 +315,121 @@ class nodeEngine {
         }
         return true;
     }
-}
+    public function getNodeType($nodeTypeID) {
+        if(! is_numeric($nodeTypeID)) {
+            return false;
+        }
+        if(isset($this->foundNodeTypes[$nodeTypeID])) {
+            return $this->foundNodeTypes[$nodeTypeID];
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $nodeTypeID = $database->escapeString($nodeTypeID);
+        $results = $database->getData('nt.nodeTypeID, nt.humanName, m.moduleName, nt.description', 'nodeType nt, module m', "nt.module=m.moduleID AND nt.nodeTypeID={$nodeTypeID}");
+        if($results == null) {
+            return false;
+        }
+        if($results == false) {
+            return false;
+        }
+        if(count($results) > 1) {
+            return false;
+        }
+        $nodeFieldTypesRawData = $database->getData('nft.fieldName', 'nodeFieldType nft, nodeField nf', "nft.fieldName=nf.nodeFieldType AND nf.nodeType={$nodeTypeID}");
+        if(! is_array($nodeFieldTypesRawData)) {
+            //Not saving because an error happened.
+            return new nodeType($results[0]['nodeTypeID'], $results[0]['humanName'], $results[0]['moduleName'], $results[0]['description'], array());
+        }
+        $nodeFieldTypes = array();
+        foreach($nodeFieldTypesRawData as $nodeFieldTypeRawData) {
+            $nodeFieldType = $this->getNodeFieldType($nodeFieldTypeRawData['fieldName']);
+            if($nodeFieldType == false) {
+                continue;
+            }
+            $nodeFieldTypes[] = $nodeFieldType;
+        }
+        $toReturn = new nodeType($results[0]['nodeTypeID'], $results[0]['humanName'], $results[0]['moduleName'], $results[0]['description'], $nodeFieldTypes);
+        $this->foundNodeTypes[$toReturn->getID()] = $toReturn;
+        return $toReturn;
+    }
+    public function editNodeType(nodeType $toEdit) {
+        if(! $toEdit->moduleIsValid()) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canEditNodeTypes')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toEdit->getID());
+        $humanName = $database->escapeString(strip_tags($toEdit->getHumanName()));
+        $moduleName = $database->escapeString($toEdit->getModuleInCharge());
+        $description = $database->escapeString($toEdit->getDescription());
+        $moduleIDData = $database->getData('moduleID', 'module', "moduleName={$moduleName}");
+        if(! is_array($moduleIDData)) {
+            return false;
+        }
+        $moduleID = $moduleIDData[0]['moduleID'];
+        $result = $database->updateTable('nodeType', "humanName='{$humanName}', module={$moduleID}, description='{$description}'", "nodeTypeID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function addNodeType(nodeType $toAdd) {
+        if(! $toAdd->moduleIsValid()) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canAddNodeTypes')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $humanName = $database->escapeString(strip_tags($toAdd->getHumanName()));
+        $moduleName = $database->escapeString($toAdd->getModuleInCharge());
+        $description = $database->escapeString($toAdd->getDescription());
+        $moduleIDData = $database->getData('moduleID', 'module', "moduleName={$moduleName}");
+        if(! is_array($moduleIDData)) {
+            return false;
+        }
+        $moduleID = $moduleIDData[0]['moduleID'];
+        $result = $database->insertData('nodeType', 'humanName, module, description', "'{$humanName}', {$moduleID}, '{$description}'");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteNodeType(nodeType $toDelete) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canDeleteNodeTypes')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toDelete->getID());
+        //Check if any data in the db depends on this nodeType
+        $dataExists = $database->getData('id', 'nodeField', "nodeType={$id}");
+        if($dataExists != null) {
+            return false;
+        }
+        $dataExists = $database->getData('nodeID', 'node', "nodeType={$id}");
+        if($dataExists != null) {
+            return false;
+        }
+        $result = $database->removeData('nodeType', "nodeTypeID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+ }
