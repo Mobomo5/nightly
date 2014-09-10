@@ -6,7 +6,6 @@
  * Time: 11:05 AM
  */
 require_once(DATABASE_OBJECT_FILE);
-require_once(NODE_ENGINE_OBJECT_FILE);
 require_once(NODE_OBJECT_FILE);
 require_once(NODE_TYPE_OBJECT_FILE);
 require_once(NODE_FIELD_REVISION_OBJECT_FILE);
@@ -20,6 +19,8 @@ class nodeEngine {
     private $foundNodeFieldTypes;
     private $foundNodeFieldRevisions;
     private $foundNodeTypes;
+    private $foundNodeFields;
+    private $foundNodes;
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new nodeEngine();
@@ -30,6 +31,8 @@ class nodeEngine {
         $this->foundNodeFieldTypes = array();
         $this->foundNodeFieldRevisions = array();
         $this->foundNodeTypes = array();
+        $this->foundNodeFields = array();
+        $this->foundNodes = array();
     }
     public function getNodeFieldType($fieldName) {
         if(isset($this->foundNodeFieldTypes[$fieldName])) {
@@ -188,10 +191,51 @@ class nodeEngine {
             return false;
         }
         if($fieldRevisionData['isCurrent'] == 1) {
-            return new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType);
+            $toReturn = new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType);
+            $this->foundNodeFieldRevisions[$toReturn->getID()] = $toReturn;
+            return $toReturn;
         }
         $toReturn = new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType, false);
         $this->foundNodeFieldRevisions[$toReturn->getID()] = $toReturn;
+        return $toReturn;
+    }
+    public function getNodeFieldRevisionsForNode($nodeID) {
+        if(! is_numeric($nodeID)) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $nodeID = $database->escapeString($nodeID);
+        $rawData = $database->getData('*', 'nodeFieldRevision', "nodeID={$nodeID}");
+        if($rawData == false) {
+            return false;
+        }
+        if($rawData == null) {
+            return false;
+        }
+        $toReturn = array();
+        foreach($rawData as $rawDataForRevision) {
+            if(isset($this->foundNodeFieldRevisions[$rawDataForRevision['revisionID']])) {
+                $toReturn[] = $this->foundNodeFieldRevisions[$rawDataForRevision['revisionID']];
+                continue;
+            }
+            $date = new DateTime($rawDataForRevision['timePosted']);
+            $nodeFieldType = $this->getNodeFieldType($rawDataForRevision['nodeFieldType']);
+            if($nodeFieldType == false) {
+                continue;
+            }
+            if($rawDataForRevision['isCurrent'] == 1) {
+                $nodeField = new nodeFieldRevision($rawDataForRevision['revisionID'], $rawDataForRevision['content'], $date, $rawDataForRevision['authorID'], $rawDataForRevision['nodeID'], $nodeFieldType);
+                $this->foundNodeFieldRevisions[$nodeField->getID()] = $nodeField;
+                $toReturn[] = $nodeField;
+                continue;
+            }
+            $nodeField = new nodeFieldRevision($rawDataForRevision['revisionID'], $rawDataForRevision['content'], $date, $rawDataForRevision['authorID'], $rawDataForRevision['nodeID'], $nodeFieldType, false);
+            $this->foundNodeFieldRevisions[$nodeField->getID()] = $nodeField;
+            $toReturn[] = $nodeField;
+        }
         return $toReturn;
     }
     public function addNodeFieldRevision(nodeFieldRevision $toAdd) {
@@ -337,7 +381,7 @@ class nodeEngine {
         if(count($results) > 1) {
             return false;
         }
-        $nodeFieldTypesRawData = $database->getData('nft.fieldName', 'nodeFieldType nft, nodeField nf', "nft.fieldName=nf.nodeFieldType AND nf.nodeType={$nodeTypeID}");
+        $nodeFieldTypesRawData = $database->getData('nft.fieldName', 'nodeFieldType nft, nodeField nf', "nft.fieldName=nf.nodeFieldType AND nf.nodeType={$nodeTypeID} ORDER BY nf.weight, nf.id, nft.fieldName");
         if(! is_array($nodeFieldTypesRawData)) {
             //Not saving because an error happened.
             return new nodeType($results[0]['nodeTypeID'], $results[0]['humanName'], $results[0]['moduleName'], $results[0]['description'], array());
@@ -431,5 +475,258 @@ class nodeEngine {
             return false;
         }
         return true;
+    }
+    public function getNodeField($nodeFieldID) {
+        if(! is_numeric($nodeFieldID)) {
+            return false;
+        }
+        if(isset($this->foundNodeFields[$nodeFieldID])) {
+            return $this->foundNodeFields[$nodeFieldID];
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $nodeFieldID = $database->escapeString($nodeFieldID);
+        $rawData = $database->getData('*', 'nodeField', "id={$nodeFieldID}");
+        if($rawData == false) {
+            return false;
+        }
+        if($rawData == null) {
+            return false;
+        }
+        if(count($rawData) > 1) {
+            return false;
+        }
+        $nodeFieldType = $this->getNodeFieldType($rawData[0]['nodeFieldType']);
+        if($nodeFieldType == false) {
+            return false;
+        }
+        $nodeType = $this->getNodeType($rawData[0]['nodeType']);
+        if($nodeType == false) {
+            return false;
+        }
+        $toReturn = new nodeField($rawData[0]['id'], $nodeFieldType, $nodeType, $rawData[0]['weight']);
+        $this->foundNodeFields[$toReturn->getID()] = $toReturn;
+        return $toReturn;
+    }
+    public function addNodeField(nodeField $toAdd) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canAddNodeFields')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $nodeFieldType = $toAdd->getNodeFieldType();
+        $nodeFieldTypeID = $nodeFieldType->getFieldName();
+        $nodeFieldTypeID = $database->escapeString(preg_replace('/\s+/', '', strip_tags($nodeFieldTypeID)));
+        $nodeType = $toAdd->getNodeType();
+        $nodeTypeID = $nodeType->getID();
+        if(! is_numeric($nodeTypeID)) {
+            return false;
+        }
+        $nodeTypeID = $database->escapeString($nodeTypeID);
+        $weight = $toAdd->getWeight();
+        if(! is_numeric($weight)) {
+            return false;
+        }
+        $weight = $database->escapeString($weight);
+        $result = $database->insertData('nodeField', 'nodeFieldType, nodeType, weight', "'{$nodeFieldTypeID}', {$nodeTypeID}, {$weight}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function editNodeField(nodeField $toEdit) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canEditNodeFields')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $toEdit->getID();
+        if(! is_numeric($id)) {
+            return false;
+        }
+        $id = $database->escapeString($id);
+        $weight = $toEdit->getWeight();
+        if(! is_numeric($weight)) {
+            return false;
+        }
+        $weight = $database->escapeString($weight);
+        $result = $database->updateTable('nodeField', "weight={$weight}", "id={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteNodeField(nodeField $toDelete) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canDeleteNodeFields')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $toDelete->getID();
+        if(! is_numeric($id)) {
+            return false;
+        }
+        $id = $database->escapeString($id);
+        $result = $database->removeData('nodeField', "id={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function getNode($id) {
+        if(! is_numeric($id)) {
+            return false;
+        }
+        if(isset($this->foundNodes[$id])) {
+            return $this->foundNodes[$id];
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($id);
+        $rawData = $database->getData('*', 'node', "id={$id}");
+        if($rawData == false) {
+            return false;
+        }
+        if($rawData == null) {
+            return false;
+        }
+        if(count($rawData) > 1) {
+            return false;
+        }
+        $nodeType = $this->getNodeType($rawData[0]['nodeType']);
+        if($nodeType == false) {
+            return false;
+        }
+        $fieldRevisions = $this->getNodeFieldRevisionsForNode($id);
+        if($fieldRevisions == false) {
+            return false;
+        }
+        $toReturn = new node($rawData[0]['nodeID'], $rawData[0]['title'], $rawData[0]['author'], $nodeType, $fieldRevisions);
+        $this->foundNodes[$toReturn->getID()] = $toReturn;
+        return $toReturn;
+    }
+    public function addNode(node $toAdd) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canAddNodesOfType' . preg_replace('/\s+/', '', $toAdd->getNodeType()->getHumanName()))) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $title = $database->escapeString(strip_tags($toAdd->getTitle()));
+        $author = $database->escapeString($toAdd->getAuthorID());
+        $nodeTypeID = $database->escapeString($toAdd->getNodeType()->getID());
+        $result = $database->insertData('node', 'title, nodeType, authorID', "'{$title}', {$author}, {$nodeTypeID}");
+        if($result == false) {
+            return false;
+        }
+        $lastInsertID = $database->getLastInsertID();
+        $fieldRevisions = $toAdd->getFields();
+        $completed = array();
+        foreach($fieldRevisions as $fieldRevision) {
+            $fieldRevision->setNodeID($lastInsertID);
+            $added = $this->addNodeFieldRevision($fieldRevision);
+            if($added == false) {
+                $this->removeBulkFieldRevisions($completed);
+                return false;
+            }
+            $completed[] = $fieldRevision;
+        }
+    }
+    public function editNode(node $toEdit) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canEditAllNodesOfType' . preg_replace('/\s+/', '', $toEdit->getNodeType()->getHumanName()))) {
+            if(! $permissionEngine->currentUserCanDo('canEditOwnNodesOfType' . preg_replace('/\s+/', '', $toEdit->getNodeType()->getHumanName()))) {
+                return false;
+            }
+            if($toEdit->getAuthorID() != currentUser::getUserSession()->getUserID()) {
+                return false;
+            }
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $toEdit->getID();
+        if(! is_numeric($id)) {
+            return false;
+        }
+        $id = $database->escapeString($id);
+        $title = $database->escapeString(strip_tags($toEdit->getTitle()));
+        $result = $database->updateTable('node', "title='{$title}'", "nodeID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteNode(node $toRemove) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('canDeleteAllNodesOfType' . preg_replace('/\s+/', '', $toRemove->getNodeType()->getHumanName()))) {
+            if(! $permissionEngine->currentUserCanDo('canDeleteOwnNodesOfType' . preg_replace('/\s+/', '', $toRemove->getNodeType()->getHumanName()))) {
+                return false;
+            }
+            if($toRemove->getAuthorID() != currentUser::getUserSession()->getUserID()) {
+                return false;
+            }
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $toRemove->getID();
+        if(! is_numeric($id)) {
+            return false;
+        }
+        $removedRevisions = $database->removeData('nodeFieldRevisions', "nodeID={$id}");
+        if($removedRevisions == false) {
+            return false;
+        }
+        $modifiedFiles = $database->updateTable('file', 'nodeID=0', "nodeID={$id}");
+        if($modifiedFiles == false) {
+            return false;
+        }
+        $removedAssignmentMarked = $database->removeData('assignmentMark', "assignmentID={$id}");
+        if($removedAssignmentMarked == false) {
+            return false;
+        }
+        $removedGroupMembers = $database->removeData('groupMember', "nodeID={$id}");
+        if($removedGroupMembers == false) {
+            return false;
+        }
+        $removedMessages = $database->removeData('message m, messageRecipient mr', "mr.messageID = m.messageID AND m.nodeID={$id}");
+        if($removedMessages == false) {
+            return false;
+        }
+        $statusesToRemove = $database->getData('statusID', 'status', "nodeID={$id}");
+        if($statusesToRemove == false) {
+            return false;
+        }
+        foreach($statusesToRemove as $status) {
+            //@ToDo: delete statuses on the node individually. Status System has to be rewritten first.
+        }
+        $nodeRemoved = $database->removeData('node', "nodeID={$id}");
+        if($nodeRemoved == false) {
+            return false;
+        }
+        return true;
+    }
+    private function removeBulkFieldRevisions(array $fieldRevisionsToRemove) {
+        foreach($fieldRevisionsToRemove as $fieldRevision) {
+            $this->deleteNodeFieldRevision($fieldRevision);
+        }
     }
  }

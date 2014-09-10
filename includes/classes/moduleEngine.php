@@ -18,11 +18,9 @@ class moduleEngine {
 
         return self::$instance;
     }
-
     private function __construct() {
         $this->foundModules = array();
     }
-
     public function moduleExists($moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
         if ($moduleName == '/') {
@@ -52,7 +50,6 @@ class moduleEngine {
 
         return true;
     }
-
     public function includeModule($moduleName) {
         if (!$this->moduleExists($moduleName)) {
                 $moduleName = 'fourOhFour';
@@ -75,7 +72,6 @@ class moduleEngine {
         }
         return true;
     }
-
     public function addModule($name, $humanName, $enabled = 1) {
         // check permissions
         $permEng = permissionEngine::getInstance();

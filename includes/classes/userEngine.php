@@ -125,7 +125,7 @@ class userEngine {
         $userID = $results[0]['userID'];
         return $userID;
     }
-
+    //@ToDO: This won't work since the user's id is tied with a lot of other data in the db. Darn Foreign Keys! :)
     public function deleteUser(user $userToBeDeleted) {
         if (!permissionEngine::getInstance()->currentUserCanDo('userCanDeleteUsers')) {
             return false;

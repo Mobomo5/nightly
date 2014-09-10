@@ -7,6 +7,7 @@
  */
 require_once(NODE_TYPE_OBJECT_FILE);
 require_once(NODE_FIELD_REVISION_OBJECT_FILE);
+require_once(MODULE_ENGINE_OBJECT_FILE);
 class node {
     private $id;
     private $title;
@@ -58,33 +59,18 @@ class node {
     public function getFields() {
         return $this->fieldRevisions;
     }
-    public function setField(nodeFieldRevision $field) {
-        if($field->getNodeID() != $this->id) {
-            return;
-        }
-        foreach($this->fieldRevisions as $fieldRevision) {
-            if($field->getFieldType() != $fieldRevision->getFieldType()) {
-                continue;
-            }
-            if($field->getID() != $fieldRevision->getID()) {
-                continue;
-            }
-            $fieldRevision->setIsCurrent(false);
-            $nodeEngine = nodeEngine::getInstance();
-            $nodeEngine->saveFieldRevision($fieldRevision);
-            $nodeEngine->addFieldRevision($field);
-            $fieldRevision = $field;
-            break;
-        }
-    }
     public function getContent() {
-        $toReturn = '';
-        foreach($this->fieldRevisions as $fieldRevision) {
-            if(! $fieldRevision->isCurrent()) {
-                continue;
-            }
-            $toReturn .= $fieldRevision->getContent();
+        if(! $this->nodeType->moduleIsValid()) {
+            return '<p>Module Error</p>';
         }
-        return $toReturn;
+        $moduleEngine = moduleEngine::getInstance();
+        $module = $this->nodeType->getModuleInCharge();
+        $moduleEngine->includeModule($module);
+        $interfacesImplemented = class_implements($module);
+        if(! in_array('nodeModule', $interfacesImplemented)) {
+            return '<p>Module Error</p>';
+        }
+        $module = new $module();
+        return $module->getNodeContent($this);
     }
 }

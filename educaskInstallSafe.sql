@@ -661,7 +661,7 @@ CREATE TABLE IF NOT EXISTS `nodeField` (
   `id` INT NOT NULL COMMENT 'A unique identifier for the row.',
   `nodeFieldType` VARCHAR(45) NOT NULL COMMENT 'The nodeFiledType that the the nodeType is being mapped to.',
   `nodeType` INT NOT NULL COMMENT 'The nodeType that the nodeFieldType is being mapped to.',
-  `weigth` INT NOT NULL,
+  `weight` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_nodeField_nodeFieldType1_idx` (`nodeFieldType` ASC),
   INDEX `fk_nodeField_nodeType1_idx` (`nodeType` ASC),

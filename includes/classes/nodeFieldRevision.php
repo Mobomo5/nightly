@@ -52,6 +52,12 @@ class nodeFieldRevision {
     public function getNodeID() {
         return $this->nodeID;
     }
+    public function setNodeID($id) {
+        if(! is_numeric($id)) {
+            return;
+        }
+        $this->nodeID = $id;
+    }
     public function getFieldType() {
         return $this->fieldType;
     }

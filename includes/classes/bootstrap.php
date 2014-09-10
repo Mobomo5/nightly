@@ -101,6 +101,7 @@ class bootstrap {
         define('LOCKOUT_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/lockoutEngine.php');
         define('URL_ALIAS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/urlAlias.php');
         define('URL_ALIAS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/urlAliasEngine.php');
+        define('NODE_MODULE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/nodeModule.php');
     }
 
     private function doRequires() {
