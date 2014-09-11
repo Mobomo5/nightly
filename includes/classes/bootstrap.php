@@ -102,6 +102,8 @@ class bootstrap {
         define('URL_ALIAS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/urlAlias.php');
         define('URL_ALIAS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/urlAliasEngine.php');
         define('NODE_MODULE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/nodeModule.php');
+        define('FORGOT_PASSWORD_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPassword.php');
+        define('FORGOT_PASSWORD_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPasswordEngine.php');
     }
 
     private function doRequires() {
