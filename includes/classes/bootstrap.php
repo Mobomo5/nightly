@@ -209,8 +209,6 @@ class bootstrap {
             $name = end($name);
             $loader->addPath($baseTheme, $name);
         }
-        $loader->addPath(EDUCASK_ROOT . '/includes/baseThemes/html5');
-        $loader->addPath(EDUCASK_ROOT . '/includes/baseThemes');
         $twig = new Twig_Environment($loader, array('debug' => true,));
         $twig->addExtension(new Twig_Extension_Debug());
         if($this->site->isInMaintenanceMode()) {
