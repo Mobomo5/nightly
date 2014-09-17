@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: craig
@@ -13,7 +12,6 @@ class mySQL implements databaseInterface {
     private $dbPassword = '';
     private $db = '';
     private static $instance;
-
     /**
      * creates a new singleton mySQL database instance
      * @return mySQL
@@ -25,19 +23,16 @@ class mySQL implements databaseInterface {
         }
         return self::$instance;
     }
-
     public static function getRequiredPHPDatabaseModule() {
         return 'mysqli';
     }
-
     private function __construct() {
         //Do nothing;
     }
-
     /**
      * @bool Returns false if there are any connection errors, otherwise returns true.
      */
-    function isConnected() {
+    public function isConnected() {
         if (empty($this->mysqli)) {
             return false;
         }
@@ -55,7 +50,6 @@ class mySQL implements databaseInterface {
         }
         return true;
     }
-
     public function connect() {
         if ($this->isConnected()) {
             return;
@@ -73,7 +67,6 @@ class mySQL implements databaseInterface {
         }
         self::$instance = $this;
     }
-
     public function disconnect() {
         if (!$this->isConnected()) {
             return;
@@ -82,12 +75,11 @@ class mySQL implements databaseInterface {
         unset($this->mysqli);
         self::$instance = $this;
     }
-
     /**
      * returns an associative array of values stored as $result[row][column]=>value
      *
-     * @param string       $select
-     * @param string       $from
+     * @param string $select
+     * @param string $from
      * @param mixed|string $where
      *
      * @throws Exception
@@ -106,7 +98,6 @@ class mySQL implements databaseInterface {
         $resultsArray = $this->makeAssoc($results);
         return $resultsArray;
     }
-
     public function makeCustomQuery($inQuery) {
         if (!($results = $this->mysqli->query($inQuery))) {
             return false;
@@ -117,7 +108,6 @@ class mySQL implements databaseInterface {
         $resultsArray = $this->makeAssoc($results);
         return $resultsArray;
     }
-
     public function insertData($into, $columns, $values) {
         $query = 'INSERT INTO ' . $into . ' (' . $columns . ') VALUES (' . $values . ');';
         $results = $this->mysqli->query($query);
@@ -126,13 +116,11 @@ class mySQL implements databaseInterface {
         }
         return true;
     }
-
     public function updateTable($table, $set, $values) {
         $query = 'UPDATE ' . $table . ' SET ' . $set . ' WHERE ' . $values . ';';
         $results = $this->mysqli->query($query);
         return $results;
     }
-
     private function makeAssoc($results) {
         $numRows = $results->num_rows;
         $resultArray = array();
@@ -141,7 +129,6 @@ class mySQL implements databaseInterface {
         }
         return $resultArray;
     }
-
     public function configure($dbServer, $userName, $password, $db) {
         $this->db = $db;
         $this->dbServer = $dbServer;
@@ -149,28 +136,22 @@ class mySQL implements databaseInterface {
         $this->dbUsername = $userName;
         self::$instance = $this;
     }
-
     public function escapeString($inString) {
         $escapedString = $this->mysqli->real_escape_string($inString);
         return $escapedString;
     }
-
     public function removeData($from, $where) {
         $query = 'DELETE FROM ' . $from . ' WHERE ' . $where . ';';
         $results = $this->mysqli->query($query);
         return $results;
     }
-
     public function __wakeup() {
         $this->connect();
     }
-
-    function getError() {
+    public function getError() {
         return $this->mysqli->error;
     }
-
-    function getLastInsertID() {
+    public function getLastInsertID() {
         return $this->mysqli->insert_id;
     }
-
 }

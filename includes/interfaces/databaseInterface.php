@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: craig
@@ -13,14 +12,14 @@ interface databaseInterface {
     public static function getRequiredPHPDatabaseModule();
     public function isConnected();
     public function connect();
-    function disconnect();
-    function getData($select, $from, $where);
-    function makeCustomQuery($inQuery);
-    function insertData($into, $columns, $values);
-    function updateTable($table, $set, $where);
-    function configure($dbServer, $userName, $password, $db);
-    function escapeString($inString);
-    function removeData($from, $where);
-    function getError();
-    function getLastInsertID();
+    public function disconnect();
+    public function getData($select, $from, $where);
+    public function makeCustomQuery($inQuery);
+    public function insertData($into, $columns, $values);
+    public function updateTable($table, $set, $where);
+    public function configure($dbServer, $userName, $password, $db);
+    public function escapeString($inString);
+    public function removeData($from, $where);
+    public function getError();
+    public function getLastInsertID();
 }

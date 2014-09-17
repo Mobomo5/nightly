@@ -104,6 +104,7 @@ class bootstrap {
         define('NODE_MODULE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/nodeModule.php');
         define('FORGOT_PASSWORD_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPassword.php');
         define('FORGOT_PASSWORD_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPasswordEngine.php');
+        define('OBJECT_CACHE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/objectCache.php');
     }
 
     private function doRequires() {
