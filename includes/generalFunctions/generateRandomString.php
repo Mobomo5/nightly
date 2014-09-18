@@ -8,7 +8,7 @@
 require_once(GENERAL_FUNCTION_INTERFACE_FILE);
 
 class generateRandomString implements generalFunction {
-    public function run(array $inParams = array()) {
+    public function run(array $inParams = array('length' => 5)) {
         if (empty($inParams)) {
             $inParams = array('length' => 5);
         }

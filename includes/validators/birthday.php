@@ -6,6 +6,7 @@
  * Date: 5/30/14
  * Time: 1:15 PM
  */
+require_once(VALIDATOR_INTERFACE_FILE);
 class birthday implements subValidator {
 
     public function validate($inValue) {

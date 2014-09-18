@@ -7,7 +7,7 @@
  */
 require_once(VALIDATOR_INTERFACE_FILE);
 
-class file implements subValidator {
+class fileV implements subValidator {
     public function validate($inValue, array $inOptions = array('removeDotDot' => true)) {
         if ($inValue == '/') {
             return false;
