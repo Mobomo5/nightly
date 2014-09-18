@@ -15,14 +15,14 @@ $boot->declareConstants();
 require_once(DATABASE_OBJECT_FILE);
 require_once(DATABASE_INTERFACE_FILE);
 function getErrorDiv() {
-    if(!isset($_SESSION['errors'])) {
+    if (!isset($_SESSION['errors'])) {
         return '';
     }
-    if(empty($_SESSION['errors'])) {
+    if (empty($_SESSION['errors'])) {
         return '';
     }
     $toReturn = '<div id="errors"><ul>';
-    foreach($_SESSION['errors'] as $error) {
+    foreach ($_SESSION['errors'] as $error) {
         $error = strip_tags($error, '<a>');
         $toReturn .= "<li>{$error}</li>";
     }
@@ -33,7 +33,7 @@ function getErrorDiv() {
 
 function getDatabaseEngines() {
     $engines = array();
-    foreach(glob('includes/databases/*.php') as $dbEngine) {
+    foreach (glob('includes/databases/*.php') as $dbEngine) {
         $name = explode('/', $dbEngine);
         $name = end($name);
         $name = str_replace('.php', '', $name);
@@ -50,31 +50,31 @@ function getAction() {
 
 function validateAction() {
     $action = getAction();
-    if($action == 'welcome') {
+    if ($action == 'welcome') {
         return true;
     }
-    if($action == 'requirement') {
+    if ($action == 'requirement') {
         return true;
     }
-    if($action == 'database') {
+    if ($action == 'database') {
         return true;
     }
-    if($action == 'doDatabase') {
+    if ($action == 'doDatabase') {
         return true;
     }
-    if($action == 'configure') {
+    if ($action == 'configure') {
         return true;
     }
-    if($action == 'doConfigure') {
+    if ($action == 'doConfigure') {
         return true;
     }
-    if($action == 'install') {
+    if ($action == 'install') {
         return true;
     }
-    if($action == 'doInstall') {
+    if ($action == 'doInstall') {
         return true;
     }
-    if($action == 'finish') {
+    if ($action == 'finish') {
         return true;
     }
     return false;
@@ -83,10 +83,10 @@ function validateAction() {
 function getCurrentCss($step) {
     $step = preg_replace('/\s/', '', strip_tags($step));
     $action = getAction();
-    if($action == $step) {
+    if ($action == $step) {
         return 'class="current"';
     }
-    if($action == 'do' . ucfirst($step)) {
+    if ($action == 'do' . ucfirst($step)) {
         return 'class="current"';
     }
     return '';
@@ -94,15 +94,15 @@ function getCurrentCss($step) {
 
 function getContent() {
     //Comment the following three lines if you wish to overwrite an Educask install. You can also delete config.php.
-    if(is_file('includes/config.php')) {
+    if (is_file('includes/config.php')) {
         return '<p>Educask is already installed. If you wish to overwrite the install, please delete includes/config.php</p>';
     }
     $action = getAction();
     $function = $action . 'Content';
-    if(function_exists($function)) {
-        return $function();
+    if (! function_exists($function)) {
+        return '<h1>Ooops</h1><p>Sorry, I didn\'t understand which page you wanted to see.</p>';
     }
-    return '<h1>Ooops</h1><p>Sorry, I didn\'t understand which page you wanted to see.</p>';
+    return $function();
 }
 
 function welcomeContent() {
@@ -110,7 +110,7 @@ function welcomeContent() {
     $toReturn .= '<p>Thank you for choosing Educask. This wizard will help you get Educask ready.</p>';
     $toReturn .= '<p>Please agree to the following license agreement before you continue. Once Educask is installed, it is assumed that you agreed to the license.</p>';
     $license = file_get_contents('LICENSE');
-    if($license == false) {
+    if ($license == false) {
         $license = '<p>Please see <a href="https://github.com/educask/nightly/blob/master/LICENSE">this page</a> to read the license.</p>';
     }
     $toReturn .= "<div id=\"license\"><pre>{$license}</pre></div>";
@@ -120,7 +120,7 @@ function welcomeContent() {
 }
 
 function requirementContent() {
-    if(!isset($_SESSION['welcomeComplete'])) {
+    if (!isset($_SESSION['welcomeComplete'])) {
         header('Location: install.php?action=welcome');
         return;
     }
@@ -139,11 +139,11 @@ function requirementContent() {
     $toReturn .= '<p>Below is a list of requirements. All rows need to be green in order to continue. If any row is red, please read the appropriate documentation.</p>';
     $toReturn .= '<table>';
     $toReturn .= '<tr><td>Requirement:</td><td>Explanation:</td></tr>';
-    foreach($requirements as $requirement) {
-        if(!function_exists($requirement['testFunction'])) {
+    foreach ($requirements as $requirement) {
+        if (!function_exists($requirement['testFunction'])) {
             continue;
         }
-        if(!function_exists($requirement['explanationFunction'])) {
+        if (!function_exists($requirement['explanationFunction'])) {
             continue;
         }
         $success = $requirement['testFunction']();
@@ -151,7 +151,7 @@ function requirementContent() {
         $explanation = strip_tags($explanation, '<a> <ul> <li>');
         $name = $requirement['name'];
         $name = strip_tags($name);
-        if($success == false) {
+        if ($success == false) {
             $anyFailed = true;
             $toReturn .= "<tr class=\"failed\"><td>{$name}</td><td>{$explanation}</td></tr>";
             continue;
@@ -159,7 +159,7 @@ function requirementContent() {
         $toReturn .= "<tr class=\"success\"><td>{$name}</td><td>{$explanation}</td></tr>";
     }
     $toReturn .= '</table>';
-    if($anyFailed == true) {
+    if ($anyFailed == true) {
         return $toReturn;
     }
     $toReturn .= '<p><a class="button" href="install.php?action=database">Continue</a></p>';
@@ -168,7 +168,7 @@ function requirementContent() {
 }
 
 function databaseContent() {
-    if(!isset($_SESSION['requirementsComplete'])) {
+    if (!isset($_SESSION['requirementsComplete'])) {
         header('Location: install.php?action=requirement');
         return;
     }
@@ -179,9 +179,9 @@ function databaseContent() {
     $toReturn .= '<p>Database Engine:</p>';
     $toReturn .= '<select class="formDrop" name="engine" id="engine">';
     $engines = getDatabaseEngines();
-    foreach($engines as $engine) {
+    foreach ($engines as $engine) {
         $canUse = testDatabaseModule($engine);
-        if(!$canUse) {
+        if (!$canUse) {
             continue;
         }
         $toReturn .= "<option value=\"{$engine}\">{$engine}</option>";
@@ -204,41 +204,41 @@ function databaseContent() {
 }
 
 function doDatabaseContent() {
-    if(!isset($_SESSION['databaseComplete'])) {
+    if (!isset($_SESSION['databaseComplete'])) {
         header('Location: install.php?action=database');
         return;
     }
-    if(!isset($_POST['engine'])) {
+    if (!isset($_POST['engine'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
         return;
     }
-    if(!isset($_POST['server'])) {
+    if (!isset($_POST['server'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
         return;
     }
-    if(!isset($_POST['database'])) {
+    if (!isset($_POST['database'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
         return;
     }
-    if(!isset($_POST['username'])) {
+    if (!isset($_POST['username'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
         return;
     }
-    if(!isset($_POST['password1'])) {
+    if (!isset($_POST['password1'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
         return;
     }
-    if(!isset($_POST['password2'])) {
+    if (!isset($_POST['password2'])) {
         unset($_SESSION['databaseComplete']);
         header('Location: install.php?action=database');
         return;
     }
-    if($_POST['password1'] != $_POST['password2']) {
+    if ($_POST['password1'] != $_POST['password2']) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'The inputted passwords don\'t match.';
         header('Location: install.php?action=database');
@@ -263,7 +263,7 @@ function doDatabaseContent() {
                 $dbUserName = \'' . $userName . '\';
                 $dbPassword = \'' . $password . '\'; //Change password when account and database created.
                 $dbType = \'' . $engine . '\';';
-    if(file_put_contents($file, $content) == false) {
+    if (file_put_contents($file, $content) == false) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t write the config file. Please make sure that includes/config.php is a file that can be written to by PHP.';
         header('Location: install.php?action=database');
@@ -272,21 +272,21 @@ function doDatabaseContent() {
     chmod($file, 664);
     $database = database::getInstance();
     $database->connect();
-    if(!$database->isConnected()) {
+    if (!$database->isConnected()) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t connect to the database. Please try again.';
         header('Location: install.php?action=database');
         return;
     }
     $sqlScript = EDUCASK_ROOT . '/educaskInstallSafe.sql';
-    if(!is_file($sqlScript)) {
+    if (!is_file($sqlScript)) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t find the SQL script to create the needed tables. Please make sure that educaskInstallSafe.sql exists and is readable by PHP.';
         header('Location: install.php?action=database');
         return;
     }
     $sql = file_get_contents($sqlScript);
-    if(!$sql) {
+    if (!$sql) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t read the SQL script in order to create the needed tables. Please make sure PHP can read the file educaskInstallSafe.sql';
         header('Location: install.php?action=database');
@@ -294,18 +294,18 @@ function doDatabaseContent() {
     }
     $sqlStatements = explode(';', $sql);
     $noErrors = true;
-    foreach($sqlStatements as $sqlStatement) {
+    foreach ($sqlStatements as $sqlStatement) {
         $sqlStatement = trim($sqlStatement);
-        if($sqlStatement == '') {
+        if ($sqlStatement == '') {
             continue;
         }
         $success = $database->makeCustomQuery($sqlStatement);
-        if($success == true) {
+        if ($success == true) {
             continue;
         }
         $noErrors = false;
         $table = array();
-        if(!preg_match('/EXISTS \b([a-z]|[A-Z])+\b\s\(/', $sqlStatement, $table)) {
+        if (!preg_match('/EXISTS \b([a-z]|[A-Z])+\b\s\(/', $sqlStatement, $table)) {
             $error = $database->getError();
             $_SESSION['errors'][] = "I couldn't create an unknown table. The database said: {$error}.";
             continue;
@@ -317,7 +317,7 @@ function doDatabaseContent() {
         $error = $database->getError();
         $_SESSION['errors'][] = "I couldn't create the {$table} table. The database said: {$error}.";
     }
-    if($noErrors == false) {
+    if ($noErrors == false) {
         unset($_SESSION['databaseComplete']);
         $_SESSION['errors'][] = 'I couldn\'t create all of the needed tables. Please try again. If this keeps happening, please see <a href="https://www.educask.com" target="_blank">educask.com for help</a>.';
         header('Location: install.php?action=database');
@@ -327,7 +327,7 @@ function doDatabaseContent() {
 }
 
 function configureContent() {
-    if(!isset($_SESSION['databaseComplete'])) {
+    if (!isset($_SESSION['databaseComplete'])) {
         header('Location: install.php?action=database');
         return;
     }
@@ -352,8 +352,8 @@ function configureContent() {
     $timeZones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
     $toReturn .= '<p>The timezone for your website:</p>';
     $toReturn .= '<select class="formDrop" name="timeZone" id="timeZone">';
-    foreach($timeZones as $timeZone) {
-        if($timeZone == 'America/Vancouver') {
+    foreach ($timeZones as $timeZone) {
+        if ($timeZone == 'America/Vancouver') {
             $toReturn .= "<option value=\"{$timeZone}\" selected>{$timeZone}</option>";
             continue;
         }
@@ -383,71 +383,71 @@ function configureContent() {
 }
 
 function doConfigureContent() {
-    if(!isset($_SESSION['configureComplete'])) {
+    if (!isset($_SESSION['configureComplete'])) {
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['siteName'])) {
+    if (!isset($_POST['siteName'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['siteEmail'])) {
+    if (!isset($_POST['siteEmail'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['nonSecureURL'])) {
+    if (!isset($_POST['nonSecureURL'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['secureURL'])) {
+    if (!isset($_POST['secureURL'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['webDirectory'])) {
+    if (!isset($_POST['webDirectory'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['timeZone'])) {
+    if (!isset($_POST['timeZone'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['username'])) {
+    if (!isset($_POST['username'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['firstName'])) {
+    if (!isset($_POST['firstName'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['lastName'])) {
+    if (!isset($_POST['lastName'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['email'])) {
+    if (!isset($_POST['email'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['password1'])) {
+    if (!isset($_POST['password1'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if(!isset($_POST['password2'])) {
+    if (!isset($_POST['password2'])) {
         unset($_SESSION['configureComplete']);
         header('Location: install.php?action=configure');
         return;
     }
-    if($_POST['password1'] != $_POST['password2']) {
+    if ($_POST['password1'] != $_POST['password2']) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'The inputted passwords for the first account don\'t match.';
         header('Location: install.php?action=configure');
@@ -468,19 +468,19 @@ function doConfigureContent() {
     require_once(VALIDATOR_INTERFACE_FILE);
     require_once(HASHER_OBJECT_FILE);
     $emailValidator = new validator('email');
-    if(!$emailValidator->validatorExists()) {
+    if (!$emailValidator->validatorExists()) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t validate all of the data. Please try again.';
         header('Location: install.php?action=configure');
         return;
     }
-    if(!$emailValidator->validate($siteEmail)) {
+    if (!$emailValidator->validate($siteEmail)) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'The site email isn\'t a valid email address.';
         header('Location: install.php?action=configure');
         return;
     }
-    if(!$emailValidator->validate($email)) {
+    if (!$emailValidator->validate($email)) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'The email address for the first user isn\'t valid.';
         header('Location: install.php?action=configure');
@@ -488,7 +488,7 @@ function doConfigureContent() {
     }
     unset($emailValidator);
     $urlValidator = new validator('url');
-    if(!$urlValidator->validatorExists()) {
+    if (!$urlValidator->validatorExists()) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t validate all of the data. Please try again.';
         header('Location: install.php?action=configure');
@@ -497,33 +497,33 @@ function doConfigureContent() {
     $options = array('noDirectories', 'mightBeIP');
     $nonSecureOptions = array_merge($options, array('httpOnly'));
     $secureOptions = array_merge($options, array('httpsOnly'));
-    if(!$urlValidator->validate($nonSecureURL, $nonSecureOptions)) {
+    if (!$urlValidator->validate($nonSecureURL, $nonSecureOptions)) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'The non-secure URL isn\'t valid. Please try again.';
         header('Location: install.php?action=configure');
         return;
     }
-    if(!$urlValidator->validate($secureURL, $secureOptions)) {
+    if (!$urlValidator->validate($secureURL, $secureOptions)) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'The secure URL isn\'t valid. Please try again.';
         header('Location: install.php?action=configure');
         return;
     }
     unset($urlValidator);
-    if($webDirectory[0] != '/') {
+    if ($webDirectory[0] != '/') {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t validate the web directory. Please try again.';
         header('Location: install.php?action=configure');
         return;
     }
     $timeZoneValidator = new validator('phpTimeZone');
-    if(!$timeZoneValidator->validatorExists()) {
+    if (!$timeZoneValidator->validatorExists()) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t validate all of the data. Please try again.';
         header('Location: install.php?action=configure');
         return;
     }
-    if(!$timeZoneValidator->validate($timeZone)) {
+    if (!$timeZoneValidator->validate($timeZone)) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t validate the selected time zone. Please try again.';
         header('Location: install.php?action=configure');
@@ -532,7 +532,7 @@ function doConfigureContent() {
     unset($timeZoneValidator);
     $hasher = new hasher();
     $password = $hasher->generateHash($password);
-    if($password == false) {
+    if ($password == false) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t properly hash your password. Please try again.';
         header('Location: install.php?action=configure');
@@ -540,52 +540,52 @@ function doConfigureContent() {
     }
     $database = database::getInstance();
     $database->connect();
-    if(!$database->isConnected()) {
+    if (!$database->isConnected()) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t establish a connection to the database. Please try again. If you keep receiving this error, please delete the config.php and start the installer again.';
         header('Location: install.php?action=configure');
         return;
     }
     $variables = array(
-        'cleanURLsEnabled' => 'false',
-        'educaskVersion' => EDUCASK_VERSION,
-        'guestRoleID' => '1',
-        'maintenanceMode' => 'false',
-        'siteEmail' => $siteEmail,
-        'siteTheme' => 'default',
-        'siteTimeZone' => $timeZone,
-        'siteTitle' => $siteName,
-        'siteWebAddress' => $nonSecureURL,
+        'cleanURLsEnabled'     => 'false',
+        'educaskVersion'       => EDUCASK_VERSION,
+        'guestRoleID'          => '1',
+        'maintenanceMode'      => 'false',
+        'siteEmail'            => $siteEmail,
+        'siteTheme'            => 'default',
+        'siteTimeZone'         => $timeZone,
+        'siteTitle'            => $siteName,
+        'siteWebAddress'       => $nonSecureURL,
         'siteWebAddressSecure' => $secureURL,
-        'siteWebDirectory' => $webDirectory . '/'
+        'siteWebDirectory'     => $webDirectory . '/'
     );
-    foreach($variables as $name => $value) {
+    foreach ($variables as $name => $value) {
         $name = $database->escapeString($name);
         $value = $database->escapeString($value);
-        if(!$database->insertData('variable', 'variableName, variableValue', "'{$name}', '{$value}'")) {
+        if (!$database->insertData('variable', 'variableName, variableValue', "'{$name}', '{$value}'")) {
             $_SESSION['errors'][] = "I wasn't able to insert the variable {$name} with a value of {$value} into the variable table. You may want to manually add this row to the variable table in the database. For help on this, please see <a href=\"https://www.educask.com\" target=\"_blank\">this page</a>."; //@ToDo: make the link point to actual help
             continue;
         }
     }
     $database->updateTable('variable', 'readOnly=1', "variableName='educaskVersion'");
     $sqlScript = EDUCASK_ROOT . '/defaultRolesInstallSafe.sql';
-    if(!is_file($sqlScript)) {
+    if (!is_file($sqlScript)) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t find the SQL script to create the needed roles. Please make sure that defaultRolesInstallSafe.sql exists and is readable by PHP.';
         header('Location: install.php?action=configure');
         return;
     }
     $sql = file_get_contents($sqlScript);
-    if(!$sql) {
+    if (!$sql) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t read the SQL script in order to create the needed roles. Please make sure PHP can read the file defaultRolesInstallSafe.sql';
         header('Location: install.php?action=configure');
         return;
     }
     $sqlStatements = explode(';', $sql);
-    foreach($sqlStatements as $sqlStatement) {
+    foreach ($sqlStatements as $sqlStatement) {
         $sqlStatement = trim($sqlStatement);
-        if($sqlStatement == '') {
+        if ($sqlStatement == '') {
             continue;
         }
         $database->makeCustomQuery($sqlStatement);
@@ -596,7 +596,7 @@ function doConfigureContent() {
     $email = $database->escapeString($email);
     $password = $database->escapeString($password);
     $success = $database->insertData('user', 'userName, firstName, lastName, email, password, roleID', "'{$username}', '{$firstName}', '{$lastName}', '{$email}', '{$password}', 4");
-    if(!$success) {
+    if (!$success) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t create the new user account. Please try again. For help on this, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: make the link point to actual help
         header('Location: install.php?action=configure');
@@ -606,13 +606,13 @@ function doConfigureContent() {
 }
 
 function installContent() {
-    if(!isset($_SESSION['configureComplete'])) {
+    if (!isset($_SESSION['configureComplete'])) {
         header('Location: install.php?action=configure');
         return;
     }
     require_once(GENERAL_ENGINE_OBJECT_FILE);
     $general = new general('generateRandomString');
-    if(!$general->functionsExists()) {
+    if (!$general->functionsExists()) {
         $_SESSION['errors'][] = 'I couldn\'t generate a security token. Please try again by refreshing the page. If this problem persists, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: Make this link to actual help.
         header('Location: install.php?action=install');
         return;
@@ -688,21 +688,21 @@ function installContent() {
 function doInstallContent() {
     $knownToken = strip_tags($_SESSION['token']);
     $givenToken = strip_tags($_GET['token']);
-    if($knownToken != $givenToken) {
+    if ($knownToken != $givenToken) {
         unset($_SESSION['token']);
         header("HTTP/1.1 404 Not Found");
         die();
     }
     $installers = glob(EDUCASK_ROOT . '/includes/modules/*/install.php');
     $numberToDo = count($installers);
-    if($numberToDo == 0) {
+    if ($numberToDo == 0) {
         $_SESSION['moduleProgress'] = 100;
         $_SESSION['moduleStatus'] = 'Done';
         session_write_close();
         return;
     }
     $i = 0;
-    foreach($installers as $installer) {
+    foreach ($installers as $installer) {
         session_start();
         $_SESSION['moduleProgress'] = ($i / $numberToDo) * 100;
         $_SESSION['moduleStatus'] = 'Installing ' . str_replace('/install.php', '', $installer);
@@ -716,7 +716,7 @@ function doInstallContent() {
 }
 
 function finishContent() {
-    if(!isset($_SESSION['installComplete'])) {
+    if (!isset($_SESSION['installComplete'])) {
         header('Location: install.php?action=install');
         return;
     }
@@ -728,69 +728,69 @@ function finishContent() {
 }
 
 function phpTest() {
-    if(version_compare(PHP_VERSION, '5.2.4') < 0) {
+    if (version_compare(PHP_VERSION, '5.2.4') < 0) {
         return false;
     }
     return true;
 }
 
 function phpTestExp() {
-    if(!phpTest()) {
+    if (!phpTest()) {
         return 'Your PHP version is ' . PHP_VERSION . ' and it\'s too old. Please upgrade to the latest PHP version. Educask needs PHP newer than 5.2.4.';
     }
     return 'Your PHP version is ' . PHP_VERSION;
 }
 
 function registerGlobalsTest() {
-    if(ini_get('register_globals') == 1) {
+    if (ini_get('register_globals') == 1) {
         return false;
     }
     return true;
 }
 
 function registerGlobalsExp() {
-    if(!registerGlobalsTest()) {
+    if (!registerGlobalsTest()) {
         return 'Please turn register_globals off in the php.ini file or in a .htaccess file. Please see <a href="http://ca1.php.net/manual/en/security.registerglobals.php" target="_blank">this page</a> for more information.';
     }
     return 'register_globals is turned off.';
 }
 
 function magicQuotesTest() {
-    if(ini_get('magic_quotes_gpc') == 1) {
+    if (ini_get('magic_quotes_gpc') == 1) {
         return false;
     }
-    if(ini_get('magic_quotes_runtime') == 1) {
+    if (ini_get('magic_quotes_runtime') == 1) {
         return false;
     }
-    if(ini_get('magic_quotes_sybase') == 1) {
+    if (ini_get('magic_quotes_sybase') == 1) {
         return false;
     }
     return true;
 }
 
 function magicQuotesExp() {
-    if(!magicQuotesTest()) {
+    if (!magicQuotesTest()) {
         return 'Please turn Magic Quotes off in the php.ini file or in a .htaccess file. Please see <a href="http://www.php.net/manual/en/security.magicquotes.php" target="_blank">this page</a> for more information.';
     }
     return 'Magic Quotes are disabled.';
 }
 
 function phpExtensionTest($returnArrayOfFailed = false) {
-    if(!is_bool($returnArrayOfFailed)) {
+    if (!is_bool($returnArrayOfFailed)) {
         return false;
     }
     $extensionsToTest = array('xml', 'zip', 'session', 'hash', 'Core', 'calendar', 'json', 'date');
     $failed = array();
-    foreach($extensionsToTest as $extension) {
-        if(extension_loaded($extension) == true) {
+    foreach ($extensionsToTest as $extension) {
+        if (extension_loaded($extension) == true) {
             continue;
         }
         $failed[] = $extension;
     }
-    if($returnArrayOfFailed == true) {
+    if ($returnArrayOfFailed == true) {
         return $failed;
     }
-    if(!empty($failed)) {
+    if (!empty($failed)) {
         return false;
     }
     return true;
@@ -798,12 +798,12 @@ function phpExtensionTest($returnArrayOfFailed = false) {
 
 function phpExtensionExp() {
     $extensionsFailed = phpExtensionTest(true);
-    if(empty($extensionsFailed)) {
+    if (empty($extensionsFailed)) {
         return 'All needed PHP extensions are ready for use!';
     }
     $toReturn = 'I detected that some of the PHP extensions I need aren\'t available:';
     $toReturn .= '<ul>';
-    foreach($extensionsFailed as $extension) {
+    foreach ($extensionsFailed as $extension) {
         $toReturn .= "<li>{$extension} is not installed or enabled.</li>";
     }
     $toReturn .= '</ul>';
@@ -814,7 +814,7 @@ function memoryLimitTest() {
     $memoryLimit = ini_get('memory_limit');
     $intMemoryLimit = returnBytes($memoryLimit);
     $minMemory = 33554432;
-    if($intMemoryLimit < $minMemory) {
+    if ($intMemoryLimit < $minMemory) {
         return false;
     }
     return true;
@@ -822,7 +822,7 @@ function memoryLimitTest() {
 
 function memoryLimitExp() {
     $memoryLimit = ini_get('memory_limit');
-    if(!memoryLimitTest()) {
+    if (!memoryLimitTest()) {
         return "Your current memory limit is set at {$memoryLimit}. This isn't enough - Educask needs 32M minimum. Please see <a href=\"http://www.php.net/manual/en/ini.core.php#ini.memory-limit\" target=\"_blank\">this page</a> for more information.";
     }
     return "Your current memory limit is set at {$memoryLimit}.";
@@ -830,10 +830,10 @@ function memoryLimitExp() {
 
 function databaseModuleTest() {
     $engines = getDatabaseEngines();
-    foreach($engines as $engine) {
+    foreach ($engines as $engine) {
         require_once('includes/databases/' . $engine . '.php');
         $requiredModule = $engine::getRequiredPHPDatabaseModule();
-        if(testDatabaseModule($requiredModule) == true) {
+        if (testDatabaseModule($requiredModule) == true) {
             return true;
         }
     }
@@ -841,14 +841,14 @@ function databaseModuleTest() {
 }
 
 function databaseModuleExp() {
-    if(!databaseModuleTest()) {
+    if (!databaseModuleTest()) {
         return 'I couldn\'t find any supported database extensions on your server. May I <a href="http://www.php.net/manual/en/book.mysqli.php" target="_blank">recommend MySQLi</a>?';
     }
     return 'I found a supported database engine.';
 }
 
 function testDatabaseModule($inModule) {
-    if(extension_loaded($inModule) == false) {
+    if (extension_loaded($inModule) == false) {
         return false;
     }
     return true;
@@ -857,28 +857,28 @@ function testDatabaseModule($inModule) {
 function fileSystemTest() {
     error_reporting(0);
     $directory = EDUCASK_ROOT . '/uploads';
-    if(!is_dir($directory)) {
+    if (!is_dir($directory)) {
         $couldWrite = mkdir($directory);
-        if(!chmod($directory, 0755)) {
+        if (!chmod($directory, 0755)) {
             return false;
         }
-        if(!$couldWrite) {
+        if (!$couldWrite) {
             return false;
         }
     }
     $couldWrite = file_put_contents($directory . '/test.txt', 'This is a test write.');
-    if(!$couldWrite) {
+    if (!$couldWrite) {
         return false;
     }
     $couldDelete = unlink($directory . '/test.txt');
-    if(!$couldDelete) {
+    if (!$couldDelete) {
         return false;
     }
     return true;
 }
 
 function fileSystemExp() {
-    if(!fileSystemTest()) {
+    if (!fileSystemTest()) {
         return 'The uploads directory does not exist and an attempt to make it failed. Please make the directory and make sure it\'s writeable by PHP.';
     }
     return 'The uploads directory is a go. You can change the location of it later.';
@@ -887,20 +887,21 @@ function fileSystemExp() {
 function configFileTest() {
     error_reporting(0);
     $config = EDUCASK_ROOT . '/includes/config.php';
-    if(!is_file($config)) {
+    if (!is_file($config)) {
         $couldWrite = file_put_contents($config, 'Test Write');
-        if(!$couldWrite) {
+        if (!$couldWrite) {
             return false;
         }
-    }$couldWrite = file_put_contents($config, 'Test Write');
-    if(! $couldWrite) {
+    }
+    $couldWrite = file_put_contents($config, 'Test Write');
+    if (!$couldWrite) {
         return false;
     }
     return true;
 }
 
 function configFileExp() {
-    if(!configFileTest()) {
+    if (!configFileTest()) {
         return 'The configuration file, includes/config.php, does not exist. An attempt to make it and write to it failed. Please make the file and make it writeable by PHP.';
     }
     return 'The configuration file is ready for settings.';
@@ -908,19 +909,19 @@ function configFileExp() {
 
 //Function borrowed from http://www.php.net/manual/en/function.ini-get.php#106518
 function returnBytes($val) {
-    if(empty($val)) {
+    if (empty($val)) {
         return 0;
     }
     $val = trim($val);
     preg_match('#([0-9]+)[\s]*([a-z]+)#i', $val, $matches);
     $last = '';
-    if(isset($matches[2])) {
+    if (isset($matches[2])) {
         $last = $matches[2];
     }
-    if(isset($matches[1])) {
+    if (isset($matches[1])) {
         $val = (int)$matches[1];
     }
-    switch(strtolower($last)) {
+    switch (strtolower($last)) {
         case 'g':
         case 'gb':
             $val *= 1024;
@@ -934,10 +935,10 @@ function returnBytes($val) {
     return (int)$val;
 }
 
-if(!isset($_GET['action'])) {
+if (!isset($_GET['action'])) {
     header('Location: install.php?action=welcome');
 }
-if(!validateAction()) {
+if (!validateAction()) {
     header('Location: install.php?action=welcome');
 }
 ?>
@@ -1139,7 +1140,7 @@ if(!validateAction()) {
         <div id="titleBar">
             <img src="includes/images/educasklogo.png">
 
-            <p>Educask <?php echo EDUCASK_VERSION?> - Developer Preview</p>
+            <p>Educask <?php echo EDUCASK_VERSION ?> - Developer Preview</p>
         </div>
         <ul>
             <li <?php echo getCurrentCss('welcome'); ?>>Welcome</li>
