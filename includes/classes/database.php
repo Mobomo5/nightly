@@ -1,7 +1,6 @@
 <?php
 
 require_once(DATABASE_INTERFACE_FILE);
-
 /**
  * Created by JetBrains PhpStorm.
  * User: Craig
@@ -20,7 +19,6 @@ class database implements databaseInterface {
     private $dbServer;
     private $dbObject;
     private $dbType;
-
     /**
      * will call the new constructor methods.
      * @return database
@@ -34,7 +32,6 @@ class database implements databaseInterface {
     public static function getRequiredPHPDatabaseModule() {
         return '';
     }
-
     private function __construct() {
         require_once(EDUCASK_ROOT . '/includes/config.php');
         $this->dbUsername = $dbUserName;
@@ -50,18 +47,15 @@ class database implements databaseInterface {
         $this->dbObject->configure($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
         $this->dbObject->connect();
     }
-
     private function __clone() {
         //Me not like clones! Me smash clones!
     }
-
     /**
      * Will be called when the code no longer needs the class.
      */
     public function __destruct() {
         $this->disconnect();
     }
-
     /**
      * returns true when connection is available, false otherwise
      * @return bool
@@ -72,11 +66,9 @@ class database implements databaseInterface {
         }
         return $this->dbObject->isConnected();
     }
-
     public function bootstrapDisconnect() {
         $this->dbObject->disconnect();
     }
-
     /**
      * disconnects the database
      */
@@ -86,7 +78,6 @@ class database implements databaseInterface {
         }
         $this->dbObject->disconnect();
     }
-
     /**
      * Calls the sub-database's getData function
      * returns false on failure, Data Array on success
@@ -104,7 +95,6 @@ class database implements databaseInterface {
         $result = $this->dbObject->getData($select, $from, $where);
         return $result;
     }
-
     /**
      * Allows the user to make custom queries. May be removed before release
      *
@@ -119,7 +109,6 @@ class database implements databaseInterface {
         }
         return $result;
     }
-
     /**
      * inserts data into a table. returns true on success, false on failure
      *
@@ -137,9 +126,8 @@ class database implements databaseInterface {
         if (!$result) {
             return false;
         }
-        return $result;
+        return true;
     }
-
     /**
      * updates supplied table. returns true on success, false on fail
      *
@@ -157,16 +145,14 @@ class database implements databaseInterface {
         if (!$result) {
             return false;
         }
-        return $result;
+        return true;
     }
-
     /**
      * calls the sub-database's connect function
      */
     public function connect() {
         $this->dbObject->connect();
     }
-
     /**
      * intentionally left empty
      *
@@ -175,10 +161,9 @@ class database implements databaseInterface {
      * @param $password
      * @param $db
      */
-    function configure($dbServer, $userName, $password, $db) {
+    public function configure($dbServer, $userName, $password, $db) {
         // does nothing in the databaseCreator
     }
-
     /**
      * returns an escaped string
      *
@@ -186,14 +171,13 @@ class database implements databaseInterface {
      *
      * @return bool
      */
-    function escapeString($inString) {
+    public function escapeString($inString) {
         if (empty($inString)) {
             return false;
         }
         $escapedString = $this->dbObject->escapeString($inString);
         return $escapedString;
     }
-
     /**
      * delete data from the db
      *
@@ -202,18 +186,16 @@ class database implements databaseInterface {
      *
      * @return bool
      */
-    function removeData($from, $where) {
+    public function removeData($from, $where) {
         if (empty($from) OR empty($where)) {
             return false;
         }
         return $this->dbObject->removeData($from, $where);
     }
-
-    function getError() {
+    public function getError() {
         return $this->dbObject->getError();
     }
-
-    function getLastInsertID() {
+    public function getLastInsertID() {
         return $this->dbObject->getLastInsertID();
     }
 }

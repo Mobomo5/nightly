@@ -7,21 +7,17 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(HOOK_ENGINE_OBJECT_FILE);
-
 class blockEngine {
     private static $instance;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new blockEngine();
         }
         return self::$instance;
     }
-
     private function __construct() {
         //Do nothing;
     }
-
     public function getBlocks($theme, $pageType, $roleID, page $pageBlock) {
         $database = database::getInstance();
         $database->connect();
@@ -43,7 +39,7 @@ class blockEngine {
             if (!$this->blockVisible($blockData['blockID'], $pageType, $roleID)) {
                 continue;
             }
-            if($blockData['blockName'] == 'page') {
+            if ($blockData['blockName'] == 'page') {
                 $blocks[$blockData['themeRegion']][] = $pageBlock;
                 continue;
             }
@@ -58,7 +54,6 @@ class blockEngine {
         }
         return $blocks;
     }
-
     private function getBlock($moduleName, $blockName) {
         $this->includeBlock($blockName, $moduleName);
         if (!$this->validateBlock($blockName)) {
@@ -67,7 +62,6 @@ class blockEngine {
         $block = new $blockName();
         return $block;
     }
-
     private function includeBlock($moduleName, $blockName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
@@ -77,7 +71,6 @@ class blockEngine {
         }
         require_once($blockPath);
     }
-
     private function validateBlock($blockName) {
         if (!class_exists($blockName)) {
             return false;
@@ -91,13 +84,11 @@ class blockEngine {
         }
         return true;
     }
-
     private function getPathToBlock($blockName, $moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
         return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
-
     private function blockVisible($blockID, $pageType, $roleID) {
         if (!is_numeric($blockID)) {
             return false;
@@ -113,7 +104,6 @@ class blockEngine {
         $blockID = $database->escapeString($blockID);
         // check to see if it's in the visibility table
         $results = $database->getData('*', 'blockVisibility', 'blockID = ' . $blockID);
-
         //Default is to display the block unless specified.
         if ($results === null) {
             return true;
@@ -122,7 +112,6 @@ class blockEngine {
         if ($results === false) {
             return false;
         }
-
         $comparators = array('referenceType' => '', 'referenceValue' => '');
         $hookEngine = hookEngine::getInstance();
         $comparators = $hookEngine->runFilter('blockVisibilityComparator', $comparators);
@@ -143,19 +132,18 @@ class blockEngine {
         }
         $countOfDoNotDisplays = 0;
         $countOfDoDisplays = 0;
-
         foreach ($results as $rule) {
             if (!isset($finalComparators[$rule['referenceType']])) {
                 continue;
             }
             //If the first character is an !, then negate the operation.
-            if($rule['referenceID'][0] == '!') {
+            if ($rule['referenceID'][0] == '!') {
                 $vote = $this->blockVisibleNegate($rule, $finalComparators);
-                if($vote == -1) {
+                if ($vote == -1) {
                     $countOfDoNotDisplays += 1;
                     continue;
                 }
-                if($vote == 1) {
+                if ($vote == 1) {
                     $countOfDoDisplays += 1;
                     continue;
                 }
@@ -179,7 +167,6 @@ class blockEngine {
     private function blockVisibleNegate($rule, $finalComparators) {
         //Take the ! off
         $rule['referenceID'] = substr($rule['referenceID'], 1);
-
         if (!isset($finalComparators[$rule['referenceType']])) {
             return 0;
         }
@@ -192,7 +179,6 @@ class blockEngine {
         }
         return 1;
     }
-
     public function setBlockVisibility($inBlockID, $referenceID, $referenceType, $isVisible = false) {
         if (!is_numeric($inBlockID)) {
             return false;
@@ -220,16 +206,16 @@ class blockEngine {
         if ($exists != null) {
             return $this->insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible);
         }
-        if($isVisible == true) {
+        if ($isVisible == true) {
             $visible = 1;
         } else {
             $visible = 0;
         }
         $success = $database->updateTable('blockVisibility', "visibile={$visible}", $whereClause);
-        if($success == false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
@@ -253,16 +239,16 @@ class blockEngine {
         $referenceType = $database->escapeString($referenceType);
         $referenceID = $database->escapeString($referenceID);
         $inBlockID = $database->escapeString($inBlockID);
-        if($isVisible == true) {
+        if ($isVisible == true) {
             $visible = 1;
         } else {
             $visible = 0;
         }
         $success = $database->insertData('blockVisibility', 'referenceID, referenceType, visible, blockID', "'{$referenceID}', '{$referenceType}', {$visible}, {$inBlockID}");
-        if($success == false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
@@ -284,28 +270,28 @@ class blockEngine {
         $referenceID = $database->escapeString($referenceID);
         $inBlockID = $database->escapeString($inBlockID);
         $success = $database->removeData('blockVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}");
-        if($success == false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
     }
     public function addBlock($blockName, $theme, $themeRegion, $weight, $moduleInCharge, $enabled = false) {
-        if(! is_numeric($weight)) {
+        if (!is_numeric($weight)) {
             return false;
         }
-        if(! is_numeric($moduleInCharge)) {
+        if (!is_numeric($moduleInCharge)) {
             return false;
         }
-        if(! is_bool($enabled)) {
+        if (!is_bool($enabled)) {
             return false;
         }
         $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
         $theme = preg_replace('/\s+/', '', strip_tags($theme));
         $themeRegion = preg_replace('/\s+/', '', strip_tags($themeRegion));
-        if($enabled == true) {
+        if ($enabled == true) {
             $isEnabled = 1;
         } else {
             $isEnabled = 0;
@@ -315,47 +301,47 @@ class blockEngine {
         $theme = $database->escapeString($theme);
         $themeRegion = $database->escapeString($themeRegion);
         $success = $database->insertData('block', 'blockName, theme, themeRegion, weight, enabled, module', "'{$blockName}', '{$theme}', '{$themeRegion}', {$weight}, {$isEnabled}, {$moduleInCharge}");
-        if($success ==  false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
     }
     public function setBlockTitle($blockID, $title) {
-        if(! is_numeric($blockID)) {
+        if (!is_numeric($blockID)) {
             return false;
         }
         $database = database::getInstance();
         $title = $database->escapeString(strip_tags($title));
         $blockID = $database->escapeString($blockID);
         $success = $database->updateTable('block', "title='{$title}'", "blockID={$blockID}");
-        if($success ==  false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
     }
     public function setBlock($blockID, $blockName, $theme, $themeRegion, $weight, $moduleInCharge, $enabled = false) {
-        if(! is_numeric($blockID)) {
+        if (!is_numeric($blockID)) {
             return false;
         }
-        if(! is_numeric($weight)) {
+        if (!is_numeric($weight)) {
             return false;
         }
-        if(! is_numeric($moduleInCharge)) {
+        if (!is_numeric($moduleInCharge)) {
             return false;
         }
-        if(! is_bool($enabled)) {
+        if (!is_bool($enabled)) {
             return false;
         }
         $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
         $theme = preg_replace('/\s+/', '', strip_tags($theme));
         $themeRegion = preg_replace('/\s+/', '', strip_tags($themeRegion));
-        if($enabled == true) {
+        if ($enabled == true) {
             $isEnabled = 1;
         } else {
             $isEnabled = 0;
@@ -366,25 +352,25 @@ class blockEngine {
         $themeRegion = $database->escapeString($themeRegion);
         $blockID = $database->escapeString($blockID);
         $success = $database->updateTable('block', "blockName='{$blockName}', theme='{$theme}', themeRegion='{$themeRegion}', weight={$weight}, enabled={$enabled}, module={$moduleInCharge}", "blockID={$blockID}");
-        if($success ==  false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
     }
     public function deleteBlock($blockID) {
-        if(! is_numeric($blockID)) {
+        if (!is_numeric($blockID)) {
             return false;
         }
         $database = database::getInstance();
         $blockID = $database->escapeString($blockID);
         $success = $database->removeData('block', "blockID={$blockID}");
-        if($success ==  false) {
+        if ($success == false) {
             return false;
         }
-        if($success == null) {
+        if ($success == null) {
             return false;
         }
         return true;
@@ -394,28 +380,28 @@ class blockEngine {
         $database = database::getInstance();
         $blockName = $database->escapeString($blockName);
         $data = $database->getData('*', 'block', "blockName='{$blockName}'");
-        if($data == false) {
+        if ($data == false) {
             return false;
         }
-        if($data == null) {
+        if ($data == null) {
             return false;
         }
-        if(count($data) > 1) {
+        if (count($data) > 1) {
             return false;
         }
         return $data[0];
     }
     public function getRawBlockDataByID($blockID) {
-        if(! is_numeric($blockID)) {
+        if (!is_numeric($blockID)) {
             return false;
         }
         $database = database::getInstance();
-        $blockID= $database->escapeString($blockID);
+        $blockID = $database->escapeString($blockID);
         $data = $database->getData('*', 'block', "blockID={$blockID}");
-        if($data == false) {
+        if ($data == false) {
             return false;
         }
-        if($data == null) {
+        if ($data == null) {
             return false;
         }
         return $data;

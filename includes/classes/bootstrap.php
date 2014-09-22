@@ -54,7 +54,7 @@ class bootstrap {
         define('GENERAL_FUNCTION_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/generalFunction.php');
         define('VALIDATOR_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/validator.php');
         define('VALIDATOR_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/validator.php');
-        define('SYSTEM_LOGGER_OBJET_FILE', EDUCASK_ROOT . '/includes/classes/systemLog.php');
+        define('SYSTEM_LOGGER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/systemLog.php');
         define('SITE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/site.php');
         define('LINK_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/link.php');
         define('HASHER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/hasher.php');
@@ -105,6 +105,7 @@ class bootstrap {
         define('FORGOT_PASSWORD_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPassword.php');
         define('FORGOT_PASSWORD_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPasswordEngine.php');
         define('OBJECT_CACHE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/objectCache.php');
+        define('CENSORSHIP_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/censorshipEngine.php');
     }
 
     private function doRequires() {
