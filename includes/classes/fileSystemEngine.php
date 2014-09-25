@@ -183,7 +183,7 @@ class fileSystemEngine {
     /**
      *  returns false on fail and the ID of the newly created folder on success
      */
-    public function createFolder(folder $inFolder, $parentFolderID = 1) {
+    public function createFolder(folder $inFolder, $parentFolderID = 0) {
         if (!permissionEngine::getInstance()->getPermission('userCanAddFolders')->canDo()) {
             return false;
         }

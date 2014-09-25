@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -10,21 +9,17 @@ class hookEngine {
     private $actionEvents;
     private $filterEvents;
     private static $instance;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new hookEngine();
         }
-
         return self::$instance;
     }
-
     private function __construct() {
         $this->actionEvents = array();
         $this->filterEvents = array();
         $this->failed = array();
     }
-
     public function addAction($inEventName, $plugin) {
         if (!is_object($plugin)) {
             return false;
@@ -35,17 +30,15 @@ class hookEngine {
         $this->actionEvents[$inEventName][] = $plugin;
         return true;
     }
-
     public function runAction($inEventName) {
         if (!isset($this->actionEvents[$inEventName])) {
-            return null;
+            return;
         }
         $this->pluginSort($this->actionEvents[$inEventName]);
         foreach ($this->actionEvents[$inEventName] as $plugin) {
             $plugin::run();
         }
     }
-
     public function  addFilter($inEventName, $plugin) {
         if (!is_object($plugin)) {
             return false;
@@ -56,7 +49,6 @@ class hookEngine {
         $this->filterEvents[$inEventName][] = $plugin;
         return true;
     }
-
     public function runFilter($inEventName, $inContent) {
         if (!isset($this->filterEvents[$inEventName])) {
             return null;
@@ -68,7 +60,6 @@ class hookEngine {
         }
         return $content;
     }
-
     public function runAddToFilter($inEventName, $inContent) {
         if (!isset($this->filterEvents[$inEventName])) {
             return null;
@@ -80,13 +71,11 @@ class hookEngine {
         }
         return $content;
     }
-
     private function pluginSort(array $plugins) {
         //Sort the array. The function is the comparison.
         uasort($plugins, array('hookEngine', 'comparePlugins'));
         return $plugins;
     }
-
     private function comparePlugins($a, $b) {
         if (!is_object($a)) {
             return;

@@ -100,7 +100,17 @@ class forgotPasswordEngine {
         if(! $randomString->functionsExists()) {
             return false;
         }
+        $existingTokens = $database->getData('token', 'forgotPassword');
+        if($existingTokens == false) {
+            return false;
+        }
+        if($existingTokens == null) {
+            $existingTokens = array();
+        }
         $token = $randomString->run(array('length' => 50));
+        while(in_array(array('token'=>$token), $existingTokens)) {
+            $token = $randomString->run(array('length' => 50));
+        }
         $date = new DateTime();
         $date = $date->format('Y-m-d H:i:s');
         $token = $database->escapeString($token);

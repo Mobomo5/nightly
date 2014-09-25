@@ -7,23 +7,19 @@
  */
 require_once(MAIL_OBJECT_FILE);
 require_once(DATABASE_OBJECT_FILE);
-
+require_once(MAIL_TEMPLATE_OBJECT_FILE);
 class mailTemplateEngine {
     private static $instance;
     private $retrievedTemplates;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new mailTemplateEngine();
         }
-
         return self::$instance;
     }
-
     private function __construct() {
         $this->retrievedTemplates = array();
     }
-
     public function getTemplate($inTemplateName) {
         if (isset($this->retrievedTemplates[$inTemplateName])) {
             return $this->retrievedTemplates[$inTemplateName];
@@ -38,27 +34,25 @@ class mailTemplateEngine {
             return false;
         }
         if ($results == null) {
-            return null;
+            return false;
         }
         if (count($results) > 1) {
-            return null;
+            return false;
         }
         $template = new mailTemplate($results[0]['id'], $results[0]['name'], $results[0]['subject'], $results[0]['body'], $results[0]['senderEmail'], $results[0]['senderName'], $results[0]['modifier']);
         $this->retrievedTemplates = $template;
         return $template;
     }
-
     public function loadTemplate($inTemplateName) {
         $template = $this->getTemplate($inTemplateName);
         if ($template == null) {
-            return null;
+            return false;
         }
         if ($template == false) {
             return false;
         }
         return new mail($template->getSenderEmail(), $template->getSenderName(), array(), $template->getSubject(), $template->getBody(), false);
     }
-
     public function saveTemplate(mailTemplate $templateToSave) {
         $database = database::getInstance();
         if (!$database->isConnected()) {
@@ -76,7 +70,6 @@ class mailTemplateEngine {
         }
         return true;
     }
-
     public function addTemplate(mailTemplate $templateToAdd) {
         $database = database::getInstance();
         if (!$database->isConnected()) {
@@ -93,7 +86,6 @@ class mailTemplateEngine {
         }
         return true;
     }
-
     public function deleteTemplate(mailTemplate $templateToDelete) {
         $database = database::getInstance();
         if (!$database->isConnected()) {

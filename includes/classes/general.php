@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -8,7 +7,6 @@
  */
 class general {
     private $function;
-
     public function __construct($inFunction) {
         str_replace('..', '', $inFunction);
         $functionFile = EDUCASK_ROOT . '/includes/generalFunctions/' . $inFunction . '.php';
@@ -19,7 +17,6 @@ class general {
         require_once($functionFile);
         $this->function = new $inFunction();
     }
-
     public function run(array $inOptions = array()) {
         if (!$this->function) {
             return false;
@@ -35,7 +32,6 @@ class general {
         }
         return $this->function->run();
     }
-
     public function functionsExists() {
         if (!$this->function) {
             return false;

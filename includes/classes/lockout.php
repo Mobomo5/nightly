@@ -48,6 +48,7 @@ class lockout {
         }
         $this->attemptsLeft = $attemptsLeft;
         $this->numberOfFailedAttempts += 1;
+        $this->lastUpdate = new DateTime();
     }
     private function validateIP($ip) {
         $val = new validator('ip');

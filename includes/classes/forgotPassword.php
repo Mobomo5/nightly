@@ -21,7 +21,7 @@ class forgotPassword {
         preg_replace('/\s+/', '', strip_tags($token));
         $cleanString = new general('cleanString');
         if(! $cleanString->functionsExists()) {
-            return false;
+            return;
         }
         $token = $cleanString->run(array('stringToClean' => $token));
         $this->id = $id;

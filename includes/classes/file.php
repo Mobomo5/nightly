@@ -93,6 +93,7 @@ class file {
         if (empty($inTitle)) {
             return false;
         }
+        $this->title = $inTitle;
     }
 
     /**

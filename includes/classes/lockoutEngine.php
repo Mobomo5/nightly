@@ -109,6 +109,14 @@ class lockoutEngine {
         return true;
     }
     public function isLockedOut($ipAddress) {
+        $val = new validator('ip');
+        if(! $val->validatorExists()) {
+            return false;
+        }
+        //Lock the client out if the clients IP isn't valid
+        if(! $val->validate($ipAddress)) {
+            return true;
+        }
         $lockout = $this->getLockout($ipAddress);
         if($lockout == false) {
             return false;
