@@ -5,7 +5,8 @@
  * Date: 6/4/14
  * Time: 10:54 AM
  */
-
+require_once(NODE_FIELD_TYPE_OBJECT_FILE);
+require_once(NODE_TYPE_OBJECT_FILE);
 class nodeField {
     private $id;
     private $nodeFieldType;

@@ -5,6 +5,7 @@
  * Date: 03/06/14
  * Time: 9:17 PM
  */
+require_once(NODE_FIELD_TYPE_OBJECT_FILE);
 class nodeFieldRevision {
     private $id;
     private $content;

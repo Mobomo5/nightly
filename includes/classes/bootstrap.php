@@ -106,6 +106,8 @@ class bootstrap {
         define('FORGOT_PASSWORD_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/forgotPasswordEngine.php');
         define('OBJECT_CACHE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/objectCache.php');
         define('CENSORSHIP_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/censorshipEngine.php');
+        define('MESSAGE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/messageEngine.php');
+        define('MESSAGE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/message.php');
     }
 
     private function doRequires() {

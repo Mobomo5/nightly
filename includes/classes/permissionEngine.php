@@ -7,24 +7,21 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(PERMISSION_OBJECT_FILE);
-
+require_once(CURRENT_USER_OBJECT_FILE);
 class permissionEngine {
     private static $instance;
     private $permissionsChecked;
     private $retrievedPermissions;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new permissionEngine();
         }
         return self::$instance;
     }
-
     private function __construct() {
         $this->permissionsChecked = array();
         $this->retrievedPermissions = array();
     }
-
     public function getPermission($inPermissionName) {
         $inPermissionName = preg_replace('/\s+/', '', $inPermissionName);
         if (!empty($this->retrievedPermissions[$inPermissionName])) {
@@ -34,23 +31,21 @@ class permissionEngine {
         if (!$database->isConnected()) {
             return false;
         }
-
         $inPermissionName = $database->escapeString(htmlspecialchars($inPermissionName));
         $results = $database->getData('permissionID, permissionName, humanName, permissionDescription', 'permission', 'permissionName = \'' . $inPermissionName . '\'');
         if ($results == false) {
             return false;
         }
         if ($results == null) {
-            return null;
+            return false;
         }
-        if(count($results) > 1) {
+        if (count($results) > 1) {
             return false;
         }
         $permission = new permission($results[0]['permissionID'], $results[0]['permissionName'], $results[0]['humanName'], $results[0]['permissionDescription']);
         $this->retrievedPermissions[$inPermissionName] = $permission;
         return $permission;
     }
-
     public function checkPermission(permission $inPermission, $inRoleID = GUEST_ROLE_ID) {
         if (!is_numeric($inRoleID)) {
             return false;
@@ -82,7 +77,6 @@ class permissionEngine {
         $this->permissionsChecked[$inPermission->getName()][$inRoleID] = true;
         return true;
     }
-
     public function addPermission(permission $inPermission) {
         $database = database::getInstance();
         if (!$database->isConnected()) {
@@ -91,13 +85,11 @@ class permissionEngine {
         $inName = $database->escapeString(htmlspecialchars(preg_replace('/\s+/', '', $inPermission->getName())));
         $inHumanName = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getHumanName())));
         $inDescription = $database->escapeString(htmlspecialchars(strip_tags($inPermission->getDescription())));
-
         if (!$database->insertData('permission', 'permissionName, humanName, permissionDescription', '\'' . $inName . '\', \'' . $inHumanName . '\', \'' . $inDescription . '\'')) {
             return false;
         }
         return true;
     }
-
     public function savePermission(permission $inPermission) {
         $database = database::getInstance();
         if (!$database->isConnected()) {
@@ -111,7 +103,6 @@ class permissionEngine {
         }
         return true;
     }
-
     public function toggleCanDo(permission $permissionToSet, $roleID, $inCanDo = false) {
         if (!is_bool($inCanDo)) {
             return false;
@@ -148,7 +139,6 @@ class permissionEngine {
         }
         return true;
     }
-
     private function insertNewCanDo($roleID, $permissionID, $canDo = 0) {
         if (!is_int($canDo)) {
             return false;
@@ -177,18 +167,14 @@ class permissionEngine {
         }
         return true;
     }
-
     public function currentUserCanDo($inPermissionName) {
         $perm = $this->getPermission($inPermissionName);
-
         if (!$perm) {
             return false;
         }
         if (!$this->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
-
             return false;
         }
-
         return true;
     }
 }

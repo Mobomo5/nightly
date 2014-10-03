@@ -6,6 +6,7 @@
  * Time: 7:23 PM
  */
 require_once(MODULE_ENGINE_OBJECT_FILE);
+require_once(NODE_FIELD_TYPE_OBJECT_FILE);
 class nodeType {
     private $id;
     private $humanName;
