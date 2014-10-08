@@ -90,10 +90,10 @@ class router {
         $module = explode('/', $params);
         $module = $module[0];
         foreach ($this->staticRoutes as $route => $newModule) {
-            if (preg_match('#' . $route . '#', $params)) {
-                $module = $newModule;
-                break;
+            if (! preg_match('#' . $route . '#', $params)) {
+                continue;
             }
+            $module = $newModule;
         }
         if (!moduleEngine::getInstance()->moduleExists($module)) {
             return 'fourOhFour';

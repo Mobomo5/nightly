@@ -8,236 +8,211 @@
 require_once(USER_OPTION_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
-
-/**
- * Class userOptionEngine
- */
 class userOptionEngine {
-    /**
-     * @var
-     */
     private static $instance;
-    /**
-     * @var
-     */
     private $checkedOptions;
-
-    /**
-     * @return userOptionEngine
-     */
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new userOptionEngine();
         }
         return self::$instance;
     }
-
-    /**
-     *
-     */
-    public function setInstance() {
-
-    }
-
-    public function __construct() {
+    private function __construct() {
         $this->checkedOptions = array();
     }
-
-    /**
-     * @param string $inOptionName
-     * @param int $userID
-     *
-     * @return bool
-     */
-    public function getOption($inOptionName, $userID) {
-        // check the name
-        $nameVal = new validator('optionName');
-
-        if (!$nameVal->validate($inOptionName)) {
-            return false;
+    public function getOption($inOptionName) {
+        $inOptionName = preg_replace('/\s+/', '', $inOptionName);
+        if(isset($this->checkedOptions[$inOptionName]['userOptionObject'])) {
+            return $this->checkedOptions[$inOptionName]['userOptionObject'];
         }
-
-        // validate userID
-        $idVal = new validator('userID');
-
-        if (!$idVal->validate($userID)) {
-            return false;
-        }
-
         // open the db
         $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $inOptionName = $db->escapeString($inOptionName);
         // run the query
-
-        $results = $db->getData('*', 'userOptions', 'optionName = \'' . $inOptionName . '\'');
+        $results = $db->getData('*', 'userOption', 'optionName = \'' . $inOptionName . '\'');
         if (!$results) {
             return false;
         }
         if (sizeof($results) == 0) {
             return false;
         }
-
         //get the first value and return the object
         $id = $results[0]['id'];
         $computerName = $results[0]['optionName'];
         $humanName = $results[0]['humanName'];
         $description = $results[0]['description'];
         $option = new userOption($id, $computerName, $humanName, $description);
-        $this->checkedOptions[$inOptionName] = $option;
+        $this->checkedOptions[$inOptionName]['userOptionObject'] = $option;
         return $option;
     }
-
-    /**
-     * @param userOption $inOption
-     * @param int $userID
-     *
-     * @return bool
-     * @internal param int $inRoleID
-     */
-    public function checkOption(userOption $inOption, $userID) {
-        // check permissions
-        $permEng = permissionEngine::getInstance();
-        $perm = $permEng->getPermission('canCheckOption');
-        if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+    public function getUserValue($optionName, $userID) {
+        if(! is_numeric($userID)) {
             return false;
         }
-        // check the input
-        $idVal = new validator('userID');
-        if (!$idVal->validate($userID)) {
+        $userID = intval($userID);
+        if($userID < 1) {
             return false;
         }
-
+        $option = $this->getOption($optionName);
+        if($option == false) {
+            return false;
+        }
         // is it stored already?
-        if (isset($this->checkedOptions[$inOption->getComputerName()][$userID])) {
-            return $this->checkedOptions[$inOption->getComputerName()][$userID];
+        if (isset($this->checkedOptions[$option->getComputerName()][$userID])) {
+            return $this->checkedOptions[$option->getComputerName()][$userID];
         }
-
         // get the db
         $db = database::getInstance();
-
-        // is the option enabled?
-        $result = $db->getData('s.enabled', 'userOptions u, userOptionSet s', 'u.optionID = s.optionID AND u.optionID = \'' . $inOption->getId() . '\' AND s.userID = \'' . $userID . '\'');
-        $enabled = $result[0]['enabled'];
-        if (($enabled != true) OR ($enabled != false)) {
+        if(! $db->isConnected()) {
             return false;
         }
-
+        // is the option enabled?
+        $result = $db->getData('s.value', 'userOption u, userOptionSet s', 'u.optionID = s.optionID AND u.optionID = ' . $db->escapeString($option->getID()) . ' AND s.userID = ' . $userID);
+        if($result == false) {
+            return false;
+        }
+        if($result == null) {
+            return false;
+        }
+        if(count($result) > 1) {
+            return false;
+        }
+        $value = $result[0]['value'];
         // store the value
-        $this->checkedOptions[$inOption->getComputerName()][$userID] = $enabled;
-
+        $this->checkedOptions[$option->getComputerName()][$userID] = $value;
         //return the value
-        return $enabled;
-
+        return $value;
     }
-
-    /**
-     * @param userOption $option
-     * @param int $userID
-     * @param bool $value
-     *
-     * @internal param $optionName
-     * @return bool
-     */
-    public function setOption(userOption $option, $userID, $value) {
-
+    public function getCurrentUserValue($optionName) {
+        $userID = intval(currentUser::getUserSession()->getID());
+        return $this->getUserValue($optionName, $userID);
+    }
+    public function setUserOptionValue(userOption $option, $userID, $value) {
+        if(! is_numeric($userID)) {
+            return false;
+        }
+        $userID = intval($userID);
+        if($userID < 1) {
+            return false;
+        }
         // check permissions
         $permEng = permissionEngine::getInstance();
-        $perm = $permEng->getPermission('canSetOption');
-        if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+        if(! $permEng->currentUserCanDo('canSetUserOptionValues')) {
             return false;
         }
-        // check the input
-
-        $idVal = new validator('userID');
-        if (!$idVal->validate($userID)) {
-            return false;
-        }
-
         // get db
-
         $db = database::getInstance();
-
-        if ($value) {
-            $store = 1;
-        } else {
-            $store = 0;
+        if(! $db->isConnected()) {
+            return false;
         }
-        $results = $db->updateTable('userOptionSet', 'enabled = \'' . $store . '\'', 'optionID = \'' . $option->getId() . '\'');
-        if (!$results) {
+        $optionID = $db->escapeString($option->getID());
+        $userID = $db->escapeString($userID);
+        $value = $db->escapeString($value);
+        $data = $db->getData('optionSetID', 'userOptionSet', 'optionID = ' . $optionID . ' AND userID=' . $userID);
+        if(! is_array($data)) {
+            return $this->insertUserOptionValue($option, $userID, $value);
+        }
+        if(count($data) > 1) {
+            $db->removeData('userOptionSet','optionID = ' . $optionID . ' AND userID=' . $userID);
+            return $this->insertUserOptionValue($option, $userID, $value);
+        }
+        $optionSetID = $db->escapeString($data[0]['optionSetID']);
+        $results = $db->updateTable('userOptionSet', 'value = \'' . $value . '\'', 'optionSetID = '. $optionSetID . ' AND optionID = ' . $optionID . ' AND userID=' . $userID);
+        if ($results == false) {
             return false;
         }
         return true;
     }
-
-    /**
-     * Adds an option to the table
-     * on success, returns the optionID of the new option
-     *
-     * @param $inOptionName
-     * @param $inHumanName
-     * @param $inOptionDescription
-     *
-     * @return bool | int optionID of new option
-     */
-    public function addOption($inOptionName, $inHumanName, $inOptionDescription) {
-
+    private function insertUserOptionValue(userOption $option, $userID, $value) {
+        if(! is_numeric($userID)) {
+            return false;
+        }
+        $userID = intval($userID);
+        if($userID < 1) {
+            return false;
+        }
         // check permissions
         $permEng = permissionEngine::getInstance();
-        $perm = $permEng->getPermission('canAddOption');
-        if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
+        if(! $permEng->currentUserCanDo('canSetUserOptionValues')) {
             return false;
         }
-
-        // validate
-        $nameVal = new validator('optionName');
-        if (!$nameVal->validate($inOptionName)) {
-            return false;
-        }
-
         // get db
         $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $optionID = $db->escapeString($option->getID());
+        $userID = $db->escapeString($userID);
+        $value = $db->escapeString($value);
+        $results = $db->insertData('userOptionSet', 'value, userID, optionID', "'{$value}', {$userID}, {$optionID}");
+        if($results == false) {
+            return false;
+        }
+        return true;
+    }
+    public function addOption(userOption $inOption) {
+        // check permissions
+        $permEng = permissionEngine::getInstance();
+        if(! $permEng->currentUserCanDo('canAddUserOptions')) {
+            return false;
+        }
+        // get db
+        $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $inOptionName = preg_replace('/\s+/', '', $inOption->getComputerName());
+        $inHumanName = strip_tags($inOption->getHumanName());
+        $inOptionDescription = strip_tags($inOption->getDescription());
         // escape
         $inOptionName = $db->escapeString($inOptionName);
         $inHumanName = $db->escapeString($inHumanName);
         $inOptionDescription = $db->escapeString($inOptionDescription);
-
-        $results = $db->insertData('userOptions', 'optionName, humanName, description', '\'' . $inOptionName . '\', \'' . $inHumanName . '\', \'' . $inOptionDescription . '\'');
-        if (!$results) {
-            return false;
-        }
-
-        $results = $db->getData('optionID', 'userOptions', 'optionName = \'' . $inOptionName . '\'');
-        if (!$results) {
-            return false;
-        }
-        return $results[0]['optionID'];
-    }
-
-    /**
-     *
-     *
-     * @param userOption $option
-     * @param int $userRole
-     *
-     * @internal param string $optionName
-     * @return bool
-     */
-    public function deleteOption(userOption $option, $userRole = GUEST_ROLE_ID) {
-
-        // check permissions
-        $permEng = permissionEngine::getInstance();
-        $perm = $permEng->getPermission('canDeleteOption');
-        if (!$permEng->checkPermission($perm, currentUser::getUserSession()->getRoleID())) {
-            return false;
-        }
-
-        // get db
-        $db = database::getInstance();
-        $results = $db->removeData('userOptions', 'optionName = \'' . $option->getComputerName() . ' AND optionID = \'' . $option->getId() . '\'');
-        if (!$results) {
+        $results = $db->insertData('userOption', 'optionName, humanName, description', '\'' . $inOptionName . '\', \'' . $inHumanName . '\', \'' . $inOptionDescription . '\'');
+        if ($results == false) {
             return false;
         }
         return true;
-
     }
-
+    public function deleteOption(userOption $option) {
+        // check permissions
+        $permEng = permissionEngine::getInstance();
+        if(! $permEng->currentUserCanDo('canDeleteUserOptions')) {
+            return false;
+        }
+        // get db
+        $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $results = $db->removeData('userOption', 'optionName = \'' . $db->escapeString($option->getComputerName()) . '\' AND optionID = ' . $db->escapeString($option->getID()));
+        if ($results == false) {
+            return false;
+        }
+        return true;
+    }
+    public function editOption(userOption $inOption) {
+        // check permissions
+        $permEng = permissionEngine::getInstance();
+        if(! $permEng->currentUserCanDo('canEditUserOptions')) {
+            return false;
+        }
+        // get db
+        $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $id = $db->escapeString(intval($inOption->getID()));
+        $computerName = $db->escapeString(preg_replace('/\s+/', '', $inOption->getComputerName()));
+        $humanName = $db->escapeString(strip_tags($inOption->getHumanName()));
+        $description = $db->escapeString(strip_tags($inOption->getDescription()));
+        $result = $db->updateTable('userOption', "optionName='{$computerName}', humanName='{$humanName}', optionDescription='{$description}'", "optionID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * User: Keegan Bailey
  * Date: 23/04/14
@@ -17,18 +16,13 @@ class status {
     private $votes; //counter for how many people like the posting
     private $voterArray; //array of voters to prevent duplicated vote spamming
     private $posterName;
-
-    public function __construct($inStatusID = null, $inParentStatusID = null, $inVotes = 0, $inString, $inUserID, $inNodeID)
-    {
-
+    public function __construct($inStatusID, $inParentStatusID, $inVotes, $inString, $inUserID, $inNodeID) {
         if (is_numeric($inStatusID) && $inStatusID != null) {
             $this->statusID = $inStatusID;
         }
-
         if (is_numeric($inParentStatusID) && $inParentStatusID != null) {
             $this->parentID = $inParentStatusID;
         }
-
         $this->statusMsg = $inString;
         $this->posterID = $inUserID;
         $this->nodeID = $inNodeID;
@@ -37,11 +31,9 @@ class status {
         $this->voterArray = array();
         $this->posterName = userEngine::getInstance()->getUser($inUserID)->getFullName();
     }
-
     public function addChildStatusTo(status $inChildStatus) {
         $this->childStatus[] += $inChildStatus;
     }
-
     public function removeChildStatusFrom(status $inChildStatus) {
         //Look for the child status in the array and remove it.
         foreach ($this->childStatus as $child) {
@@ -51,7 +43,6 @@ class status {
             }
         }
     }
-
     /* Check the Array of voters to see if this user has already voted
      * on this status. If he has, do nothing, and if he has not, then
      * allow the vote and add his ID to the array of voters
@@ -63,13 +54,11 @@ class status {
                 $alreadyVoted = true;
             }
         }
-
         if (!$alreadyVoted) {
             $this->votes++;
             $this->voterArray[] += $inUserID;
         }
     }
-
     public function downVote($inUserID) {
         $alreadyVoted = false;
         foreach ($this->voterArray as $user) {
@@ -77,50 +66,38 @@ class status {
                 $alreadyVoted = true;
             }
         }
-
         if ($alreadyVoted) {
             $this->votes--;
             $this->voterArray[] -= $inUserID;
         }
     }
-
     /*
      * Getters, no setters due to object not being allowed to be edited
      */
     public function getStatusID() {
         return $this->statusID;
     }
-
     public function getStatus() {
         return $this->statusMsg;
     }
-
     public function getUpVotes() {
         return $this->votes;
     }
-
     public function getNodeID() {
         return $this->nodeID;
     }
-
-    public function getPosterID()
-    {
+    public function getPosterID() {
         return $this->posterID;
     }
-
     public function getPosterName() {
         return $this->posterName;
     }
-
-    public function getParentStatusID()
-    {
+    public function getParentStatusID() {
         return $this->parentID;
     }
-
     public function getPosterHref() {
         return new link('users/' . $this->posterID);
     }
-
     public function getChildStatus() {
         if (empty($this->childStatus)) {
             return false;

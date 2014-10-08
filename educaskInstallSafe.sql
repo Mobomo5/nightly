@@ -299,7 +299,7 @@ COMMENT = 'User specific options.';
 
 CREATE TABLE IF NOT EXISTS `userOptionSet` (
   `optionSetID` INT NOT NULL AUTO_INCREMENT COMMENT 'The unique identifier for the row.',
-  `enabled` TINYINT(1) NOT NULL COMMENT 'A flag to state if the option is enabled or not.',
+  `value` VARCHAR(50) NOT NULL COMMENT 'The users selected value for the option.',
   `userID` INT NOT NULL COMMENT 'The user that the setting is for.',
   `optionID` INT NOT NULL COMMENT 'The option the setting is for.',
   PRIMARY KEY (`optionSetID`),
@@ -387,7 +387,7 @@ COMMENT = 'Individual links that belong to menus.';
 CREATE TABLE IF NOT EXISTS `menuItemVisibility` (
   `ruleID` INT NOT NULL AUTO_INCREMENT COMMENT 'A unique identifier for the rule',
   `menuItemID` INT NOT NULL COMMENT 'The menu item the rule is for.',
-  `referenceID` VARCHAR(50) NOT NULL COMMENT 'The unique identifier for the object being refenced.',
+  `referenceID` VARCHAR(50) NOT NULL COMMENT 'The unique identifier for the object being referenced.',
   `referenceType` VARCHAR(50) NOT NULL COMMENT 'The type of the object being referenced. Example: user.',
   `visible` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'The flag that determines if the node is visible in the rule.',
   PRIMARY KEY (`ruleID`),
@@ -406,7 +406,7 @@ CREATE TABLE IF NOT EXISTS `groupMember` (
   `membershipID` INT NOT NULL AUTO_INCREMENT COMMENT 'The unique identifier for the row.',
   `nodeID` INT NOT NULL COMMENT 'The node that forms the group page.',
   `userID` INT NOT NULL COMMENT 'The user that is the member of the group.',
-  `isAdmin` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'A flag to indicate if the user has administrative privilages of the group.',
+  `isAdmin` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'A flag to indicate if the user has administrative privileges of the group.',
   PRIMARY KEY (`membershipID`),
   UNIQUE INDEX `membershipID_UNIQUE` (`membershipID` ASC),
   INDEX `fk_groupMember_node1_idx` (`nodeID` ASC),

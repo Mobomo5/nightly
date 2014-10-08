@@ -332,7 +332,7 @@ function configureContent() {
         return;
     }
     $address = $_SERVER['HTTP_HOST'];
-    $webDirectory = dirname($_SERVER['SCRIPT_NAME']);
+    $webDirectory = dirname($_SERVER['REQUEST_URI']);
     $toReturn = '<h1>Configure your Site</h1>';
     $toReturn .= getErrorDiv();
     $toReturn .= '<p>This form gathers the basic information for the site and prepares the first account.</p>';

@@ -9,7 +9,6 @@
 require_once(VALIDATOR_INTERFACE_FILE);
 class validator {
     private $subValidator;
-
     public function __construct($inType) {
         str_replace('..', '', $inType);
         $validatorFile = EDUCASK_ROOT . '/includes/validators/' . $inType . '.php';
@@ -18,9 +17,12 @@ class validator {
             return;
         }
         require_once($validatorFile);
+        if(class_exists($inType) == false) {
+            $this->subValidator = false;
+            return;
+        }
         $this->subValidator = new $inType();
     }
-
     public function validate($inValue, array $inOptions = array()) {
         if (!$this->subValidator) {
             return false;
@@ -39,7 +41,6 @@ class validator {
         }
         return $this->subValidator->validate($inValue);
     }
-
     public function validatorExists() {
         if (!$this->subValidator) {
             return false;

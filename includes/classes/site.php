@@ -8,7 +8,6 @@
 require_once(VARIABLE_OBJECT_FILE);
 require_once(VARIABLE_ENGINE_OBJECT_FILE);
 require_once(VALIDATOR_OBJECT_FILE);
-
 class site {
     private $title;
     private $email;
@@ -23,15 +22,12 @@ class site {
     private $maintenanceMode;
     //@TODO: Add Cron Stuff
     //@TODO: Add logo and favicon.
-
     public static function getInstance() {
         if (!isset($_SESSION['educaskSite'])) {
             self::setInstance(new site());
         }
-
         return $_SESSION['educaskSite'];
     }
-
     private static function setInstance(site $object) {
         //verify the variable given is a site object. If it is not, get out of here.
         if (get_class($object) != 'site') {
@@ -39,7 +35,6 @@ class site {
         }
         $_SESSION['educaskSite'] = $object;
     }
-
     private function __construct() {
         $variableEngine = variableEngine::getInstance();
         $variablesWanted[] = 'siteTitle';
@@ -68,23 +63,22 @@ class site {
         $this->maintenanceMode = $variables['maintenanceMode'];
         //@TODO: Add Cron Stuff
     }
-
     public function getTitle() {
         return $this->title;
     }
-
     public function getEmail() {
         return $this->email;
     }
-
     public function setTitle($inTitle) {
-        if (!$this->title->setValue($inTitle)) {
+        $inTitle = strip_tags($inTitle);
+        if(! $this->title->setValue($inTitle)) {
             return false;
         }
-        $this->title->save();
+        if(! $this->title->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function setEmail($inEmail) {
         $validator = new validator('email');
         if (!$validator->validatorExists()) {
@@ -93,17 +87,17 @@ class site {
         if (!$validator->validate($inEmail)) {
             return false;
         }
-        if (!$this->email->setValue($inEmail)) {
+        if(! $this->email->setValue($inEmail)) {
             return false;
         }
-        $this->email->save();
+        if(! $this->email->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function getTheme() {
         return $this->theme;
     }
-
     public function setTheme($inTheme) {
         $inTheme = str_replace('..', '', $inTheme);
         $tempName = '/includes/themes/' . $inTheme;
@@ -117,10 +111,11 @@ class site {
         if (!$this->theme->setValue($inTheme)) {
             return false;
         }
-        $this->theme->save();
+        if(! $this->theme->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function getWebAddress($secure = false, $withBaseDirectory = false) {
         if ($secure == true) {
             if ($withBaseDirectory == true) {
@@ -133,7 +128,6 @@ class site {
         }
         return $this->url;
     }
-
     public function setWebAddress($inUrl) {
         $validator = new validator('url');
         if (!$validator->validatorExists()) {
@@ -145,10 +139,11 @@ class site {
         if (!$this->url->setValue($inUrl)) {
             return false;
         }
-        $this->url->save();
+        if(! $this->url->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function setSecureWebAddress($inUrl) {
         $validator = new validator('url');
         if (!$validator->validatorExists()) {
@@ -160,38 +155,30 @@ class site {
         if (!$this->urlSecure->setValue($inUrl)) {
             return false;
         }
-        $this->urlSecure->save();
+        if(! $this->urlSecure->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function getBaseDirectory() {
         return $this->baseDirectory;
     }
-
-    public function setBaseDirectory($inDirectory) {
-        $inDirectory = str_replace('..', '', $inDirectory);
-        $validator = new validator('dir');
-        if (!$validator->validatorExists()) {
+    public function setBaseDirectory() {
+        $directory = EDUCASK_WEB_ROOT;
+        if (!$this->baseDirectory->setValue($directory)) {
             return false;
         }
-        if (!$validator->validate($inDirectory)) {
+        if(! $this->baseDirectory->save()) {
             return false;
         }
-        if (!$this->baseDirectory->setValue($inDirectory)) {
-            return false;
-        }
-        $this->baseDirectory->save();
         self::setInstance($this);
     }
-
     public function getEducaskVersion() {
         return $this->educaskVersion;
     }
-
     public function getGuestRoleID() {
         return $this->guestRoleID;
     }
-
     public function setGuestRoleID($inID) {
         if (!is_int($inID)) {
             return false;
@@ -199,37 +186,42 @@ class site {
         if (!$this->guestRoleID->setValue($inID)) {
             return false;
         }
-        $this->guestRoleID->save();
+        if(! $this->guestRoleID->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function areCleanURLsEnabled() {
-        return $this->cleanURLs;
+        if($this->cleanURLs->getValue() == 'false') {
+            return false;
+        }
+        return true;
     }
-
     public function setCleanURLs($areEnabled = true) {
-        if(! is_bool($areEnabled)) {
+        if (!is_bool($areEnabled)) {
             return false;
         }
         if ($areEnabled == false) {
             if (!$this->cleanURLs->setValue('false')) {
                 return false;
             }
-            $this->cleanURLs->save();
+            if(! $this->cleanURLs->save()) {
+                return false;
+            }
             self::setInstance($this);
             return;
         }
         if (!$this->cleanURLs->setValue('true')) {
             return false;
         }
-        $this->cleanURLs->save();
+        if(! $this->cleanURLs->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
-
     public function getTimeZone() {
         return $this->timeZone;
     }
-
     public function setTimeZone($inTimeZone) {
         $validator = new validator('phpTimeZone');
         if (!$validator->validatorExists()) {
@@ -241,31 +233,37 @@ class site {
         if (!$this->timeZone->setValue($inTimeZone)) {
             return false;
         }
-        $this->timeZone->save();
+        if(! $this->timeZone->save()) {
+            return false;
+        }
         self::setInstance($this);
     }
     public function isInMaintenanceMode() {
-        if($this->maintenanceMode->getValue() != 'true') {
+        if ($this->maintenanceMode->getValue() != 'true') {
             return false;
         }
         return true;
     }
     public function setMaintenanceMode($maintenanceMode = false) {
-        if(! is_bool($maintenanceMode)) {
+        if (!is_bool($maintenanceMode)) {
             return false;
         }
-        if($maintenanceMode == false) {
+        if ($maintenanceMode == false) {
             if (!$this->timeZone->setValue('false')) {
                 return false;
             }
-            $this->maintenanceMode->save();
+            if(! $this->maintenanceMode->save()) {
+                return false;
+            }
             self::setInstance($this);
             return true;
         }
         if (!$this->timeZone->setValue('true')) {
             return false;
         }
-        $this->maintenanceMode->save();
+        if(! $this->maintenanceMode->save()) {
+            return false;
+        }
         self::setInstance($this);
         return true;
     }

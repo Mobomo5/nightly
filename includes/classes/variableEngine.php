@@ -7,55 +7,63 @@
  */
 require_once(DATABASE_OBJECT_FILE);
 require_once(VARIABLE_OBJECT_FILE);
-
 class variableEngine {
     private static $instance;
-
+    private $foundVariables;
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new variableEngine();
         }
         return self::$instance;
     }
-
+    private function __construct() {
+        $this->foundVariables = array();
+    }
     public function getVariable($variableName) {
         if ($variableName == '') {
-            return null;
+            return false;
         }
         if ($variableName == null) {
-            return null;
+            return false;
+        }
+        $variableName = preg_replace('/\s+/', '', $variableName);
+        if(isset($this->foundVariables[$variableName])) {
+            return $this->foundVariables[$variableName];
         }
         $database = database::getInstance();
         if (!$database->isConnected()) {
-            return null;
+            return false;
         }
-        $variableName = preg_replace('/\s+/', '', $variableName);
         $variableName = $database->escapeString(htmlspecialchars($variableName));
-
         $variableValue = $database->getData('variableValue, readOnly', 'variable', 'variableName=\'' . $variableName . '\'');
         if ($variableValue == false) {
-            return null;
+            return false;
+        }
+        if($variableValue == null) {
+            return false;
         }
         if (count($variableValue) > 1) {
-            return null;
+            return false;
         }
         if ($variableValue[0]['readOnly'] == 1) {
             $toReturn = new variable($variableName, $variableValue[0]['variableValue'], true);
+            $this->foundVariables[$toReturn->getName()] = $toReturn;
             return $toReturn;
         }
         $toReturn = new variable($variableName, $variableValue[0]['variableValue']);
+        $this->foundVariables[$toReturn->getName()] = $toReturn;
         return $toReturn;
     }
-
     public function getVariables(array $variables = array()) {
         if (count($variables) == 0) {
-            return null;
+            return false;
         }
         $database = database::getInstance();
         if (!$database->isConnected()) {
-            return null;
+            return false;
         }
         $where = '';
+        $toReturn = array();
         foreach ($variables as $variable) {
             if ($variable == null) {
                 continue;
@@ -64,6 +72,10 @@ class variableEngine {
                 continue;
             }
             $variable = preg_replace('/\s+/', '', $variable);
+            if(isset($this->foundVariables[$variable])) {
+                $toReturn[$variable] = $this->foundVariables[$variable];
+                continue;
+            }
             $variable = $database->escapeString(htmlspecialchars($variable));
             if ($where == '') {
                 $where .= 'variableName = \'' . $variable . '\'';
@@ -71,16 +83,18 @@ class variableEngine {
             $where .= ' OR variableName = \'' . $variable . '\'';
         }
         if ($where == '') {
-            return null;
+            if(count($toReturn) > 0) {
+                return $toReturn;
+            }
+            return false;
         }
         $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
         if ($results == false) {
-            return null;
+            return false;
         }
         if ($results == null) {
-            return null;
+            return false;
         }
-        $toReturn = array();
         foreach ($results as $result) {
             $variableName = $result['variableName'];
             $variableValue = $result['variableValue'];
@@ -88,14 +102,15 @@ class variableEngine {
             if ($readOnly == 1) {
                 $variable = new variable($variableName, $variableValue, true);
                 $toReturn[$variableName] = $variable;
+                $this->foundVariables[$variableName] = $variable;
                 continue;
             }
             $variable = new variable($variableName, $variableValue);
+            $this->foundVariables[$variableName] = $variable;
             $toReturn[$variableName] = $variable;
         }
         return $toReturn;
     }
-
     public function saveVariable(variable $variableToSave) {
         $database = database::getInstance();
         if (!$database->isConnected()) {
@@ -120,7 +135,6 @@ class variableEngine {
         }
         return true;
     }
-
     public function addVariable(variable $variableToAdd) {
         $database = database::getInstance();
         if (!$database->isConnected()) {
@@ -139,7 +153,6 @@ class variableEngine {
         }
         return true;
     }
-
     public function deleteVariable(variable $variableToDelete) {
         if ($variableToDelete->isReadOnly()) {
             return false;

@@ -22,13 +22,14 @@ class logEntry {
      * @var
      */
     private $userID;
+    private $occurred;
     /**
      * @param $id
      * @param $type string from logEntryType
      * @param $message
      * @param $userID
      */
-    public function __construct($id, $type, $message, $userID) {
+    public function __construct($id, $type, $message, $userID, DateTime $occurred) {
         // clean
         if (!is_numeric($id)) {
             return false;
@@ -45,6 +46,7 @@ class logEntry {
         $this->type = $type;
         $this->message = strip_tags($message);
         $this->userID = $userID;
+        $this->occurred = $occurred;
     }
     /**
      * @return \logEntryType
@@ -69,5 +71,8 @@ class logEntry {
      */
     public function getUserID() {
         return $this->userID;
+    }
+    public function getTimeOccurred() {
+        return $this->occurred;
     }
 }
