@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -10,14 +9,12 @@ class bootstrap {
     private static $instance;
     private $blocks;
     private $site;
-
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new bootstrap();
         }
         return self::$instance;
     }
-
     private function __construct() {
         if (!is_file(EDUCASK_ROOT . '/includes/config.php')) {
             header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
@@ -30,7 +27,6 @@ class bootstrap {
         $this->blocks = null;
         $this->site = null;
     }
-
     public function init() {
         $this->declareConstants();
         $this->doRequires();
@@ -43,7 +39,6 @@ class bootstrap {
         //@TODO: Add Cron Stuff
         $this->render();
     }
-
     public function declareConstants() {
         define('SYSTEM_LOG_ANONYMOUS', 0);
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
@@ -91,7 +86,6 @@ class bootstrap {
         define('FILE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/file.php');
         define('FOLDER_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/folder.php');
         define('FILE_SYSTEM_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/fileSystemEngine.php');
-        define('MENU_ENGINE_FILE', EDUCASK_ROOT . '/includes/classes/menuEngine.php');
         define('NODE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/node.php');
         define('NODE_TYPE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeType.php');
         define('NODE_FIELD_REVISION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/nodeFieldRevision.php');
@@ -109,7 +103,6 @@ class bootstrap {
         define('MESSAGE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/messageEngine.php');
         define('MESSAGE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/message.php');
     }
-
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
         require_once(DATABASE_OBJECT_FILE);
@@ -118,7 +111,7 @@ class bootstrap {
         require_once(STATUS_ENGINE_OBJECT_FILE);
         require_once(NOTICE_ENGINE_OBJECT_FILE);
         require_once(SITE_OBJECT_FILE);
-        require_once(MENU_ENGINE_FILE);
+        require_once(MENU_ENGINE_OBJECT_FILE);
         require_once(HOOK_ENGINE_OBJECT_FILE);
         require_once(ROUTER_OBJECT_FILE);
         require_once(USER_ENGINE_OBJECT_FILE);
@@ -127,7 +120,6 @@ class bootstrap {
         require_once(PERMISSION_ENGINE_OBJECT_FILE);
         require_once(PERMISSION_OBJECT_FILE);
     }
-
     private function connectDatabase() {
         $database = database::getInstance();
         $database->connect();
@@ -135,7 +127,6 @@ class bootstrap {
             die('<html><head><title>:( Database is a no-go | Educask</title></head><body><h1>:( The database is a no-go.</h1><p>Sorry, but I had problems connecting to the database.</p></body></html>');
         }
     }
-
     private function initializePlugins() {
         foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*/*.inc.php') as $toInclude) {
             require_once($toInclude);
@@ -150,26 +141,22 @@ class bootstrap {
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('defineConstants');
     }
-
     private function getVariables() {
         $this->site = site::getInstance();
         define('GUEST_ROLE_ID', (int)$this->site->getGuestRoleID()->getValue());
         define('SITE_EMAIL', $this->site->getEmail());
         define('SITE_TITLE', $this->site->getTitle());
         date_default_timezone_set($this->site->getTimeZone());
-
-        if($this->site->isInMaintenanceMode()) {
-            if(! permissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
+        if ($this->site->isInMaintenanceMode()) {
+            if (!permissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
                 return;
             }
         }
-
         $blockEngine = blockEngine::getInstance();
         $user = currentUser::getUserSession()->toUser();
         $hookEngine = hookEngine::getInstance();
         $router = router::getInstance();
         $moduleEngine = moduleEngine::getInstance();
-
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
         if (!$moduleEngine->includeModule($moduleInCharge)) {
@@ -193,10 +180,8 @@ class bootstrap {
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID(), $pageBlock);
         noticeEngine::getInstance()->removeNotices();
         router::moveCurrentParametersToPrevious();
-
         database::getInstance()->bootstrapDisconnect();
     }
-
     //@TODO: Add Cron Stuff
     private function render() {
         Twig_Autoloader::register();
@@ -206,7 +191,6 @@ class bootstrap {
             $theme = EDUCASK_ROOT . '/includes/themes/default';
         }
         $loader = new Twig_Loader_Filesystem(array($theme));
-
         foreach (glob(EDUCASK_ROOT . '/includes/baseThemes/*') as $baseTheme) {
             $name = explode('/', $baseTheme);
             $name = end($name);
@@ -214,15 +198,14 @@ class bootstrap {
         }
         $twig = new Twig_Environment($loader, array('debug' => true,));
         $twig->addExtension(new Twig_Extension_Debug());
-        if($this->site->isInMaintenanceMode()) {
-            if(! permissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
+        if ($this->site->isInMaintenanceMode()) {
+            if (!permissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
                 echo $twig->render('maintenance.twig', array('site' => $this->site));
                 return;
             }
         }
         echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
     }
-
     private function noGUIWork($module) {
         $link = $module->getReturnPage();
         //verify the variable given is a link object. If it is not, go to the home page.

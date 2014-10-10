@@ -6,10 +6,10 @@
 {% block body %}
     <div id="wrapper">
         {% if blocks.home is defined %}
-        {% include "homepage.twig" %}
-    {% else %}
-        {% include "default.twig" %}
-    {% endif %}
+            {% include "homepage.twig" %}
+        {% else %}
+            {% include "default.twig" %}
+        {% endif %}
         <div id="push"></div>
     </div>
     {% block footer %}

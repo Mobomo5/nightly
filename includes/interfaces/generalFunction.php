@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
@@ -8,6 +7,5 @@
  */
 interface generalFunction {
     public function run();
-
     public function hasOptions();
 }
