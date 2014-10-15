@@ -7,6 +7,7 @@
  */
 ob_start();
 session_start();
+define('CURRENTLY_INSTALLING', true);
 define('EDUCASK_ROOT', getcwd());
 define('EDUCASK_VERSION', '3.0Alpha3.1');
 require_once(EDUCASK_ROOT . '/includes/classes/bootstrap.php');
@@ -94,7 +95,7 @@ function getCurrentCss($step) {
 
 function getContent() {
     //Comment the following three lines if you wish to overwrite an Educask install. You can also delete config.php.
-    if (is_file('includes/config.php')) {
+    if (is_file('includes/config.php') && (filesize('includes/config.php') != 0)) {
         return '<p>Educask is already installed. If you wish to overwrite the install, please delete includes/config.php</p>';
     }
     $action = getAction();

@@ -16,6 +16,9 @@ class bootstrap {
         return self::$instance;
     }
     private function __construct() {
+        if(defined('CURRENTLY_INSTALLING')) {
+            return;
+        }
         if (!is_file(EDUCASK_ROOT . '/includes/config.php')) {
             header('Location: ' . EDUCASK_WEB_ROOT . '/install.php');
             exit();
