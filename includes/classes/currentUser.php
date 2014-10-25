@@ -49,7 +49,7 @@ class currentUser extends user {
         $this->setFirstName('Anonymous');
         $this->setLastName('Guest');
         $this->setEmail('anon@anon.ca');
-        $this->setBirthday(strtotime('now'));
+        $this->setBirthday(new DateTime());
     }
     public function getUserID() {
         return $this->tempID;
@@ -133,7 +133,7 @@ class currentUser extends user {
         $this->setUserName($results[0]['userName']);
         $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID=' . $this->tempID);
         self::setUserSession($this);
-        $logEntry = new logEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID());
+        $logEntry = new logEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID(), new DateTime());
         logger::getInstance()->logIt($logEntry);
         $hookEngine->runAction('userLoggedIn');
         $previousPage = new link(router::getInstance()->getPreviousParameters());

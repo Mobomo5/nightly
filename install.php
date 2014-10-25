@@ -55,27 +55,35 @@ function validateAction() {
         return true;
     }
     if ($action == 'requirement') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'database') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'doDatabase') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'configure') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'doConfigure') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'install') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'doInstall') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     if ($action == 'finish') {
+        define('IGNORE_CONFIG_PHP', true);
         return true;
     }
     return false;
@@ -95,7 +103,7 @@ function getCurrentCss($step) {
 
 function getContent() {
     //Comment the following three lines if you wish to overwrite an Educask install. You can also delete config.php.
-    if (is_file('includes/config.php') && (filesize('includes/config.php') != 0)) {
+    if (is_file('includes/config.php') && (filesize('includes/config.php') != 0) && (! defined('IGNORE_CONFIG_PHP'))) {
         return '<p>Educask is already installed. If you wish to overwrite the install, please delete includes/config.php</p>';
     }
     $action = getAction();
@@ -270,7 +278,7 @@ function doDatabaseContent() {
         header('Location: install.php?action=database');
         return;
     }
-    chmod($file, 664);
+    chmod($file, 330);
     $database = database::getInstance();
     $database->connect();
     if (!$database->isConnected()) {
@@ -893,11 +901,13 @@ function configFileTest() {
         if (!$couldWrite) {
             return false;
         }
+        file_put_contents($config, '');
     }
     $couldWrite = file_put_contents($config, 'Test Write');
     if (!$couldWrite) {
         return false;
     }
+    file_put_contents($config, '');
     return true;
 }
 

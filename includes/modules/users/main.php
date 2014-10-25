@@ -71,7 +71,7 @@ class users implements module {
 
     private function doLogIn() {
         if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
-            logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $_POST['username'] . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0), 0);
+            logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $_POST['username'] . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()), 0);
             noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'I couldn\'t log you in.'));
         }
 

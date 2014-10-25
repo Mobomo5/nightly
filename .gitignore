@@ -1,6 +1,7 @@
 ##PHPStorm
 .idea/
 .htaccess
+config.php
 
 #################
 ## Eclipse
