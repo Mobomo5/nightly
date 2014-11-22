@@ -12,7 +12,7 @@ class statusBlock implements block {
 
     private $content;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
 
         if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewStatuses')) {
             return false;

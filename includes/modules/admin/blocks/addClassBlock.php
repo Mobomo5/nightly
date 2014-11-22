@@ -15,7 +15,7 @@ class addClassBlock implements block {
     private $classNumber;
     private $classSubject;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         $perm = permissionEngine::getInstance()->getPermission('userCanAddClasses');
         if (!$perm->canDo()) {
             return false;

@@ -11,7 +11,7 @@ class addPermissionBlock implements block {
     private $title;
     private $content;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         $perm = permissionEngine::getInstance()->getPermission('userCanAddPermissions');
         if (!$perm->canDo()) {
             return false;

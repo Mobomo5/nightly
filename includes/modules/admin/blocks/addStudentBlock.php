@@ -11,7 +11,7 @@ class addStudentBlock implements block {
     private $content;
     private $title;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         if (!permissionEngine::getInstance()->getPermission('userCanAddStudents')->canDo()) {
             return false;
         }

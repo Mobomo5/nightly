@@ -15,6 +15,7 @@
  * enabled INT
  * parent INT
  */
+require_once(LINK_OBJECT_FILE);
 class menuItem {
     private $id;
     private $menuID;
@@ -26,7 +27,6 @@ class menuItem {
     private $parent;
     private $children = array();
     public function __construct($inID, $inMenuID, $inLinkText, link $inHref, $inWeight, $inHasChildren, $inEnabled, $parent, array $inChildren = array()) {
-        //region constructor checks
         if (!is_numeric($inID)) {
             return;
         }
@@ -65,7 +65,6 @@ class menuItem {
         $this->parent = $parent;
         $this->children = $inChildren;
     }
-    //region get
     public function getID() {
         return $this->id;
     }
@@ -105,8 +104,6 @@ class menuItem {
         $toReturn .= '</ul>';
         return $toReturn;
     }
-    //endregion
-    //region set
     public function setMenuID($inMenuID) {
         if (!is_numeric($inMenuID)) {
             return;
@@ -143,26 +140,7 @@ class menuItem {
         }
         $this->enabled = $inSetEnabled;
     }
-    //endregion
-    //region child functions
-    public function addChild(menuItem $inChild) {
-        if (!is_object($inChild)) {
-            return;
-        }
-        array_push($this->children, $inChild);
+    public function setParent(menuItem $inParent) {
+        $this->parent = $inParent->getID();
     }
-    public function removeChild($inChildID) {
-        if (!is_numeric($inChildID)) {
-            return;
-        }
-        if ($inChildID < 1) {
-            return;
-        }
-        for ($i = 0; $i < count($this->children); $i++) {
-            if ($this->children[$i]->getID() == $inChildID) {
-                unset($this->children[$i]);
-            }
-        }
-    }
-    //endregion
 }

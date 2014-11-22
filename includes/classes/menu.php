@@ -13,9 +13,6 @@
  * themeRegion
  * enabled
  */
-require_once(DATABASE_OBJECT_FILE);
-require_once(CURRENT_USER_OBJECT_FILE);
-require_once(PERMISSION_ENGINE_OBJECT_FILE);
 require_once(MENU_ITEM_OBJECT_FILE);
 class menu {
     //vars for the menu based of db schema

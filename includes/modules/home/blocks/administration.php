@@ -10,7 +10,7 @@ require_once(BLOCK_INTERFACE_FILE);
 
 class administration implements block {
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         // TODO: Implement __construct() method.
     }
 

@@ -10,7 +10,7 @@ require_once(BLOCK_INTERFACE_FILE);
 class homepage implements block {
     private $title;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         // TODO: Implement __construct() method.
     }
 

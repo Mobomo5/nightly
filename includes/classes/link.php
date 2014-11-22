@@ -26,19 +26,19 @@ class link {
         $site = site::getInstance();
         $this->cleanURLEnabled = $site->areCleanURLsEnabled();
     }
-
     //return a href based off of the string input when object created.
     public function getHref() {
         if (substr($this->href, 0, 4) == "http") {
             return $this->href;
         }
-        if ($this->cleanURLEnabled == 'false') {
+        if ($this->cleanURLEnabled == false) {
             return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
         }
-
         return EDUCASK_WEB_ROOT . '/' . $this->href;
     }
-
+    public function getRawHref() {
+        return $this->href;
+    }
     public function __toString() {
         return '' . $this->getHref();
     }

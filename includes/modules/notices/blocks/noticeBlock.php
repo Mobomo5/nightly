@@ -9,7 +9,7 @@
 class noticeBlock implements block {
     private $content = array();
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         $this->content = noticeEngine::getInstance()->getNotices();
     }
 

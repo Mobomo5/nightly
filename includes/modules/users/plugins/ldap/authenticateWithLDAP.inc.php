@@ -29,7 +29,7 @@ class authenticateWithLDAP implements plugin{
             return;
         }
         $pluginEnabled = variableEngine::getInstance()->getVariable('ldapEnabled');
-        if($pluginEnabled == null) {
+        if($pluginEnabled == false) {
             return;
         }
         if($pluginEnabled->getValue() == 'false') {
@@ -37,25 +37,24 @@ class authenticateWithLDAP implements plugin{
         }
         $variableEngine = variableEngine::getInstance();
         $ldapServer = $variableEngine->getVariable('ldapServer');
-        if($ldapServer == null) {
+        if($ldapServer == false) {
             return;
         }
         $ldapDomain = $variableEngine->getVariable('ldapDomain');
-        if($ldapDomain == null) {
+        if($ldapDomain == false) {
             return;
         }
         $ldapIsActiveDirectory = $variableEngine->getVariable('ldapIsActiveDirectory');
-        if($ldapIsActiveDirectory == null) {
+        if($ldapIsActiveDirectory == false) {
             return;
         }
         $ldapConnection = ldap_connect($ldapServer->getValue());
         if(! $ldapConnection) {
             return;
         }
-        if($ldapIsActiveDirectory == 'true') {
-            ldap_set_option($ldapConnection, LDAP_OPT_REFERRALS, 0);
-            ldap_set_option($ldapConnection, LDAP_OPT_PROTOCOL_VERSION, 3);
-        }
+        ldap_set_option($ldapConnection, LDAP_OPT_REFERRALS, 0);
+        ldap_set_option($ldapConnection, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_start_tls($ldapConnection);
         $userName = htmlspecialchars($_POST['username']);
         $password = htmlspecialchars($_POST['password']);
         if($userName == null) {
@@ -71,6 +70,7 @@ class authenticateWithLDAP implements plugin{
             return;
         }
         $authenticated = ldap_bind($ldapConnection, $userName . '@' . $ldapDomain->getValue(), $password);
+        die();
         unset($password);
         if (!$authenticated) {
             ldap_close($ldapConnection);
@@ -81,7 +81,7 @@ class authenticateWithLDAP implements plugin{
         $haveSeenBefore = $database->getData('userID', 'activeDirectory', 'WHERE adUsername=\'' . $userName . '\'');
         if($haveSeenBefore == null) {
             $ou = $variableEngine->getVariable('ldapOrganizationUnit');
-            if($ou == null) {
+            if($ou == false) {
                 ldap_close($ldapConnection);
                 return;
             }
@@ -104,7 +104,7 @@ class authenticateWithLDAP implements plugin{
             $function = new general('generateRandomString');
             $password = $function->run(array('length' => 50));
             $defaultRoleID = $variableEngine->getVariable('ldapDefaultRoleID');
-            if($defaultRoleID == null) {
+            if($defaultRoleID == false) {
                 return;
             }
             $defaultRoleID = $defaultRoleID->getValue();

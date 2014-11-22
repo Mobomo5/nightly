@@ -12,7 +12,7 @@ class loginRegion implements block {
     private $href;
     private $content;
     private $css;
-    public function __construct() {
+    public function __construct($inBlockID) {
         $user = currentUser::getUserSession()->toUser();
         if ($user->getRoleID() == GUEST_ROLE_ID) {
             // You ain't logged in. Convince them to log in.

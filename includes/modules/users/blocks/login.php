@@ -15,7 +15,7 @@ class login implements block {
     private $button;
     private $noGUI;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         $this->title = 'Login';
         $this->noGUI = false;
         if (!currentUser::getUserSession()->isLoggedIn()) {

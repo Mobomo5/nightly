@@ -14,8 +14,7 @@ class setPermissionsBlock implements block {
     private $content;
     private $title;
 
-    public function __construct() {
-
+    public function __construct($inBlockID) {
         $this->title = "Set Permissions";
         if (empty($_POST['permissionState'])) {
             $this->getStepOne();

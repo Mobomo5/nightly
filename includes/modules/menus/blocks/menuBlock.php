@@ -10,7 +10,7 @@ class menuBlock implements block {
 
     private $content;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         $this->content = menuEngine::getInstance()->getMenu(1);
     }
 

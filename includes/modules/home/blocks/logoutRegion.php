@@ -13,7 +13,7 @@ class logoutRegion implements block {
     private $content;
     private $href;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         $this->title = 'Log Out';
         $this->content = '';
         $this->href = new link('users/logout');

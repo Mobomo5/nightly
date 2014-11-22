@@ -9,7 +9,7 @@ require_once(BLOCK_INTERFACE_FILE);
 class page implements block {
     private $title;
     private $content;
-    public function __construct() {
+    public function __construct($inBlockID) {
         $this->title = 'Node';
         $this->content = '';
     }

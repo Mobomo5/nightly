@@ -10,7 +10,7 @@ class sidebarBlock implements block {
 
     private $content;
 
-    public function __construct() {
+    public function __construct($inBlockID) {
         for ($i = 0; $i < 10; $i++) {
             $this->content[] = array('href' => $i, 'title' => 'Title' . $i);
         }

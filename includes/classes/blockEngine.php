@@ -43,7 +43,7 @@ class blockEngine {
                 $blocks[$blockData['themeRegion']][] = $pageBlock;
                 continue;
             }
-            $block = $this->getBlock($blockData['moduleName'], $blockData['blockName']);
+            $block = $this->getBlock($blockData['moduleName'], $blockData['blockName'], $blockData['blockID']);
             if ($block == false) {
                 continue;
             }
@@ -54,12 +54,15 @@ class blockEngine {
         }
         return $blocks;
     }
-    private function getBlock($moduleName, $blockName) {
+    private function getBlock($moduleName, $blockName, $blockID) {
+        if(! is_numeric($blockID)) {
+            return false;
+        }
         $this->includeBlock($blockName, $moduleName);
         if (!$this->validateBlock($blockName)) {
             return false;
         }
-        $block = new $blockName();
+        $block = new $blockName($blockID);
         return $block;
     }
     private function includeBlock($moduleName, $blockName) {

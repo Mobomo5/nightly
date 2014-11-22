@@ -177,9 +177,10 @@ class bootstrap {
         $contentToPassToPageBlock = $module->getPageContent();
         $titleToPassToPageBlock = $module->getTitle();
         require_once(EDUCASK_ROOT . '/includes/modules/node/blocks/page.php');
-        $pageBlock = new page();
+        $pageBlock = new page(null);
         $pageBlock->setContent($contentToPassToPageBlock);
         $pageBlock->setTitle($titleToPassToPageBlock);
+        define('PAGE_TYPE', $module->getPageType());
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID(), $pageBlock);
         noticeEngine::getInstance()->removeNotices();
         router::moveCurrentParametersToPrevious();
