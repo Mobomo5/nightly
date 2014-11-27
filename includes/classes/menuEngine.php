@@ -384,4 +384,103 @@ class menuEngine {
         }
         return 1;
     }
+    public function setMenuItemVisibility($inMenuItemID, $referenceID, $referenceType, $isVisible = false) {
+        if (!is_numeric($inMenuItemID)) {
+            return false;
+        }
+        if ($inMenuItemID < 1) {
+            return false;
+        }
+        if (!is_bool($isVisible)) {
+            return false;
+        }
+        $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
+        $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
+        $database = database::getInstance();
+        if (!$database->isConnected()) {
+            return false;
+        }
+        $referenceType = $database->escapeString($referenceType);
+        $referenceID = $database->escapeString($referenceID);
+        $inMenuItemID = $database->escapeString($inMenuItemID);
+        $whereClause = "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND menuItemID={$inMenuItemID}";
+        $exists = $database->getData('ruleID', 'menuItemVisibility', $whereClause);
+        if ($exists == false) {
+            return false;
+        }
+        if ($exists != null) {
+            return $this->insertNewVisibilityRule($inMenuItemID, $referenceID, $referenceType, $isVisible);
+        }
+        if ($isVisible == true) {
+            $visible = 1;
+        } else {
+            $visible = 0;
+        }
+        $success = $database->updateTable('menuItemVisibility', "visibile={$visible}", $whereClause);
+        if ($success == false) {
+            return false;
+        }
+        if ($success == null) {
+            return false;
+        }
+        return true;
+    }
+    private function insertNewVisibilityRule($inMenuItemID, $referenceID, $referenceType, $isVisible = false) {
+        if (!is_numeric($inMenuItemID)) {
+            return false;
+        }
+        if ($inMenuItemID < 1) {
+            return false;
+        }
+        if (!is_bool($isVisible)) {
+            return false;
+        }
+        $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
+        $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
+        $database = database::getInstance();
+        if (!$database->isConnected()) {
+            return false;
+        }
+        $referenceType = $database->escapeString($referenceType);
+        $referenceID = $database->escapeString($referenceID);
+        $inMenuItemID = $database->escapeString($inMenuItemID);
+        if ($isVisible == true) {
+            $visible = 1;
+        } else {
+            $visible = 0;
+        }
+        $success = $database->insertData('menuItemVisibility', 'referenceID, referenceType, visible, menuItemID', "'{$referenceID}', '{$referenceType}', {$visible}, {$inMenuItemID}");
+        if ($success == false) {
+            return false;
+        }
+        if ($success == null) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteMenuItemVisibilityRule($inMenuItemID, $referenceID, $referenceType) {
+        if (!is_numeric($inMenuItemID)) {
+            return false;
+        }
+        if ($inMenuItemID < 1) {
+            return false;
+        }
+        $referenceID = preg_replace('/\s+/', '', strip_tags($referenceID));
+        $referenceType = preg_replace('/\s+/', '', strip_tags($referenceType));
+        $database = database::getInstance();
+        if (!$database->isConnected()) {
+            return false;
+        }
+        $referenceType = $database->escapeString($referenceType);
+        $referenceID = $database->escapeString($referenceID);
+        $inMenuItemID = $database->escapeString($inMenuItemID);
+        $success = $database->removeData('menuItemVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND menuItemID={$inMenuItemID}");
+        if ($success == false) {
+            return false;
+        }
+        if ($success == null) {
+            return false;
+        }
+        return true;
+    }
 }
