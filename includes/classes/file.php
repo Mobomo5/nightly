@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Craig
- * Date: 5/23/14
- * Time: 3:54 PM
- */
+require_once(MIME_TYPE_ARRAYS_OBJECT_FILE);
 class file {
     private $id;
     private $uploaded;
@@ -15,13 +10,29 @@ class file {
     private $nodeID;
     private $uploader;
     private $folderID;
-    private $TITLEMAXLENGTH = 50;
-    public function __construct($inID, $inUploaded, $inTitle, $inMimeType, $inSize, $inLocation, $inNodeID, $inUploader, $inFolderID) {
-        // validate
-        if (strlen($inTitle) > $this->TITLEMAXLENGTH) {
-            return false;
+    public function __construct($inID, DateTime $inUploaded, $inTitle, $inMimeType, $inSize, $inLocation, $inNodeID, $inUploader, $inFolderID) {
+        if(! is_numeric($inID)) {
+            return;
         }
-        //@todo: better validation
+        $inTitle = strip_tags($inTitle);
+        if(! mimeType::checkIfKnownMimeType($inMimeType)) {
+            return;
+        }
+        if(! is_numeric($inSize)) {
+            return;
+        }
+        if(! is_file($inLocation)) {
+            return;
+        }
+        if(! is_numeric($inNodeID)) {
+            return;
+        }
+        if(! is_numeric($inUploader)) {
+            return;
+        }
+        if(! is_numeric($inFolderID)){
+            return;
+        }
         $this->id = $inID;
         $this->uploaded = $inUploaded;
         $this->title = $inTitle;
