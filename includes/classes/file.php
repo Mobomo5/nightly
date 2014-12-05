@@ -14,11 +14,17 @@ class file {
         if(! is_numeric($inID)) {
             return;
         }
+        if($inID < 0) {
+            return;
+        }
         $inTitle = strip_tags($inTitle);
         if(! mimeType::checkIfKnownMimeType($inMimeType)) {
             return;
         }
         if(! is_numeric($inSize)) {
+            return;
+        }
+        if($inSize < 0) {
             return;
         }
         if(! is_file($inLocation)) {
@@ -27,10 +33,19 @@ class file {
         if(! is_numeric($inNodeID)) {
             return;
         }
+        if($inNodeID < 0) {
+            return;
+        }
         if(! is_numeric($inUploader)) {
             return;
         }
+        if($inUploader < 0) {
+            return;
+        }
         if(! is_numeric($inFolderID)){
+            return;
+        }
+        if($inFolderID < 0) {
             return;
         }
         $this->id = $inID;
@@ -43,67 +58,85 @@ class file {
         $this->uploader = $inUploader;
         $this->folderID = $inFolderID;
     }
-    /**
-     * @return mixed
-     */
-    public function getFolderID() {
-        return $this->folderID;
-    }
-    /**
-     * @return mixed
-     */
-    public function getId() {
+    public function getID() {
         return $this->id;
     }
-    /**
-     * @return mixed
-     */
-    public function getLocation() {
-        return $this->location;
+    public function getUploaded() {
+        return $this->uploaded;
     }
-    /**
-     * @return mixed
-     */
-    public function getMimeType() {
-        return $this->mimeType;
+    public function setUploaded(DateTime $inUploaded) {
+        $this->uploaded = $inUploaded;
     }
-    /**
-     * @return mixed
-     */
-    public function getNodeID() {
-        return $this->nodeID;
-    }
-    /**
-     * @return mixed
-     */
-    public function getSize() {
-        return $this->size;
-    }
-    /**
-     * @return mixed
-     */
     public function getTitle() {
         return $this->title;
     }
     public function setTitle($inTitle) {
-        if (strlen($inTitle) > $this->TITLEMAXLENGTH) {
-            return false;
-        }
-        if (empty($inTitle)) {
-            return false;
-        }
-        $this->title = $inTitle;
+        $this->title = strip_tags($inTitle);
     }
-    /**
-     * @return mixed
-     */
-    public function getUploaded() {
-        return $this->uploaded;
+    public function getMimeType() {
+        return $this->mimeType;
     }
-    /**
-     * @return mixed
-     */
-    public function getUploader() {
+    public function setMimeType($inMimeType) {
+        if(! mimeType::checkIfKnownMimeType($inMimeType)) {
+            return;
+        }
+        $this->mimeType = $inMimeType;
+    }
+    public function getSize() {
+        return $this->size;
+    }
+    public function setSize($inSize) {
+        if(! is_numeric($inSize)) {
+            return;
+        }
+        if($inSize < 0) {
+            return;
+        }
+        $this->size = $inSize;
+    }
+    public function getLocation() {
+        return $this->location;
+    }
+    public function setLocation($locationOnServer) {
+        if(! is_file($locationOnServer)) {
+            return;
+        }
+        $this->location = $locationOnServer;
+    }
+    public function getNodeID() {
+        return $this->nodeID;
+    }
+    public function setNodeID($inNodeID) {
+        if(! is_numeric($inNodeID)) {
+            return;
+        }
+        if($inNodeID < 0) {
+            return;
+        }
+        $this->nodeID = $inNodeID;
+    }
+    public function getUploaderID() {
         return $this->uploader;
+    }
+    public function setUploaderID($inUploaderID) {
+        if(! is_numeric($inUploaderID)) {
+            return;
+        }
+        if($inUploaderID < 0) {
+            return;
+        }
+        $this->uploader = $inUploaderID;
+    }
+    public function getFolderID() {
+        return $this->folderID;
+    }
+    public function setFolderID($inFolderID) {
+        if(! is_numeric($inFolderID)) {
+            return;
+        }
+        if($inFolderID < 0) {
+            return;
+        }
+        $this->folderID = $inFolderID;
     }
 }
