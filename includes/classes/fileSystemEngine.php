@@ -1,336 +1,462 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: Craig
- * Date: 5/23/14
- * Time: 5:49 PM
- */
-
 require_once(FOLDER_OBJECT_FILE);
 require_once(FILE_OBJECT_FILE);
-
+require_once(PERMISSION_ENGINE_OBJECT_FILE);
+require_once(MIME_TYPE_ARRAYS_OBJECT_FILE);
 class fileSystemEngine {
-
     private static $instance;
-
-    /**
-     * @return fileSystemEngine
-     */
+    private $foundFiles;
+    private $foundFolders;
     public static function getInstance() {
         if (!isset(self::$instance)) {
             self::$instance = new fileSystemEngine();
         }
         return self::$instance;
     }
-
-    /**
-     * @param $inID
-     *
-     * @return bool|file
-     */
-    public function getFileByID($inID) {
-        if (!permissionEngine::getInstance()->getPermission('userCanAccessFileSystem')->canDo()) {
-            return false;
-        }
-
-        if (!is_numeric($inID)) {
-            return false;
-        }
-        $db = database::getInstance();
-        $results = $db->getData('*', 'file', 'fileID = \'' . $inID . '\'');
-        if (!$results) {
-            return false;
-        }
-        if (count($results) > 1) {
-            return false;
-        }
-
-        return new file($results[0]['fileID'], $results[0]['uploaded'], $results[0]['title'], $results[0]['mimeType'], $results[0]['size'], $results[0]['location'], $results[0]['nodeID'], $results[0]['uploader'], $results[0]['folderID']);
+    private function __construct() {
+        $this->foundFiles = array();
+        $this->foundFolders = array();
     }
-
-    /**
-     * @param $id
-     *
-     * @return array|bool
-     */
-    public function getFilesByUploaderID($id) {
-        if (!permissionEngine::getInstance()->getPermission('userCanAccessFileSystem')->canDo()) {
+    public function getFile($inFileID) {
+        if(! is_numeric($inFileID)) {
             return false;
         }
-
-        if (!is_numeric($id)) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('readFileSystem')) {
             return false;
         }
-        if (!permissionEngine::getInstance()->getPermission('userCanGetFiles')->canDo()) {
+        if(isset($this->foundFiles[$inFileID])) {
+            return $this->foundFiles[$inFileID];
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
             return false;
         }
-        $db = database::getInstance();
-        $results = $db->getData('*', 'file', 'uploaderID = \'' . $id . '\'');
-        $files = array();
-        if ($results) {
-            foreach ($results as $row) {
-                $files[] = new file($row['fileID'], $row['uploaded'], $row['title'], $row['mimeType'], $row['size'], $row['location'], $row['nodeID'], $row['uploader'], $row['folderID']);
+        $inFileID = $database->escapeString($inFileID);
+        $results = $database->getData("*", "file", "fileID = {$inFileID}");
+        if($results == false) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        if(count($results) > 1) {
+            return false;
+        }
+        $dateUploaded = new DateTime($results[0]['uploaded']);
+        $toReturn = new file($results[0]['fileID'], $dateUploaded, $results[0]['title'], $results[0]['mimeType'], $results[0]['size'], $results[0]['location'], $results[0]['nodeID'], $results[0]['uploader'], $results[0]['parentFolder']);
+        $this->foundFiles[$inFileID] = $toReturn;
+        return $toReturn;
+    }
+    public function getUploaderFiles($inUploaderID) {
+        if(! is_numeric($inUploaderID)) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('readFileSystem')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $inUploaderID = $database->escapeString($inUploaderID);
+        $results = $database->getData("*", "file", "uploader={$inUploaderID}");
+        if($results == false) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        $toReturn = array();
+        foreach($results as $rawFileData) {
+            if(isset($this->foundFiles[$rawFileData['fileID']])) {
+                $toReturn[] = $this->foundFiles[$rawFileData['fileID']];
+                continue;
+            }
+            $toAddDateUploaded = new DateTime($rawFileData['uploaded']);
+            $toAdd = new file($rawFileData['fileID'], $toAddDateUploaded, $rawFileData['title'], $rawFileData['mimeType'], $rawFileData['size'], $rawFileData['location'], $rawFileData['nodeID'], $rawFileData['uploader'], $rawFileData['parentFolder']);
+            $this->foundFiles[$rawFileData['fileID']] = $toAdd;
+            $toReturn[] = $toAdd;
+        }
+        return $toReturn;
+    }
+    public function getFolder($inFolderID) {
+        if(! is_numeric($inFolderID)) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('readFileSystem')) {
+            return false;
+        }
+        if(isset($this->foundFolders[$inFolderID])) {
+            return $this->foundFolders[$inFolderID];
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $inFolderID = $database->escapeString($inFolderID);
+        $results = $database->getData('*', 'folder', "folderID={$inFolderID}");
+        if($results == false) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        if(count($results) > 1) {
+            return false;
+        }
+        $timeCreated = new DateTime($results[0]['created']);
+        $childItems = array();
+        $childFolders = $database->getData('folderID', 'folder', "parentFolder={$inFolderID}");
+        if($childFolders == false) {
+            return false;
+        }
+        foreach($childFolders as $childFolder) {
+            $child = $this->getFolder($childFolder['folderID']);
+            if($child == false) {
+                continue;
+            }
+            $childItems[] = $child;
+        }
+        $childFiles = $database->getData('fileID', 'file', "folderID={$inFolderID}");
+        if($childFiles == false) {
+            return false;
+        }
+        foreach($childFiles as $childFile) {
+            $child = $this->getFile($childFile['fileID']);
+            if($child == false) {
+                continue;
+            }
+            $childItems[] = $child;
+        }
+        $toReturn = new folder($results[0]['folderID'], $results[0]['title'], $timeCreated, $results[0]['ownerID'], $results[0]['parentFolder'], $childItems);
+        $this->foundFolders[$toReturn->getID()] = $toReturn;
+        return $toReturn;
+    }
+    public function addFile(file $toAdd) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('uploadFile')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if(! mimeType::checkIfKnownMimeType($toAdd->getMimeType())) {
+            return false;
+        }
+        if(! is_file($toAdd->getLocation())) {
+            return false;
+        }
+        $dateUploaded = $database->escapeString($toAdd->getUploadedDate()->format('Y-m-d H:i:s'));
+        $title = $database->escapeString(strip_tags($toAdd->getTitle()));
+        $mimeType = $database->escapeString($toAdd->getMimeType());
+        $size = $database->escapeString($toAdd->getSize());
+        $location = $database->escapeString($toAdd->getLocation());
+        $nodeID = $database->escapeString($toAdd->getNodeID());
+        $uploader = $database->escapeString($toAdd->getUploaderID());
+        $folder = $database->escapeString($toAdd->getFolderID());
+        $result = $database->insertData('file', 'uploaded, title, mimeType, size, location, nodeID, uploader, folderID', "'{$dateUploaded}', '{$title}', '{$mimeType}', {$size}, '{$location}', {$nodeID}, {$uploader}, {$folder}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function addFolder(folder $toAdd) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('createFolder')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $title = $database->escapeString(strip_tags($toAdd->getTitle()));
+        $dateCreated = $database->escapeString($toAdd->getDateCreated()->format('Y-m-d H:i:s'));
+        $owner = $database->escapeString($toAdd->getOwnerID());
+        $parent = $database->escapeString($toAdd->getParentFolderID());
+        $result = $database->insertData('folder', 'title, created, ownerID, parentFolder', "'{$title}', '{$dateCreated}', {$owner}, {$parent}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function setFile(file $toSave) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('uploadFile')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if(! mimeType::checkIfKnownMimeType($toSave->getMimeType())) {
+            return false;
+        }
+        if(! is_file($toSave->getLocation())) {
+            return false;
+        }
+        $id = $database->escapeString($toSave->getID());
+        $dateUploaded = $database->escapeString($toSave->getUploadedDate()->format('Y-m-d H:i:s'));
+        $title = $database->escapeString(strip_tags($toSave->getTitle()));
+        $mimeType = $database->escapeString($toSave->getMimeType());
+        $size = $database->escapeString($toSave->getSize());
+        $location = $database->escapeString($toSave->getLocation());
+        $nodeID = $database->escapeString($toSave->getNodeID());
+        $uploader = $database->escapeString($toSave->getUploaderID());
+        $folder = $database->escapeString($toSave->getFolderID());
+        $result = $database->updateTable('file', "uploaded='{$dateUploaded}', title='{$title}', mimeType='{$mimeType}', size={$size}, location='{$location}', nodeID={$nodeID}, uploader={$uploader}, folderID={$folder}", "fileID='{$id}'");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function setFolder(folder $toSave) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('createFolder')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toSave->getID());
+        $title = $database->escapeString(strip_tags($toSave->getTitle()));
+        $dateCreated = $database->escapeString($toSave->getDateCreated()->format('Y-m-d H:i:s'));
+        $owner = $database->escapeString($toSave->getOwnerID());
+        $parent = $database->escapeString($toSave->getParentFolderID());
+        $result = $database->updateTable('folder', "title='{$title}', created='{$dateCreated}', ownerID={$owner}, parentFolder={$parent}", "folderID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteFile(file $toDelete) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('deleteFile')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toDelete->getID());
+        $result = $database->removeData('fileSystemShare', "referenceID={$id} AND referenceType='file'");
+        if($result == false) {
+            return false;
+        }
+        $result = $database->removeData('file', "fileID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function deleteFolder(folder $toDelete) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('deleteFolder')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toDelete->getID());
+        $childFiles = $toDelete->getChildFiles();
+        foreach($childFiles as $childFile) {
+            $deleted = $this->deleteFile($childFile);
+            if($deleted == false) {
+                return false;
             }
         }
-        return $files;
-
-    }
-
-    /**
-     * @param $folderID
-     *
-     * @return bool|folder
-     */
-    public function getFolder($folderID) {
-        if (!permissionEngine::getInstance()->getPermission('userCanAccessFileSystem')->canDo()) {
-            return false;
-        }
-
-        if (!is_numeric($folderID)) {
-            return false;
-        }
-
-        if (strlen($folderID) > 11) {
-            return false;
-        }
-
-        $db = database::getInstance();
-
-        $results = $db->getData('*', 'folder', 'folderID = \'' . $folderID . '\'');
-
-        if (count($results) > 1) {
-            return false;
-        }
-        $folder = new folder($results[0]['folderID'], $results[0]['title'], $results[0]['created'], $results[0]['ownerID'], $results[0]['parentFolder'], $this->getfolderChildren($folderID));
-
-        return $folder;
-    }
-
-    /**
-     * @param $folderID
-     *
-     * @return array
-     */
-    private function getFolderChildren($folderID) {
-        $db = database::getInstance();
-        $results = $db->getData('*', 'folder', 'parentFolder = \'' . $folderID . '\'');
-        if (!$results) {
-            return;
-        }
-        if (empty($results)) {
-            return false;
-        }
-
-        $subFolders = array();
-        foreach ($results as $row) {
-            $subFolders[] = new folder($row['folderID'], $row['title'], $row['created'], $row['ownerID'], $row['parentFolder'], $this->getfolderChildren($row['folderID']));
-        }
-        return $subFolders;
-
-    }
-
-    /**
-     *
-     */
-    public function setFile(file $inFile) {
-        if (!permissionEngine::getInstance()->getPermission('userCanAlterFiles')->canDo()) {
-            return false;
-        }
-
-        $db = database::getInstance();
-
-        $title = $db->escapeString($inFile->getTitle());
-        $mimeType = $db->escapeString($inFile->getMimeType());
-        $size = $db->escapeString($inFile->getSize());
-        $location = $db->escapeString($inFile->getLocation());
-        $nodeID = $db->escapeString($inFile->getNodeID());
-        $folderID = $db->escapeString($inFile->getFolderID());
-        $fileID = $db->escapeString($inFile->getId());
-
-        $results = $db->updateTable(
-            'file',
-            'title = \'' . $title . '\', mimeType = \'' . $mimeType . '\', size = \'' . $size .
-            '\', location = \'' . $location . '\', nodeID = \'' . $nodeID . '\', folderID = \'' . $folderID . '\'',
-            'fileID = \'' . $fileID . '\'');
-
-        if (!$results) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     *
-     */
-    public function setFolder() {
-        if (!permissionEngine::getInstance()->getPermission('userCanAlterFolders')->canDo()) {
-            return false;
-        }
-
-    }
-
-    /**
-     * @param file $inFile
-     */
-    public function uploadFile(file $inFile) {
-        if (!permissionEngine::getInstance()->getPermission('userCanUploadFiles')->canDo()) {
-            return false;
-        }
-
-    }
-
-    /**
-     *  returns false on fail and the ID of the newly created folder on success
-     */
-    public function createFolder(folder $inFolder, $parentFolderID = 0) {
-        if (!permissionEngine::getInstance()->getPermission('userCanAddFolders')->canDo()) {
-            return false;
-        }
-        if (!is_numeric($parentFolderID)) {
-            return false;
-        }
-
-        $db = database::getInstance();
-
-        $title = $db->escapeString($inFolder->getTitle());
-        $ownerID = $db->escapeString(currentUser::getUserSession()->getUserID());
-
-        $results = $db->insertData('folder', 'title, ownerID, parentFolder', '\'' . $title . '\', \'' . $ownerID . '\', \'' . $parentFolderID . '\'');
-
-        if (!$results) {
-            return false;
-        }
-
-        $results = $db->getData('folderID', 'folder', 'title = \'' . $title . '\' AND ownerID = \'' . $ownerID . '\' AND parentFolder = \'' . $parentFolderID . '\'');
-        return $results[0]['folderID'];
-    }
-
-    /**
-     *
-     */
-    public function deleteFile(file $inFile) {
-//        if (!permissionEngine::getInstance()->getPermission('userCanDeleteFiles')->canDo()){
-//            return false;
-//        }
-
-        $db = database::getInstance();
-
-        $id = $db->escapeString($inFile->getId());
-        $title = $db->escapeString($inFile->getTitle());
-        $uploader = $db->escapeString($inFile->getUploader());
-
-        $results = $db->removeData('file', 'fileID = \'' . $id . '\' AND title = \'' . $title . '\' AND uploader = \'' . $uploader . '\'');
-        if (!$results) {
-            return false;
-        }
-        return true;
-
-    }
-
-    /**
-     *
-     */
-    public function deleteFolder($folderID, $deleteSubDirectories = false) {
-
-        $perm = permissionEngine::getInstance()->getPermission('userCanDeleteFolders');
-
-        if (!$perm->canDo()) {
-            return false;
-        }
-        if (!is_numeric($folderID)) {
-            return false;
-        }
-        // don't delete master folder or non-folders
-        if ($folderID < 1) {
-            return false;
-        }
-
-        $db = database::getInstance();
-
-        // if it's empty, get rid of it
-
-        if ($this->folderIsEmpty($this->getFolder($folderID))) {
-            return $db->removeData('folder', 'folderID = \'' . $folderID . '\'');
-        }
-
-        // if it's not empty and you don't want to delete subs, bail.
-        if (!$this->folderIsEmpty($this->getFolder($folderID)) AND !$deleteSubDirectories) {
-            return false;
-        }
-
-        // get the subs, if any
-        $subDirectories = $db->getData('folderID', 'folder', 'parentFolder = \'' . $folderID . '\'');
-        if ($subDirectories) {
-            foreach ($subDirectories as $sub) {
-                $this->deleteFolder($sub['folderID'], $deleteSubDirectories);
-
+        unset($childFiles);
+        $childFolders = $toDelete->getChildFolders();
+        foreach($childFolders as $childFolder) {
+            $deleted = $this->deleteFolder($childFolder);
+            if($deleted == false) {
+                return false;
             }
         }
-
-        // delete all files in the folder
-        $results = $db->getData('fileID', 'file', 'folderID = \'' . $folderID . '\'');
-        if ($results) {
-            foreach ($results as $file) {
-                $this->deleteFile($this->getFileByID($file['fileID']));
-            }
+        unset($childFolders);
+        $result = $database->removeData('fileSystemShare', "referenceID={$id} AND referenceType='folder'");
+        if($result == false) {
+            return false;
         }
-
-        $results = $db->removeData('folder', 'folderID = \'' . $folderID . '\'');
-        if (!$results) {
+        $result = $database->removeData('folder', "folderID={$id}");
+        if($result == false) {
             return false;
         }
         return true;
-
     }
-
-    private function folderIsEmpty(folder $inFolder) {
-        if (!$inFolder) {
+    public function shareFile(file $toShare, $userIDToShareTo, $shared = true) {
+        if(! is_numeric($userIDToShareTo)) {
             return false;
         }
-        $db = database::getInstance();
-        $subFolders = $db->getData('*', 'folder', 'parentFolder = \'' . $inFolder->getId() . '\'');
-        $files = $db->getData('*', 'file', 'folderID = \'' . $inFolder->getId() . '\'');
-
-        if ($subFolders OR $files) {
+        if(! is_bool($shared)) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('shareFile')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if($shared == true) {
+            $insertShare = 1;
+        } else {
+            $insertShare = 0;
+        }
+        $fileID = $database->escapeString($toShare->getID());
+        $userIDToShareTo = $database->escapeString($userIDToShareTo);
+        $insertShare = $database->escapeString($insertShare);
+        $alreadyIn = $database->getData('shared', 'fileSystemShare', "referenceID={$fileID} AND referenceType='file' AND userID={$userIDToShareTo}");
+        if($alreadyIn != null) {
+            return $this->updateFileShare($fileID, $userIDToShareTo, $insertShare, $alreadyIn[0]['shared']);
+        }
+        $result = $database->insertData('fileSystemShare', 'referenceID, referenceType, shared, userID', "{$fileID}, 'file', {$insertShare}, {$userIDToShareTo}");
+        if($result == false) {
             return false;
         }
         return true;
-
     }
-
-    /**
-     *
-     */
-    public function shareFile() {
-
-    }
-
-    /**
-     *
-     */
-    public function shareFolder() {
-
-    }
-
-    public function moveFolder(folder $inFolder, folder $toFolder) {
-        if (!permissionEngine::getInstance()->getPermission('userCanMoveFolders')->canDo()) {
+    private function updateFileShare($fileID, $userID, $shared, $currentShared) {
+        if($currentShared == $shared) {
+            return true;
+        }
+        if(! is_numeric($fileID)) {
             return false;
         }
-        // can't move the base filesystem
-        if ($inFolder->getId() == 0) {
+        if(! is_numeric($userID)) {
             return false;
         }
-        $final = new folder($inFolder->getId(), $inFolder->getTitle(), $inFolder->getCreated(), $inFolder->getOwnerID(), $toFolder->getId(), $inFolder->getChildFilesAndFolders());
-        return $this->setFolder($final);
-    }
-
-    public function moveFile(file $inFile, folder $toFolder) {
-        if (!permissionEngine::getInstance()->getPermission('userCanMoveFiles')->canDo()) {
+        if(($shared != 0) and ($shared != 1)) {
             return false;
         }
-        $final = new file($inFile->getId(), $inFile->getUploaded(), $inFile->getTitle(), $inFile->getMimeType(),
-            $inFile->getSize(), $inFile->getLocation(), $inFile->getNodeID(), $inFile->getUploader(), $toFolder->getId());
-        return $this->setFile($final);
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('shareFile')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $result = $database->updateTable('fileSystemShare', "shared={$shared}", "referenceID={$fileID} AND referenceType='file' AND userID={$userID}");
+        if($result == false) {
+            return false;
+        }
+        return true;
     }
-} 
+    public function shareFolder(folder $toShare, $userIDToShareTo, $shared = true) {
+        if(! is_numeric($userIDToShareTo)) {
+            return false;
+        }
+        if(! is_bool($shared)) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('shareFolder')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if($shared == true) {
+            $insertShare = 1;
+        } else {
+            $insertShare = 0;
+        }
+        $folderID = $database->escapeString($toShare->getID());
+        $userIDToShareTo = $database->escapeString($userIDToShareTo);
+        $insertShare = $database->escapeString($insertShare);
+        $alreadyIn = $database->getData('shared', 'fileSystemShare', "referenceID={$folderID} AND referenceType='folder' AND userID={$userIDToShareTo}");
+        if($alreadyIn != null) {
+            return $this->updateFolderShare($folderID, $userIDToShareTo, $insertShare, $alreadyIn[0]['shared']);
+        }
+        $result = $database->insertData('fileSystemShare', 'referenceID, referenceType, shared, userID', "{$folderID}, 'folder', {$insertShare}, {$userIDToShareTo}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    private function updateFolderShare($folderID, $userID, $shared, $currentShared) {
+        if($currentShared == $shared) {
+            return true;
+        }
+        if(! is_numeric($folderID)) {
+            return false;
+        }
+        if(! is_numeric($userID)) {
+            return false;
+        }
+        if(($shared != 0) and ($shared != 1)) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo('shareFolder')) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $result = $database->updateTable('fileSystemShare', "shared={$shared}", "referenceID={$folderID} AND referenceType='folder' AND userID={$userID}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function isFileSharedTo(file $toCheck, $userIDToCheck) {
+        if(! is_numeric($userIDToCheck)) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toCheck->getID());
+        $results = $database->getData('shared', 'fileSystemShare', "referenceID={$id} AND referenceType='file' AND userID={$userIDToCheck}");
+        if($results == false) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        if(count($results) > 1) {
+            return false;
+        }
+        $shared = (int) $results[0]['shared'];
+        if($shared == 0) {
+            return false;
+        }
+        return true;
+    }
+    public function isFolderSharedTo(folder $toCheck, $userIDToCheck) {
+        if(! is_numeric($userIDToCheck)) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($toCheck->getID());
+        $results = $database->getData('shared', 'fileSystemShare', "referenceID={$id} AND referenceType='folder' AND userID={$userIDToCheck}");
+        if($results == false) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        if(count($results) > 1) {
+            return false;
+        }
+        $shared = (int) $results[0]['shared'];
+        if($shared == 0) {
+            return false;
+        }
+        return true;
+    }
+}

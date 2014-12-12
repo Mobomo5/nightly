@@ -1,70 +1,88 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Craig
- * Date: 5/23/14
- * Time: 4:07 PM
- */
 class folder {
     private $id;
     private $title;
     private $created;
     private $ownerID;
     private $parentFolder;
-    private $childFilesAndFolders;
-    private $TITLEMAXSIZE = 50;
-    public function __construct($inID, $inTitle, $inCreated, $inOwnerID, $inParentFolder, $inChildFilesAndFolders) {
-        //validate
-        if (strlen($inTitle) > $this->TITLEMAXSIZE) {
-            return false;
+    private $childFiles;
+    private $childFolders;
+    public function __construct($inID, $inTitle, DateTime $inDateCreated, $inOwnerID, $inParentFolderID, array $inChildFiles = array(), array $inChildFolders = array()) {
+        if(! is_numeric($inID)) {
+            return;
+        }
+        $inTitle = strip_tags($inTitle);
+        if(! is_numeric($inOwnerID)) {
+            return;
+        }
+        if(! is_numeric($inParentFolderID)) {
+            return;
         }
         $this->id = $inID;
         $this->title = $inTitle;
-        $this->created = $inCreated;
+        $this->created = $inDateCreated;
         $this->ownerID = $inOwnerID;
-        $this->parentFolder = $inParentFolder;
-        $this->childFilesAndFolders = $inChildFilesAndFolders;
+        $this->parentFolder = $inParentFolderID;
+        $this->childFiles = array();
+        $this->childFolders = array();
+        foreach($inChildFiles as $childFile) {
+            if(! is_object($childFile)) {
+                continue;
+            }
+            $class = get_class($childFile);
+            if($class != 'file') {
+                continue;
+            }
+            $this->childFiles[] = $childFile;
+        }
+        foreach($inChildFolders as $childFolder) {
+            if(! is_object($childFolder)) {
+                continue;
+            }
+            $class = get_class($childFolder);
+            if($class != 'folder') {
+                continue;
+            }
+            $this->childFolders[] = $childFolder;
+        }
     }
-    /**
-     * @return mixed
-     */
-    public function getChildFilesAndFolders() {
-        return $this->childFilesAndFolders;
-    }
-    /**
-     * @return mixed
-     */
-    public function getCreated() {
-        return $this->created;
-    }
-    /**
-     * @return mixed
-     */
-    public function getId() {
+    public function getID() {
         return $this->id;
     }
-    /**
-     * @return mixed
-     */
-    public function getOwnerID() {
-        return $this->ownerID;
-    }
-    /**
-     * @return mixed
-     */
-    public function getParentFolder() {
-        return $this->parentFolder;
-    }
-    /**
-     * @return mixed
-     */
     public function getTitle() {
         return $this->title;
     }
     public function setTitle($inTitle) {
-        if (strlen($inTitle) > $this->TITLEMAXSIZE) {
-            return false;
+        $this->title = strip_tags($inTitle);
+    }
+    public function getDateCreated() {
+        return $this->created;
+    }
+    public function setDateCreated(DateTime $inDateCreated) {
+        $this->created = $inDateCreated;
+    }
+    public function getOwnerID() {
+        return $this->ownerID;
+    }
+    public function setOwnerID($inOwnerID) {
+        if(! is_numeric($inOwnerID)) {
+            return;
         }
-        $this->title = $inTitle;
+        $this->ownerID = $inOwnerID;
+    }
+    public function getParentFolderID() {
+        return $this->parentFolder;
+    }
+    public function setParentFolderID($inParentFolderID) {
+        if(! is_numeric($inParentFolderID)) {
+            return;
+        }
+        $this->parentFolder = $inParentFolderID;
+    }
+    public function getChildFolders() {
+        return $this->childFolders;
+    }
+    public function getChildFiles() {
+        return $this->childFiles;
     }
 }

@@ -10,7 +10,7 @@ class file {
     private $nodeID;
     private $uploader;
     private $folderID;
-    public function __construct($inID, DateTime $inUploaded, $inTitle, $inMimeType, $inSize, $inLocation, $inNodeID, $inUploader, $inFolderID) {
+    public function __construct($inID, DateTime $inUploadedDate, $inTitle, $inMimeType, $inSize, $inLocation, $inNodeID, $inUploader, $inFolderID) {
         if(! is_numeric($inID)) {
             return;
         }
@@ -49,7 +49,7 @@ class file {
             return;
         }
         $this->id = $inID;
-        $this->uploaded = $inUploaded;
+        $this->uploaded = $inUploadedDate;
         $this->title = $inTitle;
         $this->mimeType = $inMimeType;
         $this->size = $inSize;
@@ -61,11 +61,11 @@ class file {
     public function getID() {
         return $this->id;
     }
-    public function getUploaded() {
+    public function getUploadedDate() {
         return $this->uploaded;
     }
-    public function setUploaded(DateTime $inUploaded) {
-        $this->uploaded = $inUploaded;
+    public function setUploadedDate(DateTime $inUploadedDate) {
+        $this->uploaded = $inUploadedDate;
     }
     public function getTitle() {
         return $this->title;
