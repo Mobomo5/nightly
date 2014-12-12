@@ -323,7 +323,7 @@ class fileSystemEngine {
         return true;
     }
     private function updateFileShare($fileID, $userID, $shared, $currentShared) {
-        if($currentShared == $shared) {
+        if((int)$currentShared == (int)$shared) {
             return true;
         }
         if(! is_numeric($fileID)) {
