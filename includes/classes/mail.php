@@ -6,7 +6,8 @@
  * Date: 5/15/14
  * Time: 2:19 PM
  */
-//@ToDo: Change this to use a php mailer class, not the mail function.
+require_once(EDUCASK_ROOT . 'thirdPartyLibraries/PHPMailer/PHPMailerAutoload.php');
+require_once(VARIABLE_ENGINE_OBJECT_FILE);
 class mail {
     private $senderEmail;
     private $senderName;
@@ -99,18 +100,53 @@ class mail {
     }
     public function sendMail() {
         $siteEmail = SITE_EMAIl;
-        $headers = "From: {$this->senderName}<{$siteEmail}>\r\n" .
-            "Reply-To: {$this->senderName}<{$this->senderEmail}>\r\n" .
-            'Content-Type: text/html; charset=ISO-8859-1\r\n' .
-            'X-Mailer: PHP/' . phpversion() . "\r\n";
+        $variableEngine = variableEngine::getInstance();
+        $smtpServer = $variableEngine->getVariable('smtpServer');
+        if($smtpServer == false) {
+            return false;
+        }
+        $smtpPort = $variableEngine->getVariable('smtpPort');
+        if($smtpPort == false) {
+            return false;
+        }
+        $smtpUserName = $variableEngine->getVariable('smtpUserName');
+        if($smtpUserName == false) {
+            return false;
+        }
+        $smtpPassword = $variableEngine->getVariable('smtpPassword');
+        if($smtpPassword == false) {
+            return false;
+        }
+        $smtpUseEncryption = $variableEngine->getVariable('smtpUseEncryption');
+        if($smtpUseEncryption == false) {
+            return false;
+        }
+        $smtpUseEncryption = $smtpUseEncryption->getValue();
+        if($smtpUseEncryption == 'false') {
+            $encryption = "";
+        } else {
+            $encryption = "tls";
+        }
+        $toSend = new PHPMailer();
+        $toSend->isSMTP();
+        $toSend->Host = $smtpServer->getValue();
+        $toSend->SMTPAuth = true;
+        $toSend->Username = $smtpUserName->getValue();
+        $toSend->Password = $smtpPassword->getValue();
+        $toSend->SMTPSecure = $encryption;
+        $toSend->Port = intval($smtpPort->getValue());
+        $toSend->From = $siteEmail;
+        $toSend->FromName = $this->senderName;
+        $toSend->addReplyTo($this->senderEmail, $this->senderName);
+        $toSend->isHTML(true);
+        $toSend->Subject = $this->subject;
         if ($this->isBulkMail) {
-            $recipients = '';
             foreach ($this->recipients as $recipient) {
-                $recipients .= $recipient . ', ';
+                $toSend->addBCC($recipient);
             }
-            $recipients = substr($recipients, 0, -2);
-            $headers .= "Bcc: " . $recipients . "\r\n";
-            if (!mail($this->senderEmail, $this->subject, $this->body, $headers)) {
+            $toSend->Body = $this->body;
+            $toSend->AltBody = strip_tags($this->body);
+            if (! $toSend->send()) {
                 return false;
             }
             return true;
@@ -118,7 +154,12 @@ class mail {
         $sent = true;
         foreach ($this->recipients as $recipient) {
             $body = $this->doReplacement($recipient);
-            if (!mail($recipient, $this->subject, $body, $headers)) {
+            $altBody = strip_tags($body);
+            $toSend->clearAddresses();
+            $toSend->addAddress($recipient);
+            $toSend->Body = $body;
+            $toSend->AltBody = $altBody;
+            if (! $toSend->send()) {
                 $sent = false;
             }
         }

@@ -371,6 +371,21 @@ function configureContent() {
     $toReturn .= '</select>';
     $toReturn .= '</fieldset>';
     $toReturn .= '<fieldset>';
+    $toReturn .= '<legend>Email Settings:</legend>';
+    $toReturn .= '<p>SMTP Servers:</p>';
+    $toReturn .= '<input type="text" id="smtpServer" name="smtpServer" class="formtext" value="smtp1.example.com;smtp2.example.com" required>';
+    $toReturn .= '<p>SMTP Server Port:</p>';
+    $toReturn .= '<input type="number" id="smtpPort" name="smtpPort" class="formtext" value="25" required>';
+    $toReturn .= '<p>Username:</p>';
+    $toReturn .= '<input type="text" id="smtpUserName" name="smtpUserName" class="formtext" required>';
+    $toReturn .= '<p>Password:</p>';
+    $toReturn .= '<input type="password" id="smtpPassword1" name="smtpPassword1" class="formtext" required>';
+    $toReturn .= '<p>Confirm password:</p>';
+    $toReturn .= '<input type="password" id="smtpPassword2" name="smtpPassword2" class="formtext" required>';
+    $toReturn .= '<p>Encryption:</p>';
+    $toReturn .= '<input type="checkbox" id="smtpUseEncryption" name="smtpUseEncryption" class="formtext" value="tls" style="width:5px">Encypt email sending by using TLS (Transport Layer Security) to connect to the mail server.';
+    $toReturn .= '</fieldset>';
+    $toReturn .= '<fieldset>';
     $toReturn .= '<legend>First Account:</legend>';
     $toReturn .= '<p>Username:</p>';
     $toReturn .= '<input type="text" id="username" name="username" class="formtext" value="admin" required>';
@@ -462,6 +477,48 @@ function doConfigureContent() {
         header('Location: install.php?action=configure');
         return;
     }
+    if (!isset($_POST['smtpServer'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if (!isset($_POST['smtpPort'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if (!is_numeric($_POST['smtpPort'])) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'Please enter a valid port for the SMTP Server.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if (!isset($_POST['smtpUserName'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if (!isset($_POST['smtpPassword1'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if (!isset($_POST['smtpPassword2'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if ($_POST['smtpPassword1'] != $_POST['smtpPassword2']) {
+        unset($_SESSION['configureComplete']);
+        $_SESSION['errors'][] = 'The inputted passwords for the SMTP account don\'t match.';
+        header('Location: install.php?action=configure');
+        return;
+    }
+    if (!isset($_POST['smtpUseEncryption'])) {
+        unset($_SESSION['configureComplete']);
+        header('Location: install.php?action=configure');
+        return;
+    }
     $siteName = strip_tags(trim($_POST['siteName']));
     $siteEmail = strip_tags(trim($_POST['siteEmail']));
     $nonSecureURL = strip_tags(trim($_POST['nonSecureURL']));
@@ -473,6 +530,11 @@ function doConfigureContent() {
     $lastName = strip_tags(trim($_POST['lastName']));
     $email = strip_tags(trim($_POST['email']));
     $password = $_POST['password1'];
+    $smtpServers = strip_tags(trim($_POST['smtpServer']));
+    $smtpPort = intval($_POST['smtpPort']);
+    $smtpUserName = strip_tags(trim($_POST['smtpUserName']));
+    $smtpPassword = strip_tags(trim($_POST['smtpPassword1']));
+    $smtpUseEncryption = strip_tags(trim($_POST['smtpUseEncryption']));
     require_once(VALIDATOR_OBJECT_FILE);
     require_once(VALIDATOR_INTERFACE_FILE);
     require_once(HASHER_OBJECT_FILE);
@@ -555,6 +617,11 @@ function doConfigureContent() {
         header('Location: install.php?action=configure');
         return;
     }
+    if($smtpUseEncryption == 'tls') {
+        $smtpEncryption = 'true';
+    } else {
+        $smtpEncryption = 'false';
+    }
     $variables = array(
         'cleanURLsEnabled'     => 'false',
         'educaskVersion'       => EDUCASK_VERSION,
@@ -566,7 +633,12 @@ function doConfigureContent() {
         'siteTitle'            => $siteName,
         'siteWebAddress'       => $nonSecureURL,
         'siteWebAddressSecure' => $secureURL,
-        'siteWebDirectory'     => $webDirectory . '/'
+        'siteWebDirectory'     => $webDirectory . '/',
+        'smtpServer'           => $smtpServers,
+        'smtpPort'             => $smtpPort,
+        'smtpUserName'         => $smtpUserName,
+        'smtpPassword'         => $smtpPassword,
+        'smtpUseEncryption'    => $smtpEncryption
     );
     foreach ($variables as $name => $value) {
         $name = $database->escapeString($name);
