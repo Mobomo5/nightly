@@ -17,6 +17,7 @@ class mail {
     private $isBulkMail;
     private $allowedTags = "<p><a><img><ul><li>";
     private $replacements;
+    private $errors;
     public function __construct($inSenderEmail = SITE_EMAIL, $inSenderName = SITE_TITLE, array $inRecipients = array(), $inSubject = 'Email', $inBody = '<p>This is an email.</p>', $isBulkMail = false) {
         if (!is_bool($isBulkMail)) {
             return;
@@ -44,6 +45,7 @@ class mail {
         $this->body = strip_tags(trim($inBody), $this->allowedTags);
         $this->isBulkMail = $isBulkMail;
         $this->replacements = array();
+        $this->errors = array();
     }
     public function addRecipient($inRecipient) {
         if (!filter_var($inRecipient, FILTER_VALIDATE_EMAIL)) {
@@ -147,6 +149,7 @@ class mail {
             $toSend->Body = $this->body;
             $toSend->AltBody = strip_tags($this->body);
             if (! $toSend->send()) {
+                $this->errors[] = $toSend->ErrorInfo;
                 return false;
             }
             return true;
@@ -160,10 +163,17 @@ class mail {
             $toSend->Body = $body;
             $toSend->AltBody = $altBody;
             if (! $toSend->send()) {
+                $this->errors = $toSend->ErrorInfo;
                 $sent = false;
             }
         }
         return $sent;
+    }
+    public function clearErrors() {
+        $this->errors = array();
+    }
+    public function getErrors() {
+        return $this->errors;
     }
     public function doReplacement($emailForReplacement) {
         if ($this->replacements == null) {
