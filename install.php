@@ -260,12 +260,6 @@ function doDatabaseContent() {
     $password = preg_replace('/\s+/', '', $_POST['password1']);
     $file = EDUCASK_ROOT . '/includes/config.php';
     $content = '<?php
-                /**
-                * Created by PhpStorm.
-                * User: Keegan Laur
-                * Date: 4/9/14
-                * Time: 6:45 PM
-                */
                 //Basic site configuration - currently only contains variables needed to connect to the site\'s database
                 $dbServer = \'' . $server . '\';
                 $db = \'' . $database . '\';
@@ -278,7 +272,7 @@ function doDatabaseContent() {
         header('Location: install.php?action=database');
         return;
     }
-    chmod($file, 330);
+    chmod($file, 440);
     $database = database::getInstance();
     $database->connect();
     if (!$database->isConnected()) {

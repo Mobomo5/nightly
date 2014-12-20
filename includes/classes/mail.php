@@ -6,7 +6,7 @@
  * Date: 5/15/14
  * Time: 2:19 PM
  */
-require_once(EDUCASK_ROOT . 'thirdPartyLibraries/PHPMailer/PHPMailerAutoload.php');
+require_once(EDUCASK_ROOT . '/thirdPartyLibraries/PHPMailer/PHPMailerAutoload.php');
 require_once(VARIABLE_ENGINE_OBJECT_FILE);
 class mail {
     private $senderEmail;
@@ -101,7 +101,7 @@ class mail {
         $this->body = strip_tags(trim($inBody), $this->allowedTags);
     }
     public function sendMail() {
-        $siteEmail = SITE_EMAIl;
+        $siteEmail = SITE_EMAIL;
         $variableEngine = variableEngine::getInstance();
         $smtpServer = $variableEngine->getVariable('smtpServer');
         if($smtpServer == false) {
