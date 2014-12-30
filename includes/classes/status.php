@@ -1,107 +1,87 @@
 <?php
-/**
- * User: Keegan Bailey
- * Date: 23/04/14
- * Time: 11:00 AM
- *
- * Handles the creation of Status objects
- */
 class status {
-    private $statusID; //ID of the status
-    private $statusMsg; //Contents of the status
-    private $posterID; //Who the status belongs too
-    private $parentID; //
-    private $nodeID; //what node the status was posted too
-    private $childStatus; //Array for child statuses
-    private $votes; //counter for how many people like the posting
-    private $voterArray; //array of voters to prevent duplicated vote spamming
-    private $posterName;
-    public function __construct($inStatusID, $inParentStatusID, $inVotes, $inString, $inUserID, $inNodeID) {
-        if (is_numeric($inStatusID) && $inStatusID != null) {
-            $this->statusID = $inStatusID;
+    private $id;
+    private $posterID;
+    private $parentStatusID;
+    private $supporterCount;
+    private $nodeID;
+    private $message;
+    public function __construct($inID, $inPosterID, $inParentStatusID, $inSupporterCount, $inNodeID, $inMessage) {
+        if(! is_numeric($inID)) {
+            return;
         }
-        if (is_numeric($inParentStatusID) && $inParentStatusID != null) {
-            $this->parentID = $inParentStatusID;
+        if($inID < 0) {
+            return;
         }
-        $this->statusMsg = $inString;
-        $this->posterID = $inUserID;
+        if(! is_numeric($inPosterID)) {
+            return;
+        }
+        if($inPosterID < 0) {
+            return;
+        }
+        if(! is_numeric($inParentStatusID)) {
+            return;
+        }
+        if($inParentStatusID < 0) {
+            return;
+        }
+        if(! is_numeric($inSupporterCount)) {
+            return;
+        }
+        if($inSupporterCount < 0) {
+            return;
+        }
+        if(! is_numeric($inNodeID)) {
+            return;
+        }
+        if($inNodeID < 0) {
+            return;
+        }
+        $inMessage = strip_tags($inMessage);
+        $this->id = $inID;
+        $this->posterID = $inPosterID;
+        $this->parentStatusID = $inParentStatusID;
+        $this->supporterCount = $inSupporterCount;
         $this->nodeID = $inNodeID;
-        $this->childStatus = array();
-        $this->votes = $inVotes;
-        $this->voterArray = array();
-        $this->posterName = userEngine::getInstance()->getUser($inUserID)->getFullName();
+        $this->message = $inMessage;
     }
-    public function addChildStatusTo(status $inChildStatus) {
-        $this->childStatus[] += $inChildStatus;
-    }
-    public function removeChildStatusFrom(status $inChildStatus) {
-        //Look for the child status in the array and remove it.
-        foreach ($this->childStatus as $child) {
-            if ($child->getStatusID() == $inChildStatus->getStatusID()) {
-                $child = null;
-                unset($child);
-            }
-        }
-    }
-    /* Check the Array of voters to see if this user has already voted
-     * on this status. If he has, do nothing, and if he has not, then
-     * allow the vote and add his ID to the array of voters
-     */
-    public function upVote($inUserID) {
-        $alreadyVoted = false;
-        foreach ($this->voterArray as $user) {
-            if ($user == $inUserID) {
-                $alreadyVoted = true;
-            }
-        }
-        if (!$alreadyVoted) {
-            $this->votes++;
-            $this->voterArray[] += $inUserID;
-        }
-    }
-    public function downVote($inUserID) {
-        $alreadyVoted = false;
-        foreach ($this->voterArray as $user) {
-            if ($user == $inUserID) {
-                $alreadyVoted = true;
-            }
-        }
-        if ($alreadyVoted) {
-            $this->votes--;
-            $this->voterArray[] -= $inUserID;
-        }
-    }
-    /*
-     * Getters, no setters due to object not being allowed to be edited
-     */
-    public function getStatusID() {
-        return $this->statusID;
-    }
-    public function getStatus() {
-        return $this->statusMsg;
-    }
-    public function getUpVotes() {
-        return $this->votes;
-    }
-    public function getNodeID() {
-        return $this->nodeID;
+    public function getID() {
+        return $this->id;
     }
     public function getPosterID() {
         return $this->posterID;
     }
-    public function getPosterName() {
-        return $this->posterName;
+    public function  getParentStatusID() {
+        return $this->parentStatusID;
     }
-    public function getParentStatusID() {
-        return $this->parentID;
-    }
-    public function getPosterHref() {
-        return new link('users/' . $this->posterID);
-    }
-    public function getChildStatus() {
-        if (empty($this->childStatus)) {
-            return false;
+    public function setParentStatusID($inNewParentStatusID) {
+        if(! is_numeric($inNewParentStatusID)) {
+            return;
         }
-        return $this->childStatus;
+        if($inNewParentStatusID < 0) {
+            return;
+        }
+        $this->parentStatusID = $inNewParentStatusID;
+    }
+    public function getSupporterCount() {
+        return $this->supporterCount;
+    }
+    public function getNodeID() {
+        return $this->nodeID;
+    }
+    public function setNodeID($inNodeID) {
+        if(! is_numeric($inNodeID)) {
+            return;
+        }
+        if($inNodeID < 0) {
+            return;
+        }
+        $this->nodeID = $inNodeID;
+    }
+    public function getMessage() {
+        return $this->message;
+    }
+    public function setMessage($inMessage) {
+        $this->message = strip_tags($inMessage);
     }
 }
