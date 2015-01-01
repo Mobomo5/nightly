@@ -783,6 +783,7 @@ function doInstallContent() {
         $_SESSION['moduleStatus'] = 'Installing ' . str_replace('/install.php', '', $installer);
         session_write_close();
         require_once($installer);
+        $i++;
     }
     session_start();
     $_SESSION['moduleProgress'] = 100;
