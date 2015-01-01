@@ -190,7 +190,6 @@ CREATE TABLE IF NOT EXISTS `status` (
   `parentStatus` INT NOT NULL DEFAULT 0 COMMENT 'The status this status may be a comment on.',
   `supporterCount` INT NOT NULL DEFAULT 0 COMMENT 'The amount of people who \"liked\" the comment.',
   `nodeID` INT NOT NULL DEFAULT 0 COMMENT 'The node that the status/comment was posted on.',
-  `message` VARCHAR(1000) NULL COMMENT 'The body of the status.',
   PRIMARY KEY (`statusID`),
   CONSTRAINT `fk_status_status1`
     FOREIGN KEY (`parentStatus`)

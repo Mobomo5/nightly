@@ -1114,6 +1114,10 @@ if (!validateAction()) {
                 padding-top: 0;
             }
 
+            input {
+                box-sizing: border-box;
+            }
+
             a.button:link {
                 padding: 10px;
                 background: #2580a2;
