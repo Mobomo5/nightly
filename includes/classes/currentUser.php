@@ -30,10 +30,12 @@ class currentUser extends user {
         if (get_class($object) != 'currentUser') {
             return;
         }
+        session_regenerate_id(true);
         $_SESSION['educaskCurrentUser'] = $object;
     }
     private static function destroySession() {
         unset($_SESSION['educaskCurrentUser']);
+        session_regenerate_id(true);
         $_SESSION['educaskCurrentUser'] = new currentUser();
     }
     public function __construct() {

@@ -113,7 +113,7 @@ class permissionEngine {
         if ($roleID < 1) {
             return false;
         }
-        $canChangePermissions = $this->checkPermission('canChangePermissions');
+        $canChangePermissions = $this->currentUserCanDo('canChangePermissions');
         if (!$canChangePermissions) {
             return false;
         }

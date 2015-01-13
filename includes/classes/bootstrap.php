@@ -35,7 +35,14 @@ class bootstrap {
         $this->doRequires();
         session_name('educaskSession');
         session_start();
-        session_regenerate_id();
+        if(! isset($_SESSION['numberOfRequestsSinceLastRegenerate'])) {
+            $_SESSION['numberOfRequestsSinceLastRegenerate'] = 0;
+        }
+        if($_SESSION['numberOfRequestsSinceLastRegenerate'] == 10) {
+            session_regenerate_id(true);
+            $_SESSION['numberOfRequestsSinceLastRegenerate'] = 0;
+        }
+        $_SESSION['numberOfRequestsSinceLastRegenerate'] = (int) $_SESSION['numberOfRequestsSinceLastRegenerate'] + 1;
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
@@ -70,6 +77,7 @@ class bootstrap {
         define('BLOCK_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/blockEngine.php');
         define('BLOCK_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/block.php');
         define('STATUS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/status.php');
+        define('STATUS_REVISION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/statusRevision.php');
         define('STATUS_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/statusEngine.php');
         define('PERMISSION_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permission.php');
         define('PERMISSION_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/permissionEngine.php');

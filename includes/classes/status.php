@@ -5,8 +5,8 @@ class status {
     private $parentStatusID;
     private $supporterCount;
     private $nodeID;
-    private $message;
-    public function __construct($inID, $inPosterID, $inParentStatusID, $inSupporterCount, $inNodeID, $inMessage) {
+    private $revision;
+    public function __construct($inID, $inPosterID, $inParentStatusID, $inSupporterCount, $inNodeID, statusRevision $inStatusRevision) {
         if(! is_numeric($inID)) {
             return;
         }
@@ -37,13 +37,12 @@ class status {
         if($inNodeID < 0) {
             return;
         }
-        $inMessage = strip_tags($inMessage);
         $this->id = $inID;
         $this->posterID = $inPosterID;
         $this->parentStatusID = $inParentStatusID;
         $this->supporterCount = $inSupporterCount;
         $this->nodeID = $inNodeID;
-        $this->message = $inMessage;
+        $this->revision = $inStatusRevision;
     }
     public function getID() {
         return $this->id;
@@ -78,10 +77,7 @@ class status {
         }
         $this->nodeID = $inNodeID;
     }
-    public function getMessage() {
-        return $this->message;
-    }
-    public function setMessage($inMessage) {
-        $this->message = strip_tags($inMessage);
+    public function getRevision() {
+        return $this->revision;
     }
 }
