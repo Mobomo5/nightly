@@ -53,7 +53,7 @@ class forgotPasswordEngine {
         }
         $token = $cleanString->run(array('stringToClean' => $token));
         $id = $database->escapeString($token);
-        $rawData = $database->getData('*', 'forgotPassword', "token={$id}");
+        $rawData = $database->getData('*', 'forgotPassword', "token='{$id}''");
         if($rawData == false) {
             return false;
         }
