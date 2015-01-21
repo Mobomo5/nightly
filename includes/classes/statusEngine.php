@@ -4,6 +4,7 @@ require_once(CURRENT_USER_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
 require_once(STATUS_OBJECT_FILE);
 require_once(STATUS_REVISION_OBJECT_FILE);
+require_once(MESSAGE_ENGINE_OBJECT_FILE);
 class statusEngine {
     private static $instance;
     private $foundStatusRevisions;
@@ -221,5 +222,185 @@ class statusEngine {
             $toReturn[] = $toAdd;
         }
         return $toReturn;
+    }
+    public function removeStatus(status $toRemove) {
+        $id = $toRemove->getID();
+        if(! is_numeric(($id))) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo("canRemoveStatuses")) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($id);
+        $result = $database->removeData("statusRevision", "statusID={$id}");
+        if($result == false) {
+            return false;
+        }
+        $result = $database->removeData("statusSupporter", "statusID={$id}");
+        if($result == false) {
+            return false;
+        }
+        $results = $database->getData("messageID", "message", "statusID={$id}");
+        if($results == false) {
+            return false;
+        }
+        $messageEngine = messageEngine::getInstance();
+        foreach($results as $entry) {
+            $message = $messageEngine->getMessage($entry['messageID']);
+            if($message == false) {
+                return false;
+            }
+            $result = $messageEngine->deleteMessage($message);
+            if($result == false) {
+                return false;
+            }
+        }
+        $results = $database->getData("statusID", "status", "parentStatus={$id}");
+        if($results == false) {
+            return false;
+        }
+        foreach($results as $entry) {
+            $status = $this->getStatus($entry['statusID']);
+            if($status == false) {
+                return false;
+            }
+            $result = $this->removeStatus($status);
+            if($result == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public function removeStatusRevision(statusRevision $toRemove) {
+        $id = $toRemove->getID();
+        if(! is_numeric($id)) {
+            return false;
+        }
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo("canRemoveStatusRevisions")) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $id = $database->escapeString($id);
+        $result = $database->removeData("statusRevision", "revisionID={$id}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function addStatus(status $toAdd) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo("canAddStatuses")) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $posterID = $database->escapeString($toAdd->getPosterID());
+        $parentStatus = $database->escapeString($toAdd->getParentStatusID());
+        $supporterCount = 0;
+        $nodeID = $database->escapeString($toAdd->getNodeID());
+        $result = $database->insertData("status", "posterID, parentStatus, supporterCount, nodeID", "{$posterID}, {$parentStatus}, {$supporterCount}, {$nodeID}");
+        if($result == false) {
+            return false;
+        }
+        $statusID = $database->getLastInsertID();
+        $statusRevision = $toAdd->getRevision();
+        $statusRevision->setIsCurrent(true);
+        return $this->addStatusRevisionInternal($statusRevision, $statusID);
+    }
+    private function addStatusRevisionInternal(statusRevision $statusRevision, $statusID) {
+        if(! is_numeric($statusID)) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $status = $database->escapeString(strip_tags($statusRevision->getMessage()));
+        $timePosted = $database->escapeString($statusRevision->getTimePosted()->format('Y-m-d H:i:s'));
+        $statusID = $database->escapeString($statusID);
+        $revisorID = $database->escapeString($statusRevision->getRevisorID());
+        if($statusRevision->getIsCurrent() == true) {
+            $isCurrent = 1;
+        } else {
+            $isCurrent = 0;
+        }
+        $result = $database->insertData("statusRevision", "status, timePosted, statusID, revisorID, isCurrent", "'{$status}', '{$timePosted}', {$statusID}, {$revisorID}, {$isCurrent}");
+        if($result == false) {
+            return false;
+        }
+        $result = $database->updateTable("statusRevision", "isCurrent=0", "statusID={$statusID} AND isCurrent=1");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    public function addStatusRevision(statusRevision $toAdd) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo("canReviseStatuses")) {
+            return false;
+        }
+        return $this->addStatusRevisionInternal($toAdd, $toAdd->getStatusID());
+    }
+    public function toggleCurrentUserSupportForStatus(status $toSupport) {
+        $permissionEngine = permissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo("canSupportStatuses")) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $user = currentUser::getUserSession();
+        $userID = $database->escapeString($user->getUserID());
+        $statusID = $database->escapeString($toSupport->getID());
+        $results = $database->getData("supporterID", "statusSupporter", "supporterID={$userID} AND statusID={$statusID}");
+        if($results == false) {
+            return false;
+        }
+        if($results != null) {
+            return $this->removeSupport($statusID, $userID);
+        }
+        return $this->addSupport($statusID, $userID);
+    }
+    private function addSupport($statusID, $supporterID) {
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $result = $database->insertData("statusSupporter", "supporterID, statusID", "{$supporterID}, {$statusID}");
+        if($result == false) {
+            return false;
+        }
+        $result = $database->updateTable("status", "supporterCount=supporterCount+1", "statusID={$statusID}");
+        if($result == false) {
+            return false;
+        }
+        return true;
+    }
+    private function removeSupport($statusID, $supporterID) {
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $result = $database->removeData("statusSupporter", "supporterID={$supporterID} AND statusID={$statusID}");
+        if($result == false) {
+            return false;
+        }
+        $result = $database->updateTable("status", "supporterCount=supporterCount-1", "statusID={$statusID}");
+        if($result == false) {
+            return false;
+        }
+        return true;
     }
 }
