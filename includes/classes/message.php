@@ -45,21 +45,19 @@ class message {
         return $this->trashed;
     }
     public function setTrashed($inBool) {
-        if ($inBool == true || $inBool = 1) {
-            $this->trashed = true;
-        } else {
-            $this->trashed = false;
+        if(! is_bool($inBool)) {
+            return;
         }
+        $this->trashed = $inBool;
     }
     public function isRead() {
         return $this->isRead;
     }
     public function setIsRead($inBool) {
-        if ($inBool == true || $inBool = 1) {
-            $this->isRead = true;
-        } else {
-            $this->isRead = false;
+        if(! is_bool($inBool)) {
+            return;
         }
+        $this->isRead = $inBool;
     }
     public function getStatusID() {
         return $this->statusID;
