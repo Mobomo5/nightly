@@ -2,7 +2,7 @@
 require_once(FOLDER_OBJECT_FILE);
 require_once(FILE_OBJECT_FILE);
 require_once(PERMISSION_ENGINE_OBJECT_FILE);
-require_once(MIME_TYPE_ARRAYS_OBJECT_FILE);
+require_once(VALIDATOR_OBJECT_FILE);
 class fileSystemEngine {
     private static $instance;
     private $foundFiles;
@@ -144,7 +144,8 @@ class fileSystemEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        if(! mimeType::checkIfKnownMimeType($toAdd->getMimeType())) {
+        $validator = new validator("checkIfKnownMimeType");
+        if(! $validator->validate($toAdd->getMimeType())) {
             return false;
         }
         if(! is_file($toAdd->getLocation())) {
@@ -192,7 +193,8 @@ class fileSystemEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        if(! mimeType::checkIfKnownMimeType($toSave->getMimeType())) {
+        $validator = new validator("checkIfKnownMimeType");
+        if(! $validator->validate($toSave->getMimeType())) {
             return false;
         }
         if(! is_file($toSave->getLocation())) {

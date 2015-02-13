@@ -113,7 +113,6 @@ class bootstrap {
         define('CENSORSHIP_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/censorshipEngine.php');
         define('MESSAGE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/messageEngine.php');
         define('MESSAGE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/message.php');
-        define('MIME_TYPE_ARRAYS_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/mimeType.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');

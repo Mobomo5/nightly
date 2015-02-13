@@ -1,5 +1,5 @@
 <?php
-require_once(MIME_TYPE_ARRAYS_OBJECT_FILE);
+require_once(VALIDATOR_OBJECT_FILES);
 class file {
     private $id;
     private $uploaded;
@@ -18,7 +18,8 @@ class file {
             return;
         }
         $inTitle = strip_tags($inTitle);
-        if(! mimeType::checkIfKnownMimeType($inMimeType)) {
+        $validator = new validator("checkIfKnownMimeType");
+        if(! $validator->validate($inMimeType)) {
             return;
         }
         if(! is_numeric($inSize)) {
@@ -77,7 +78,8 @@ class file {
         return $this->mimeType;
     }
     public function setMimeType($inMimeType) {
-        if(! mimeType::checkIfKnownMimeType($inMimeType)) {
+        $validator = new validator("checkIfKnownMimeType");
+        if(! $validator->validate($inMimeType)) {
             return;
         }
         $this->mimeType = $inMimeType;
