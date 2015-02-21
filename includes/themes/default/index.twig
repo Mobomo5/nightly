@@ -1,18 +1,14 @@
 {% extends "@html5/base.twig" %}
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/theme.css"/>
-    <link rel="icon" type="image/png" href="{{ site.getBaseDirectory }}includes/images/favicon.png">
+    <link rel="stylesheet" type="text/css" href="{{ site.getBaseDirectory }}includes/themes/default/css/main.css"/>
+    <link rel="icon" href="{{ site.getBaseDirectory }}includes/images/educaskFavicon.ico">
 {% endblock %}
 {% block body %}
-    <div id="wrapper">
-        {% if blocks.home is defined %}
-            {% include "homepage.twig" %}
-        {% else %}
-            {% include "default.twig" %}
-        {% endif %}
-        <div id="push"></div>
+    <header></header>
+    <div id="contentWrapper">
+        <div id="sidebar"></div>
+        <section id="content">
+            <h1>Title</h1>
+        </section>
     </div>
-    {% block footer %}
-        {% include 'footer.twig' %}
-    {% endblock %}
 {% endblock %}

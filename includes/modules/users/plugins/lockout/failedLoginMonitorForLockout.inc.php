@@ -33,7 +33,11 @@ class failedLoginMonitorForLockout implements plugin{
         $lockoutEngine->setLockout($lockout);
         $attempts = $lockout->getNumberOfAttemptsLeft();
         $period = $lockout->getNumberOfFailedAttempts() * $lockoutEngine->getLockoutPeriod();
-        $notice = new notice('warning', "You have {$attempts} attempts left before you're locked out for {$period} minutes.");
+        if($attempts == 1) {
+            $notice = new notice('warning', "You have {$attempts} attempt left before you're locked out for {$period} minutes.");
+        } else {
+            $notice = new notice('warning', "You have {$attempts} attempts left before you're locked out for {$period} minutes.");
+        }
         noticeEngine::getInstance()->addNotice($notice);
     }
     public static function getPriority() {

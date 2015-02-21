@@ -1,6 +1,0 @@
-<div id="notices-modal">
-    {% for notice in blocks.content %}
-        <div class="{{ notice.style }}">Notice: {{ notice.message }}</div>
-    {% endfor %}
-    <a id="notices-close" onClick="$(this).parent().remove()">Close</a>
-</div>
