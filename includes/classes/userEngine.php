@@ -31,7 +31,8 @@ class userEngine {
         if(! $db->isConnected()) {
             return false;
         }
-        $results = $db->getData('userID, userName, firstName, lastName, email, givenIdentifier, roleID, birthday', 'user', "userID = $inID");
+        $inID = $db->escapeString($inID);
+        $results = $db->getData('userID, userName, firstName, lastName, email, givenIdentifier, roleID, profilePictureLocation, birthday', 'user', "userID = $inID");
         if (!$results) {
             return false;
         }
@@ -48,8 +49,9 @@ class userEngine {
         $email = $results[0]['email'];
         $givenIdentifier = $results[0]['givenIdentifier'];
         $roleID = $results[0]['roleID'];
+        $profilePictureLocation = new link($results[0]['profilePictureLocation'], true);
         $birthday = new DateTime($results[0]['birthday']);
-        $user = new user($userID, $roleID, $givenIdentifier, $userName, $firstName, $lastName, $email, $birthday);
+        $user = new user($userID, $roleID, $givenIdentifier, $userName, $firstName, $lastName, $email, $profilePictureLocation, $birthday);
         return $user;
     }
     public function setUser(user $inUser) {
@@ -68,7 +70,8 @@ class userEngine {
         $givenID = $db->escapeString($inUser->getGivenIdentifier());
         $birthday = $inUser->getBirthday();
         $birthday = $db->escapeString($birthday->format("Y-m-d H:i:s"));
-        $results = $db->updateTable('user', "roleID = $roleID, firstName= '$firstName' , lastName = '$lastName', userName='$userName', givenIdentifier='$givenID', birthday = '" . $birthday . "'", "userID = $userID");
+        $profilePictureLocation = $db->escapeString($inUser->getProfilePictureLocation()->getRawHref());
+        $results = $db->updateTable('user', "roleID = $roleID, firstName= '$firstName' , lastName = '$lastName', userName='$userName', givenIdentifier='$givenID', birthday = '" . $birthday . "', profilePictureLocation = '$profilePictureLocation'", "userID = $userID");
         if (!$results) {
             return false;
         }
@@ -98,9 +101,10 @@ class userEngine {
         $givenID = $db->escapeString($inUser->getGivenIdentifier());
         $birthday = $inUser->getBirthday();
         $birthday = $db->escapeString($birthday->format("Y-m-d H:i:s"));
+        $picture = $db->escapeString($inUser->getProfilePictureLocation()->getRawHref());
         $password = $db->escapeString($pass);
-        $results = $db->insertData('user', 'roleID, firstName,lastName, userName, email, givenIdentifier, birthday, password',
-            "$roleID, '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$password'");
+        $results = $db->insertData('user', 'roleID, firstName,lastName, userName, email, givenIdentifier, birthday, profilePictureLocation, password',
+            "$roleID, '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$picture', '$password'");
         if (!$results) {
             return false;
         }

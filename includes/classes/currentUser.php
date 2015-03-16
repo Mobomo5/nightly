@@ -51,6 +51,7 @@ class currentUser extends user {
         $this->setFirstName('Anonymous');
         $this->setLastName('Guest');
         $this->setEmail('anon@anon.ca');
+        $this->setProfilePictureLocation(new link('includes/images/defaultUserPicture.png', true));
         $this->setBirthday(new DateTime());
     }
     public function getUserID() {
@@ -94,7 +95,7 @@ class currentUser extends user {
             return false;
         }
         $userName = $database->escapeString($userName);
-        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email';
+        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email, profilePictureLocation, birthday';
         $table = 'user';
         $where = '((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
         if ($database->isConnected()) {
@@ -133,6 +134,8 @@ class currentUser extends user {
         $this->setEmail($results[0]['email']);
         $this->setGivenIdentifier($results[0]['givenIdentifier']);
         $this->setUserName($results[0]['userName']);
+        $this->setProfilePictureLocation(new link($results[0]['profilePictureLocation'], true));
+        $this->setBirthday(new DateTime($results[0]['birthday']));
         $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', 'userID=' . $this->tempID);
         self::setUserSession($this);
         $logEntry = new logEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID(), new DateTime());
@@ -153,9 +156,9 @@ class currentUser extends user {
     }
     public function toUser() {
         if (!$this->isLoggedIn) {
-            return new user(1, GUEST_ROLE_ID, $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getBirthday());
+            return new user(1, GUEST_ROLE_ID, $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getProfilePictureLocation(), $this->getBirthday());
         }
-        return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getBirthday());
+        return new user($this->tempID, $this->getRoleID(), $this->getGivenIdentifier(), $this->getUserName(), $this->getFirstName(), $this->getLastName(), $this->getEmail(), $this->getProfilePictureLocation(), $this->getBirthday());
     }
     public function updateCurrentUserPassword($newPass, $oldPass) {
         if (!currentUser::getUserSession()->isLoggedIn()) {

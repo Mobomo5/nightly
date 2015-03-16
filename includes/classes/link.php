@@ -9,16 +9,23 @@ require_once(SITE_OBJECT_FILE);
 
 class link {
     private $cleanURLEnabled;
+    private $physicalFile;
     private $href;
 
-    public function __construct($inHref, $forceCleanURLS = false) {
+    public function __construct($inHref, $isPhysicalFile = false, $forceCleanURLS = false) {
+        if(! is_bool($isPhysicalFile)) {
+            return;
+        }
+        if(! is_bool($forceCleanURLS)) {
+            return;
+        }
         if (strlen($inHref) > 0) {
             if ($inHref[0] == '/') {
                 $inHref = substr($inHref, 1);
             }
         }
-
         $this->href = $inHref;
+        $this->physicalFile = $isPhysicalFile;
         if ($forceCleanURLS) {
             $this->cleanURLEnabled = true;
             return;
@@ -31,6 +38,9 @@ class link {
         if (substr($this->href, 0, 4) == "http") {
             return $this->href;
         }
+        if($this->physicalFile) {
+            return EDUCASK_WEB_ROOT . '/' . $this->href;
+        }
         if ($this->cleanURLEnabled == false) {
             return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
         }
@@ -38,6 +48,15 @@ class link {
     }
     public function getRawHref() {
         return $this->href;
+    }
+    public function togglePhysicalFile($isPhysicalFile = false) {
+        if(! is_bool($isPhysicalFile)) {
+            return;
+        }
+        $this->physicalFile = $isPhysicalFile;
+    }
+    public function isPhysicalFile() {
+        return $this->physicalFile;
     }
     public function __toString() {
         return '' . $this->getHref();

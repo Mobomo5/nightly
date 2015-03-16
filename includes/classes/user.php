@@ -14,8 +14,9 @@ class user {
     private $firstName;
     private $lastName;
     private $birthday;
+    private $profilePictureLocation;
     private $email;
-    public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, DateTime $inBirthday = null) {
+    public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, link $inProfilePictureLocation, DateTime $inBirthday = null) {
         if (!is_numeric($inUserID)) {
             return;
         }
@@ -39,6 +40,7 @@ class user {
         $this->firstName = strip_tags($inFirstName);
         $this->lastName = strip_tags($inLastName);
         $this->email = $inEmail;
+        $this->profilePictureLocation = $inProfilePictureLocation;
         if($inBirthday == null) {
             $this->birthday = new DateTime('June 23, 1912');
             return;
@@ -96,6 +98,13 @@ class user {
             return;
         }
         $this->birthday = $inDate;
+    }
+    public function setProfilePictureLocation(link $inLocation) {
+        $this->profilePictureLocation = $inLocation;
+    }
+    public function getProfilePictureLocation() {
+        $this->profilePictureLocation->togglePhysicalFile(true);
+        return $this->profilePictureLocation;
     }
     public function getEmail() {
         return $this->email;
