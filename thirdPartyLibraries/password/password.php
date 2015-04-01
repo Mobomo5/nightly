@@ -56,19 +56,19 @@ namespace {
                             return null;
                         }
                     }
-// The length of salt to generate
+                    // The length of salt to generate
                     $raw_salt_len = 16;
-// The length required in the final serialization
+                    // The length required in the final serialization
                     $required_salt_len = 22;
                     $hash_format = sprintf("$2y$%02d$", $cost);
-// The expected length of the final crypt() output
+                    // The expected length of the final crypt() output
                     $resultLength = 60;
                     break;
                 default:
                     trigger_error(sprintf("password_hash(): Unknown password hashing algorithm: %s", $algo), E_USER_WARNING);
                     return null;
             }
-            $salt_requires_encoding = false;
+            $salt_req_encoding = false;
             if (isset($options['salt'])) {
                 switch (gettype($options['salt'])) {
                     case 'NULL':
@@ -93,7 +93,7 @@ namespace {
                     trigger_error(sprintf("password_hash(): Provided salt is too short: %d expecting %d", PasswordCompat\binary\_strlen($salt), $required_salt_len), E_USER_WARNING);
                     return null;
                 } elseif (0 == preg_match('#^[a-zA-Z0-9./]+$#D', $salt)) {
-                    $salt_requires_encoding = true;
+                    $salt_req_encoding = true;
                 }
             } else {
                 $buffer = '';
@@ -111,21 +111,21 @@ namespace {
                     }
                 }
                 if (!$buffer_valid && @is_readable('/dev/urandom')) {
-                    $f = fopen('/dev/urandom', 'r');
+                    $file = fopen('/dev/urandom', 'r');
                     $read = PasswordCompat\binary\_strlen($buffer);
                     while ($read < $raw_salt_len) {
-                        $buffer .= fread($f, $raw_salt_len - $read);
+                        $buffer .= fread($file, $raw_salt_len - $read);
                         $read = PasswordCompat\binary\_strlen($buffer);
                     }
-                    fclose($f);
+                    fclose($file);
                     if ($read >= $raw_salt_len) {
                         $buffer_valid = true;
                     }
                 }
                 if (!$buffer_valid || PasswordCompat\binary\_strlen($buffer) < $raw_salt_len) {
-                    $bl = PasswordCompat\binary\_strlen($buffer);
+                    $buffer_length = PasswordCompat\binary\_strlen($buffer);
                     for ($i = 0; $i < $raw_salt_len; $i++) {
-                        if ($i < $bl) {
+                        if ($i < $buffer_length) {
                             $buffer[$i] = $buffer[$i] ^ chr(mt_rand(0, 255));
                         } else {
                             $buffer .= chr(mt_rand(0, 255));
@@ -133,10 +133,10 @@ namespace {
                     }
                 }
                 $salt = $buffer;
-                $salt_requires_encoding = true;
+                $salt_req_encoding = true;
             }
-            if ($salt_requires_encoding) {
-// encode string with the Base64 variant used by crypt
+            if ($salt_req_encoding) {
+                // encode string with the Base64 variant used by crypt
                 $base64_digits =
                     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
                 $bcrypt64_digits =
