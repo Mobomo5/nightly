@@ -24,6 +24,8 @@ class link {
                 $inHref = substr($inHref, 1);
             }
         }
+        $inHref = strip_tags($inHref);
+        $inHref = urlencode($inHref);
         $this->href = $inHref;
         $this->physicalFile = $isPhysicalFile;
         if ($forceCleanURLS) {
