@@ -20,7 +20,8 @@ class site {
     private $cleanURLs;
     private $timeZone;
     private $maintenanceMode;
-    //@TODO: Add Cron Stuff
+    private $lastCronRun;
+    private $cronFrequency;
     //@TODO: Add logo and favicon.
     public static function getInstance() {
         if (!isset($_SESSION['educaskSite'])) {
@@ -48,7 +49,8 @@ class site {
         $variablesWanted[] = 'cleanURLsEnabled';
         $variablesWanted[] = 'siteTimeZone';
         $variablesWanted[] = 'maintenanceMode';
-        //@TODO: Add Cron Stuff
+        $variablesWanted[] = 'cronFrequency';
+        $variablesWanted[] = 'lastCronRun';
         $variables = $variableEngine->getVariables($variablesWanted);
         $this->title = $variables['siteTitle'];
         $this->email = $variables['siteEmail'];
@@ -61,7 +63,8 @@ class site {
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
         $this->maintenanceMode = $variables['maintenanceMode'];
-        //@TODO: Add Cron Stuff
+        $this->cronFrequency = $variables['cronFrequency'];
+        $this->lastCronRun = $variables['lastCronRun'];
     }
     public function getTitle() {
         return $this->title;
@@ -267,5 +270,34 @@ class site {
         self::setInstance($this);
         return true;
     }
-    //@TODO: Add Cron Stuff
+    public function getCronFrequency() {
+        return $this->cronFrequency;
+    }
+    public function setCronFrequency($frequency) {
+        $this->cronFrequency->setValue($frequency);
+        if(! $this->cronFrequency->save()) {
+            return false;
+        }
+        self::setInstance($this);
+    }
+    public function getLastCronRun() {
+        return DateTime::createFromFormat('Y-m-d H:i:s', $this->lastCronRun->getValue());
+    }
+    public function setLastCronRun(DateTime $runTime) {
+        $this->lastCronRun->setValue($runTime->format('Y-m-d H:i:s'));
+        if(! $this->lastCronRun->save()) {
+            return false;
+        }
+        self::setInstance($this);
+    }
+    public function doesCronNeedToRun() {
+        $lastCronRun = $this->getLastCronRun();
+        $currentTime = new DateTime();
+        $cronFrequency = DateInterval::createFromDateString($this->cronFrequency);
+        $lastCronRun->add($cronFrequency);
+        if($currentTime < $lastCronRun) {
+            return false;
+        }
+        return true;
+    }
 }

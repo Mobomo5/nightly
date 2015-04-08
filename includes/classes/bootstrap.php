@@ -46,7 +46,8 @@ class bootstrap {
         $this->connectDatabase();
         $this->initializePlugins();
         $this->getVariables();
-        //@TODO: Add Cron Stuff
+        $this->cron();
+        database::getInstance()->bootstrapDisconnect();
         $this->render();
     }
     public function declareConstants() {
@@ -130,6 +131,7 @@ class bootstrap {
         require_once(LINK_OBJECT_FILE);
         require_once(PERMISSION_ENGINE_OBJECT_FILE);
         require_once(PERMISSION_OBJECT_FILE);
+        require_once(SYSTEM_LOGGER_OBJECT_FILE);
     }
     private function connectDatabase() {
         $database = database::getInstance();
@@ -192,9 +194,18 @@ class bootstrap {
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID(), $pageBlock);
         noticeEngine::getInstance()->removeNotices();
         router::moveCurrentParametersToPrevious();
-        database::getInstance()->bootstrapDisconnect();
     }
-    //@TODO: Add Cron Stuff
+    private function cron() {
+        $this->site = site::getInstance();
+        if(! $this->site->doesCronNeedToRun()) {
+            return;
+        }
+        $hookEngine = hookEngine::getInstance();
+        $hookEngine->runAction('cronRun');
+        $this->site->setLastCronRun(new DateTime());
+        $logger = logger::getInstance();
+        $logger->logIt(new logEntry(1, logEntryType::info, "Cron ran.", 0, new DateTime()));
+    }
     private function render() {
         Twig_Autoloader::register();
         $theme = EDUCASK_ROOT . '/includes/themes/' . $this->site->getTheme();
