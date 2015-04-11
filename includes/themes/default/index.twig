@@ -8,31 +8,10 @@
     <div id="headerGap"></div>
     <div id="contentWrapper">
         <section id="content">
-            <h1>{% if blocks.main.0.title is defined %}{{ blocks.main.0.getTitle }}{% else %}Home{% endif %}</h1>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
-            <p>Content</p>
+            {% for block in blocks.main %}
+                <h1>{{ block.getTitle }}</h1>
+                {{ block.getContent() | raw }}
+            {% endfor %}
         </section>
     </div>
     <div id="sidebar">

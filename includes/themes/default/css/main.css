@@ -1,6 +1,7 @@
 html, body {
     margin: 0;
     height: 100%;
+    font-family: "Lucida Grande",Verdana,Arial,Helvetica,sans-serif;
 }
 header {
     width: 100%;
