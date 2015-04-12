@@ -51,7 +51,6 @@ class bootstrap {
         $this->render();
     }
     public function declareConstants() {
-        define('SYSTEM_LOG_ANONYMOUS', 0);
         define('DATABASE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/database.php');
         define('DATABASE_INTERFACE_FILE', EDUCASK_ROOT . '/includes/interfaces/databaseInterface.php');
         define('VARIABLE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/variable.php');
@@ -114,6 +113,7 @@ class bootstrap {
         define('CENSORSHIP_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/censorshipEngine.php');
         define('MESSAGE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/messageEngine.php');
         define('MESSAGE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/message.php');
+        define('ANTI_FORGERY_TOKEN_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/antiForgeryToken.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
@@ -172,9 +172,9 @@ class bootstrap {
         $moduleEngine = moduleEngine::getInstance();
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
-        if (!$moduleEngine->includeModule($moduleInCharge)) {
-            $moduleEngine->includeModule('fiveHundred');
-            $moduleInCharge = 'fiveHundred';
+        $moduleInCharge = $moduleEngine->includeModule($moduleInCharge);
+        if ($moduleInCharge == false) {
+            $moduleInCharge = $moduleEngine->includeModule('fiveHundred');
         }
         $module = new $moduleInCharge();
         if ($module->forceFourOhFour()) {

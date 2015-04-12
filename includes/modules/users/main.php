@@ -6,6 +6,8 @@
  * Time: 2:02 PM
  */
 require_once(MODULE_INTERFACE_FILE);
+require_once(ANTI_FORGERY_TOKEN_OBJECT_FILE);
+require_once(LINK_OBJECT_FILE);
 
 class users implements module {
     private $params;
@@ -18,64 +20,64 @@ class users implements module {
     public function __construct() {
         $this->params = router::getInstance()->getParameters(true);
         $this->module = $this->params[0];
-        // check the post
-        if (!empty($_POST['login'])) {
-            $this->doLogin();
-            return;
-        } elseif (!empty($_POST['logout'])) {
-            $this->doLogout();
+
+        if(! isset($this->params[1])) {
+            $this->force404 = true;
             return;
         }
-
-        // nothing in the post. Check to see if there are second parameters
-
         if (empty($this->params[1])) {
             $this->force404 = true;
-            return false;
+            return;
         }
-
-        // handle the possibility of an href logout.
-        if ($this->params[1] == 'logout') {
+        if($this->params[1] == "login") {
+            $this->loginContent();
+            return;
+        }
+        if($this->params[1] == "logout") {
             $this->doLogOut();
             return;
         }
-
-        $userID = $this->params[1];
-
-        if (!is_numeric($userID)) {
+    }
+    private function loginContent() {
+        if(currentUser::getUserSession()->isLoggedIn()) {
             $this->force404 = true;
-            return false;
+            return;
         }
-
-//        check to see if the user has permission to see other users
-        if (!permissionEngine::getInstance()->currentUserCanDo('userCanViewOtherUsers')) {
-            $this->force404 = true;
-            return false;
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->doLogIn();
+            return;
         }
-//        check to see if that is actually a user
-        $user = userEngine::getInstance()->getUser($userID);
-        if (!$user) {
-            $this->force404 = true;
-            return false;
-        }
-//        get the user
-//        set the title
-        $this->title = $user->getFullName();
-        $this->content = userEngine::getInstance()->getUserBio($user);
-
+        $this->title = 'Login';
+        $postLink = new link("users/login");
+        $this->content = "<form action='" . $postLink . "' method='POST'>";
+        $antiForgeryToken = new antiForgeryToken();
+        $this->content .= $antiForgeryToken->getHtmlElement();
+        $this->content .= "<label for='username'>Username or email address:</label>";
+        $this->content .= "<input type='text' id='username' name='username' />";
+        $this->content .= "<label for='username'>Password:</label>";
+        $this->content .= "<input type='password' id='password' name='password' />";
+        $this->content .= "<input type='submit' value='Login' />";
+        $this->content .= '</form>';
     }
 
     private function doLogOut() {
+        if(! currentUser::getUserSession()->isLoggedIn()) {
+            $this->force404 = true;
+            return;
+        }
         return currentUser::getUserSession()->logOut();
     }
 
     private function doLogIn() {
+        $antiForgery = new antiForgeryToken();
+        if(! $antiForgery->validate()) {
+            $this->force404 = true;
+            return;
+        }
         if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
             logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $_POST['username'] . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()), 0);
             noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'I couldn\'t log you in.'));
         }
-
-        return;
     }
 
     public static function getPageType() {
@@ -91,6 +93,9 @@ class users implements module {
     }
 
     public function getPageContent() {
+        if($this->force404) {
+            return '';
+        }
         return $this->content;
     }
 

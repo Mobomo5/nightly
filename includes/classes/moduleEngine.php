@@ -30,6 +30,12 @@ class moduleEngine {
         if ($moduleName == null) {
             return false;
         }
+        if($moduleName == 'fourOhFour') {
+            return true;
+        }
+        if($moduleName == "fiveHundred") {
+            return true;
+        }
         $moduleData = $this->getRawModuleDataFromDatabase($moduleName);
         if ($moduleData == false) {
             return false;
@@ -67,7 +73,7 @@ class moduleEngine {
         if (!in_array('module', $interfacesImplemented)) {
             return false;
         }
-        return true;
+        return $moduleName;
     }
     public function addModule($name, $humanName, $enabled = false) {
         if(! is_bool($enabled)) {
