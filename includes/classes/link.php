@@ -11,12 +11,16 @@ class link {
     private $cleanURLEnabled;
     private $physicalFile;
     private $href;
+    private $localLinkOnly;
 
-    public function __construct($inHref, $isPhysicalFile = false, $forceCleanURLS = false) {
+    public function __construct($inHref, $isPhysicalFile = false, $forceCleanURLS = false, $localLinkOnly = false) {
         if(! is_bool($isPhysicalFile)) {
             return;
         }
         if(! is_bool($forceCleanURLS)) {
+            return;
+        }
+        if(! is_bool($localLinkOnly)) {
             return;
         }
         if (strlen($inHref) > 0) {
@@ -37,7 +41,7 @@ class link {
     //return a href based off of the string input when object created.
     public function getHref() {
         if (substr($this->href, 0, 4) == "http") {
-            return $this->href;
+            return $this->externalLink();
         }
         if($this->physicalFile) {
             return EDUCASK_WEB_ROOT . '/' . $this->href;
@@ -46,6 +50,12 @@ class link {
             return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
         }
         return EDUCASK_WEB_ROOT . '/' . $this->href;
+    }
+    private function externalLink() {
+        if($this->localLinkOnly) {
+            return EDUCASK_WEB_ROOT . '/home';
+        }
+        return $this->href;
     }
     public function getRawHref() {
         return $this->href;
@@ -58,6 +68,9 @@ class link {
     }
     public function isPhysicalFile() {
         return $this->physicalFile;
+    }
+    public function isLocalLinkOnly() {
+        return $this->localLinkOnly;
     }
     public function __toString() {
         return '' . $this->getHref();

@@ -48,7 +48,11 @@ class users implements module {
             return;
         }
         $this->title = 'Login';
-        $postLink = new link("users/login");
+        $url = "users/login";
+        if(isset($_GET['redirectTo'])) {
+            $url .= "?redirectTo=" . $_GET['redirectTo'];
+        }
+        $postLink = new link($url);
         $this->content = "<form action='" . $postLink . "' method='POST'>";
         $antiForgeryToken = new antiForgeryToken();
         $this->content .= $antiForgeryToken->getHtmlElement();
@@ -74,7 +78,7 @@ class users implements module {
             $this->force404 = true;
             return;
         }
-        if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
+        if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'], $_GET['redirectTo'])) {
             logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $_POST['username'] . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()), 0);
             noticeEngine::getInstance()->addNotice(new notice(noticeType::error, 'I couldn\'t log you in.'));
         }

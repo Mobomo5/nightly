@@ -145,7 +145,7 @@ class currentUser extends user {
             header('Location: ' . new link(''));
             return true;
         }
-        $page = new link($redirectTo);
+        $page = new link($redirectTo, false, false, true);
         header('Location: ' . $page);
         return true;
     }
