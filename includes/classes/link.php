@@ -40,7 +40,7 @@ class link {
     }
     //return a href based off of the string input when object created.
     public function getHref() {
-        if (substr($this->href, 0, 4) == "http") {
+        if(! $this->isLocalLink()) {
             return $this->externalLink();
         }
         if($this->physicalFile) {
@@ -71,6 +71,15 @@ class link {
     }
     public function isLocalLinkOnly() {
         return $this->localLinkOnly;
+    }
+    public function isLocalLink() {
+        if (substr($this->href, 0, 4) == "http") {
+            return false;
+        }
+        if (substr($this->href, 0, 2) == "//") {
+            return false;
+        }
+        return true;
     }
     public function __toString() {
         return '' . $this->getHref();

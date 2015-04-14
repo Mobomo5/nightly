@@ -9,7 +9,6 @@ require_once(GENERAL_ENGINE_OBJECT_FILE);
 require_once(GENERAL_FUNCTION_INTERFACE_FILE);
 class antiForgeryToken {
     private $knownToken = null;
-    private $givenToken = null;
     public function __construct() {
         $general = new general("generateRandomString");
         if(! $general->functionsExists()) {
