@@ -72,7 +72,7 @@ class currentUser extends user {
         }
         $this->isLoggedIn = $isLoggedIn;
     }
-    public function logIn($userName, $password, $redirectTo = null) {
+    public function logIn($userName, $password) {
         if ($this->isLoggedIn) {
             return true;
         }
@@ -141,12 +141,6 @@ class currentUser extends user {
         $logEntry = new logEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID(), new DateTime());
         logger::getInstance()->logIt($logEntry);
         $hookEngine->runAction('userLoggedIn');
-        if($redirectTo == null) {
-            header('Location: ' . new link(''));
-            return true;
-        }
-        $page = new link($redirectTo, false, false, true);
-        header('Location: ' . $page);
         return true;
     }
     public function logOut() {

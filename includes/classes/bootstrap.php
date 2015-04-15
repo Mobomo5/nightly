@@ -191,8 +191,8 @@ class bootstrap {
         $pageBlock->setContent($contentToPassToPageBlock);
         $pageBlock->setTitle($titleToPassToPageBlock);
         define('PAGE_TYPE', $module->getPageType());
+
         $this->blocks = $blockEngine->getBlocks($this->site->getTheme(), $module->getPageType(), $user->getRoleID(), $pageBlock);
-        noticeEngine::getInstance()->removeNotices();
         router::moveCurrentParametersToPrevious();
     }
     private function cron() {
@@ -227,7 +227,10 @@ class bootstrap {
                 return;
             }
         }
-        echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks));
+        $noticeEngine = noticeEngine::getInstance();
+        $notices = $noticeEngine->getNotices();
+        $noticeEngine->removeNotices();
+        echo $twig->render('index.twig', array('site' => $this->site, 'blocks' => $this->blocks, 'notices' => $notices));
     }
     private function noGUIWork($module) {
         $link = $module->getReturnPage();

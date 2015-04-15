@@ -8,6 +8,15 @@
     <div id="headerGap"></div>
     <div id="contentWrapper">
         <section id="content">
+            {% if notices is not empty %}
+                <div id="notices">
+                    {% for notice in notices %}
+                        <div class="{{ notice.getStyle() }}Notice notice">
+                            <p>{{ notice.getMessage() }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             {% for block in blocks.main %}
                 <h1>{{ block.getTitle }}</h1>
                 {{ block.getContent() | raw }}

@@ -30,7 +30,7 @@ class notice {
         return $this->removeOnceDisplayed;
     }
     public function __toString() {
-        $noticeHTML = '<div class=" . $this->style . ">';
+        $noticeHTML = '<div class="' . $this->style . 'Notice notice">';
         $noticeHTML .= "<p>{$this->message}</p>";
         $noticeHTML .= '</div>';
         return $noticeHTML;

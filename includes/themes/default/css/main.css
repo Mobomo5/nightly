@@ -2,6 +2,7 @@ html, body {
     margin: 0;
     height: 100%;
     font-family: "Lucida Grande",Verdana,Arial,Helvetica,sans-serif;
+    color: #222;
 }
 header {
     width: 100%;
@@ -31,4 +32,38 @@ header {
 }
 #content {
     padding: 5px;
+}
+#notices {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    background-color: #F5F5F5;
+    border-right: 1px solid #EBE6E6;
+    border-bottom: 1px solid #EBE6E6;
+}
+.notice {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+.notice:first-child {
+    margin-top: 0;
+}
+.neutralNotice {
+    background-color: white;
+    border-right: 1px solid #DBDBDB;
+    border-bottom: 1px solid #DBDBDB;
+}
+.warningNotice {
+    background-color: #d01d33;
+    color: white;
+    border-right: 1px solid #A30B1E;
+    border-bottom: 1px solid #A30B1E;
+}
+.successNotice {
+    background-color: #58A862;
+    color: white;
+    border-right: 1px solid #35733D;
+    border-bottom: 1px solid #35733D;
 }

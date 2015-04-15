@@ -73,7 +73,7 @@ class noticeEngine {
     }
 }
 abstract class noticeType {
-    const error = 'error';
+    const warning = 'warning';
     const neutral = 'neutral';
     const positive = 'positive';
 }
