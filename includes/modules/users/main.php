@@ -129,6 +129,10 @@ class users implements module {
         $this->redirectTo = new link('');
     }
 
+    public function forgotPasswordContent() {
+
+    }
+
     public static function getPageType() {
         return 'user';
     }

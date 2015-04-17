@@ -2,6 +2,7 @@ html, body {
     margin: 0;
     height: 100%;
     font-family: "Lucida Grande",Verdana,Arial,Helvetica,sans-serif;
+    font-size: 16px;
     color: #222;
 }
 header {
@@ -66,4 +67,29 @@ header {
     color: white;
     border-right: 1px solid #35733D;
     border-bottom: 1px solid #35733D;
+}
+form {
+    width: 100%;
+    box-sizing: border-box;
+}
+input {
+    display: block;
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+}
+input:hover, input:focus {
+    border-color: #66afe9;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+}
+input[type="button"], input[type="submit"] {
+    width: auto;
+    background-color: #F5F5F5;
+}
+input[type="button"]:hover, input[type="submit"]:hover {
+    cursor: pointer;
 }
