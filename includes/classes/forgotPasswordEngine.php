@@ -101,16 +101,15 @@ class forgotPasswordEngine {
             return false;
         }
         $existingTokens = $database->getData('token', 'forgotPassword');
-        if($existingTokens == false) {
+        if($existingTokens === false) {
             return false;
         }
         if($existingTokens == null) {
             $existingTokens = array();
         }
-        $token = $randomString->run(array('length' => 50));
-        while(in_array(array('token'=>$token), $existingTokens)) {
-            $token = $randomString->run(array('length' => 50));
-        }
+        do {
+            $token = $randomString->run(array('randomLength' => true, 'minLength' => 37, 'maxLength' => 136, 'length' => 50));
+        } while(in_array(array('token'=>$token), $existingTokens));
         $date = new DateTime();
         $date = $date->format('Y-m-d H:i:s');
         $token = $database->escapeString($token);

@@ -8,6 +8,9 @@
 require_once(MODULE_INTERFACE_FILE);
 require_once(ANTI_FORGERY_TOKEN_OBJECT_FILE);
 require_once(LINK_OBJECT_FILE);
+require_once(FORGOT_PASSWORD_OBJECT_FILE);
+require_once(FORGOT_PASSWORD_ENGINE_OBJECT_FILE);
+require_once(VALIDATOR_OBJECT_FILE);
 
 class users implements module {
     private $params;
@@ -42,6 +45,10 @@ class users implements module {
             $this->doLogOut();
             return;
         }
+        if($this->params[1] == "forgotPassword") {
+            $this->forgotPasswordContent();
+            return;
+        }
         $this->force404 = true;
     }
     private function loginContent() {
@@ -70,7 +77,7 @@ class users implements module {
             return;
         }
         $this->title = 'Login';
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if($this->isPostRequest()) {
             $this->doLogIn();
             return;
         }
@@ -92,6 +99,8 @@ class users implements module {
         $toReturn .= "<input type='password' id='password' name='password' />";
         $toReturn .= "<input type='submit' value='Login' />";
         $toReturn .= '</form>';
+        $forgotPasswordLink = new link("users/forgotPassword");
+        $toReturn .= "<p>Forgot your password? Click <a href=\"{$forgotPasswordLink}\">here</a> to reset it.";
         return $toReturn;
     }
 
@@ -115,9 +124,14 @@ class users implements module {
             $this->force404 = true;
             return;
         }
+        if(! isset($_POST['username']) || ! isset($_POST['password'])) {
+            $this->force404 = true;
+            return;
+        }
         $this->noGUI = true;
-        if (!currentUser::getUserSession()->logIn($_POST['username'], $_POST['password'])) {
-            logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $_POST['username'] . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()), 0);
+        $username = preg_replace('/\s+/', '', strip_tags($_POST['username']));
+        if (!currentUser::getUserSession()->logIn($username, $_POST['password'])) {
+            logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $username . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()), 0);
             noticeEngine::getInstance()->addNotice(new notice(noticeType::warning, 'I couldn\'t log you in.'));
             $this->redirectTo = new link('users/login');
             return;
@@ -130,7 +144,83 @@ class users implements module {
     }
 
     public function forgotPasswordContent() {
+        if(currentUser::getUserSession()->isLoggedIn()) {
+            $this->force404 = true;
+            return;
+        }
+        if($this->isPostRequest()) {
+            $this->doForgotPassword();
+            return;
+        }
+        $this->title = 'Request Password Reset';
+        $this->content = $this->buildForgotPasswordForm();
+    }
+    private function buildForgotPasswordForm() {
+        $toReturn = "<p>I hear you need a new password. Let's get you a new one.</p>";
+        $postLink = new link("users/forgotPassword");
+        $toReturn .= "<form action=\"{$postLink}\" method='POST' id=\"forgotPasswordForm\">";
+        $antiForgeryToken = new antiForgeryToken();
+        $toReturn .= $antiForgeryToken->getHtmlElement();
+        $toReturn .= "<label for='username'>Username or email address:</label>";
+        $toReturn .= "<input type='text' id='username' name='username' />";
+        $toReturn .= "<input type='submit' value='Request Password Reset Token' />";
+        $toReturn .= '</form>';
+        $loginLink = new link("users/login");
+        $toReturn .= "<p>Remember your password? Click <a href=\"{$loginLink}\">here</a> to login.";
+        return $toReturn;
+    }
+    private function doForgotPassword() {
+        if(! $this->isPostRequest()) {
+            return;
+        }
+        $antiForgery = new antiForgeryToken();
+        if(! $antiForgery->validate()) {
+            $this->force404 = true;
+            return;
+        }
+        if(!isset($_POST['username'])) {
+            $this->force404 = true;
+            return;
+        }
+        $this->noGUI = true;
+        $this->redirectTo = new link('users/forgotPassword');
+        $username = preg_replace('/\s+/', '', strip_tags($_POST['username']));
+        $validator = new validator('email');
+        if($validator->validate($username)) {
+            $this->doForgotPasswordByEmail($username);
+            return;
+        }
+    }
+    private function doForgotPasswordByEmail($username) {
+        $user = userEngine::getInstance()->getUserByEmail($username);
+        if($user == false) {
+            $this->showSuccessMessageForForgotPassword();
+            return;
+        }
+        $forgotPasswordEngine = forgotPasswordEngine::getInstance();
+        $exists = $forgotPasswordEngine->getForgotPasswordByUserID($user->getUserID());
+        if($exists != false) {
+            $forgotPasswordEngine->removeForgotPassword($exists);
+        }
+        $forgotPassword = $forgotPasswordEngine->generateNewForgotPassword($user->getUserID());
+        if($forgotPassword == false) {
+            $this->showErrorMessageForForgotPassword();
+            return;
+        }
+        $this->showSuccessMessageForForgotPassword();
+    }
+    private function showSuccessMessageForForgotPassword() {
+        noticeEngine::getInstance()->addNotice(new notice(noticeType::success, "Please check your email to continue."));
+    }
+    private function showErrorMessageForForgotPassword() {
+        noticeEngine::getInstance()->addNotice(new notice(noticeType::warning, "Sorry, something went wrong when I tried to generate a password reset token for you. If this keeps happening, please see an administrator."));
+    }
 
+    private function isPostRequest() {
+        if($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return false;
+        }
+        return true;
     }
 
     public static function getPageType() {

@@ -14,8 +14,7 @@ class antiForgeryToken {
         if(! $general->functionsExists()) {
             return;
         }
-        $tokenLength = mt_rand(256, 1024);
-        $this->knownToken = $general->run(array('length' => $tokenLength));
+        $this->knownToken = $general->run(array('randomLength' => true));
     }
     public function getHtmlElement() {
         if($this->knownToken == null) {

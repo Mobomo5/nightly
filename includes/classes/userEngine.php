@@ -54,6 +54,44 @@ class userEngine {
         $user = new user($userID, $roleID, $givenIdentifier, $userName, $firstName, $lastName, $email, $profilePictureLocation, $birthday);
         return $user;
     }
+    public function getUserByUsername($inUserName) {
+        $inUserName = preg_replace('/\s+/', '', strip_tags($inUserName));
+        $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $inUserName = $db->escapeString($inUserName);
+        $results = $db->getData('userID', 'user', "userName = '{$inUserName}'");
+        if (!$results) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        if (count($results) > 1) {
+            return false;
+        }
+        return $this->getUser($results[0]['userID']);
+    }
+    public function getUserByEmail($inEmail) {
+        $inEmail = preg_replace('/\s+/', '', strip_tags($inEmail));
+        $db = database::getInstance();
+        if(! $db->isConnected()) {
+            return false;
+        }
+        $inEmail = $db->escapeString($inEmail);
+        $results = $db->getData('userID', 'user', "email = '{$inEmail}'");
+        if (!$results) {
+            return false;
+        }
+        if($results == null) {
+            return false;
+        }
+        if (count($results) > 1) {
+            return false;
+        }
+        return $this->getUser($results[0]['userID']);
+    }
     public function setUser(user $inUser) {
         if (!permissionEngine::getInstance()->currentUserCanDo('userCanModifyUsers')) {
             return false;

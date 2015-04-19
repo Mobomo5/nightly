@@ -75,5 +75,5 @@ class noticeEngine {
 abstract class noticeType {
     const warning = 'warning';
     const neutral = 'neutral';
-    const positive = 'positive';
+    const success = 'success';
 }
