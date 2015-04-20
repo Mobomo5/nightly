@@ -36,7 +36,7 @@ class userEngine {
         if (!$results) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if (count($results) > 1) {
@@ -65,7 +65,7 @@ class userEngine {
         if (!$results) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if (count($results) > 1) {
@@ -84,7 +84,7 @@ class userEngine {
         if (!$results) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if (count($results) > 1) {
@@ -181,10 +181,10 @@ class userEngine {
         }
         $userID = $db->escapeString($userID);
         $results = $db->getData('password', 'user', "userID = $userID");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
@@ -213,13 +213,13 @@ class userEngine {
         if (!$results) {
             return 'The bio is temporarily unavailable. Check back soon!';
         }
-        if($results == null) {
+        if($results === null) {
             return 'No bio yet!';
         }
         if(count($results) > 1) {
             return 'No bio yet!';
         }
-        if ($results[0]['bio'] == '') {
+        if ($results[0]['bio'] === '') {
             return 'No bio yet!';
         }
         return $results[0]['bio'];

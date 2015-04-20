@@ -33,10 +33,10 @@ class permissionEngine {
         }
         $inPermissionName = $database->escapeString(htmlspecialchars($inPermissionName));
         $results = $database->getData('permissionID, permissionName, humanName, permissionDescription', 'permission', 'permissionName = \'' . $inPermissionName . '\'');
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if ($results == null) {
+        if ($results === null) {
             return false;
         }
         if (count($results) > 1) {
@@ -61,16 +61,16 @@ class permissionEngine {
             return false;
         }
         $results = $database->getData('canDo', 'permissionSet', 'permissionID = ' . $inPermission->getID() . ' AND roleID = ' . $inRoleID);
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if ($results == null) {
+        if ($results === null) {
             return false;
         }
         if (count($results) > 1) {
             return false;
         }
-        if ($results[0]['canDo'] == 0) {
+        if ($results[0]['canDo'] === 0) {
             $this->permissionsChecked[$inPermission->getName()][$inRoleID] = false;
             return false;
         }
@@ -121,17 +121,17 @@ class permissionEngine {
         if (!$database->isConnected()) {
             return false;
         }
-        if ($inCanDo == true) {
+        if ($inCanDo === true) {
             $canDo = 1;
         } else {
             $canDo = 0;
         }
         //Make sure that an entry exist for this permission and the specified role.
         $results = $database->getData('canDo', 'permissionSet', 'permissionID = ' . $permissionToSet->getID() . ' AND roleID = ' . $roleID);
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if ($results == null) {
+        if ($results === null) {
             return $this->insertNewCanDo($roleID, $canDo);
         }
         if (!$database->updateTable('permissionSet', 'canDo = ' . $canDo, 'permissionID = ' . $permissionToSet->getID() . ' AND roleID = ' . $roleID)) {

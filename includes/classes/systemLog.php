@@ -51,7 +51,7 @@ class logger {
         } else {
             $results = $db->getData('*', 'systemLog');
         }
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         $toReturn = array();
@@ -70,7 +70,7 @@ class logger {
             return false;
         }
         $success = $database->makeCustomQuery('TRUNCATE TABLE systemLog');
-        if($success == false) {
+        if($success === false) {
             return false;
         }
         return true;

@@ -21,26 +21,26 @@ class moduleEngine {
     }
     public function moduleExists($moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
-        if ($moduleName == '/') {
+        if ($moduleName === '/') {
             return false;
         }
-        if ($moduleName == '') {
+        if ($moduleName === '') {
             return false;
         }
-        if ($moduleName == null) {
+        if ($moduleName === null) {
             return false;
         }
-        if($moduleName == 'fourOhFour') {
+        if($moduleName === 'fourOhFour') {
             return true;
         }
-        if($moduleName == "fiveHundred") {
+        if($moduleName === "fiveHundred") {
             return true;
         }
         $moduleData = $this->getRawModuleDataFromDatabase($moduleName);
-        if ($moduleData == false) {
+        if ($moduleData === false) {
             return false;
         }
-        if ($moduleData['enabled'] == '0') {
+        if ($moduleData['enabled'] === '0') {
             return false;
         }
         $validator = new validator('dir');
@@ -94,7 +94,7 @@ class moduleEngine {
         $name = preg_replace('\/', '', $name);
         $name = $db->escapeString(preg_replace('/\s/', '', strip_tags($name)));
         $humanName = $db->escapeString(strip_tags($humanName));
-        if($enabled == true) {
+        if($enabled === true) {
             $enabledVal = 1;
         } else {
             $enabledVal = 0;
@@ -124,7 +124,7 @@ class moduleEngine {
         }
         // escape
         $humanName = $db->escapeString(strip_tags($humanName));
-        if($enabled == true) {
+        if($enabled === true) {
             $enabledVal = 1;
         } else {
             $enabledVal = 0;
@@ -138,23 +138,23 @@ class moduleEngine {
     public function getRawModuleDataFromDatabase($inModuleIdentifier) {
         $inModuleIdentifier = preg_replace('/\s+/', '', strip_tags($inModuleIdentifier));
         foreach ($this->foundModules as $module) {
-            if ($module['moduleID'] == $inModuleIdentifier) {
+            if ($module['moduleID'] === $inModuleIdentifier) {
                 return $module;
             }
-            if ($module['moduleName'] == $inModuleIdentifier) {
+            if ($module['moduleName'] === $inModuleIdentifier) {
                 return $module;
             }
         }
         if (is_numeric($inModuleIdentifier)) {
             $moduleData = $this->getRawDataBasedOnID($inModuleIdentifier);
-            if ($moduleData == false) {
+            if ($moduleData === false) {
                 return false;
             }
             $this->foundModules[] = $moduleData;
             return $moduleData;
         }
         $moduleData = $this->getRawDataBasedOnName($inModuleIdentifier);
-        if ($moduleData == false) {
+        if ($moduleData === false) {
             return false;
         }
         $this->foundModules[] = $moduleData;
@@ -170,10 +170,10 @@ class moduleEngine {
         }
         $inModuleID = $database->escapeString($inModuleID);
         $success = $database->getData('moduleID, moduleName, humanName, enabled', 'module', "moduleID={$inModuleID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         if (count($success) > 1) {
@@ -189,10 +189,10 @@ class moduleEngine {
         }
         $inModuleName = $database->escapeString($inModuleName);
         $success = $database->getData('moduleID, moduleName, humanName, enabled', 'module', "moduleName='{$inModuleName}'");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         if (count($success) > 1) {

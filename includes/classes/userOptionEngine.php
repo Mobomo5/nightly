@@ -36,7 +36,7 @@ class userOptionEngine {
         if (!$results) {
             return false;
         }
-        if (sizeof($results) == 0) {
+        if (sizeof($results) === 0) {
             return false;
         }
         //get the first value and return the object
@@ -57,7 +57,7 @@ class userOptionEngine {
             return false;
         }
         $option = $this->getOption($optionName);
-        if($option == false) {
+        if($option === false) {
             return false;
         }
         // is it stored already?
@@ -71,10 +71,10 @@ class userOptionEngine {
         }
         // is the option enabled?
         $result = $db->getData('s.value', 'userOption u, userOptionSet s', 'u.optionID = s.optionID AND u.optionID = ' . $db->escapeString($option->getID()) . ' AND s.userID = ' . $userID);
-        if($result == false) {
+        if($result === false) {
             return false;
         }
-        if($result == null) {
+        if($result === null) {
             return false;
         }
         if(count($result) > 1) {
@@ -121,7 +121,7 @@ class userOptionEngine {
         }
         $optionSetID = $db->escapeString($data[0]['optionSetID']);
         $results = $db->updateTable('userOptionSet', 'value = \'' . $value . '\'', 'optionSetID = '. $optionSetID . ' AND optionID = ' . $optionID . ' AND userID=' . $userID);
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
         return true;
@@ -148,7 +148,7 @@ class userOptionEngine {
         $userID = $db->escapeString($userID);
         $value = $db->escapeString($value);
         $results = $db->insertData('userOptionSet', 'value, userID, optionID', "'{$value}', {$userID}, {$optionID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -172,7 +172,7 @@ class userOptionEngine {
         $inHumanName = $db->escapeString($inHumanName);
         $inOptionDescription = $db->escapeString($inOptionDescription);
         $results = $db->insertData('userOption', 'optionName, humanName, description', '\'' . $inOptionName . '\', \'' . $inHumanName . '\', \'' . $inOptionDescription . '\'');
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
         return true;
@@ -189,7 +189,7 @@ class userOptionEngine {
             return false;
         }
         $results = $db->removeData('userOption', 'optionName = \'' . $db->escapeString($option->getComputerName()) . '\' AND optionID = ' . $db->escapeString($option->getID()));
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
         return true;
@@ -210,7 +210,7 @@ class userOptionEngine {
         $humanName = $db->escapeString(strip_tags($inOption->getHumanName()));
         $description = $db->escapeString(strip_tags($inOption->getDescription()));
         $result = $db->updateTable('userOption', "optionName='{$computerName}', humanName='{$humanName}', optionDescription='{$description}'", "optionID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;

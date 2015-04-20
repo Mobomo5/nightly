@@ -41,7 +41,7 @@ class user {
         $this->lastName = strip_tags($inLastName);
         $this->email = $inEmail;
         $this->profilePictureLocation = $inProfilePictureLocation;
-        if($inBirthday == null) {
+        if($inBirthday === null) {
             $this->birthday = new DateTime('June 23, 1912');
             return;
         }
@@ -93,7 +93,7 @@ class user {
         return $this->birthday;
     }
     public function setBirthday(DateTime $inDate = null) {
-        if($inDate == null) {
+        if($inDate === null) {
             $this->birthday = new DateTime('June 23, 1912');
             return;
         }

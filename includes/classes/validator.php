@@ -17,7 +17,7 @@ class validator {
             return;
         }
         require_once($validatorFile);
-        if(class_exists($inType) == false) {
+        if(class_exists($inType) === false) {
             $this->subValidator = false;
             return;
         }

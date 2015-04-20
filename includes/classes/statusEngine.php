@@ -36,17 +36,17 @@ class statusEngine {
         }
         $inID = $database->escapeString($inID);
         $results = $database->getData('statusID, posterID, parentStatus, supporterCount, nodeID', 'status', "statusID={$inID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
             return false;
         }
         $statusRevision = $this->getCurrentStatusRevisionForStatus($inID);
-        if($statusRevision == false) {
+        if($statusRevision === false) {
             return false;
         }
         $statusID = $results[0]['statusID'];
@@ -72,10 +72,10 @@ class statusEngine {
         }
         $inNodeID = $database->escapeString($inNodeID);
         $results = $database->getData('statusID, posterID, parentStatus, supporterCount, nodeID', 'status', "nodeID={$inNodeID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         $toReturn = array();
@@ -85,7 +85,7 @@ class statusEngine {
                 continue;
             }
             $statusRevision = $this->getCurrentStatusRevisionForStatus($result['statusID']);
-            if($statusRevision == false) {
+            if($statusRevision === false) {
                 continue;
             }
             $statusID = $result['statusID'];
@@ -113,10 +113,10 @@ class statusEngine {
         }
         $inUserID = $database->escapeString($inUserID);
         $results = $database->getData('statusID, posterID, parentStatus, supporterCount, nodeID', 'status', "posterID={$inUserID} AND parentStatus=0");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         $toReturn = array();
@@ -126,7 +126,7 @@ class statusEngine {
                 continue;
             }
             $statusRevision = $this->getCurrentStatusRevisionForStatus($result['statusID']);
-            if($statusRevision == false) {
+            if($statusRevision === false) {
                 continue;
             }
             $statusID = $result['statusID'];
@@ -154,13 +154,13 @@ class statusEngine {
         }
         $inStatusID = $database->escapeString(($inStatusID));
         $results = $database->getData('revisionID', 'statusRevision', "statusID={$inStatusID} AND isCurrent=1");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         if(count($results) > 1) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         return $this->getStatusRevision($results[0]['revisionID']);
@@ -182,13 +182,13 @@ class statusEngine {
         }
         $revisionID = $database->escapeString($revisionID);
         $results = $database->getData('revisionID, status, timePosted, statusID, revisorID, isCurrent', 'statusRevision', "revisionID={$revisionID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         if(count($results) > 1) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         $revisionID = $results[0]['revisionID'];
@@ -196,7 +196,7 @@ class statusEngine {
         $timePosted = new DateTime($results[0]['timePosted']);
         $statusID = $results[0]['statusID'];
         $revisorID = $results[0]['revisorID'];
-        if((int) $results[0]['isCurrent'] == 1) {
+        if((int) $results[0]['isCurrent'] === 1) {
             $isCurrent = true;
         } else {
             $isCurrent = false;
@@ -219,10 +219,10 @@ class statusEngine {
         }
         $statusID = $database->escapeString($statusID);
         $results = $database->getData('revisionID, status, timePosted, statusID, revisorID, isCurrent', 'statusRevision', "statusID={$statusID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         $toReturn = array();
@@ -236,7 +236,7 @@ class statusEngine {
             $timePosted = new DateTime($result['timePosted']);
             $statusID = $result['statusID'];
             $revisorID = $result['revisorID'];
-            if((int) $result['isCurrent'] == 1) {
+            if((int) $result['isCurrent'] === 1) {
                 $isCurrent = true;
             } else {
                 $isCurrent = false;
@@ -262,39 +262,39 @@ class statusEngine {
         }
         $id = $database->escapeString($id);
         $result = $database->removeData("statusRevision", "statusID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $result = $database->removeData("statusSupporter", "statusID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $results = $database->getData("messageID", "message", "statusID={$id}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         $messageEngine = messageEngine::getInstance();
         foreach($results as $entry) {
             $message = $messageEngine->getMessage($entry['messageID']);
-            if($message == false) {
+            if($message === false) {
                 return false;
             }
             $result = $messageEngine->deleteMessage($message);
-            if($result == false) {
+            if($result === false) {
                 return false;
             }
         }
         $results = $database->getData("statusID", "status", "parentStatus={$id}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         foreach($results as $entry) {
             $status = $this->getStatus($entry['statusID']);
-            if($status == false) {
+            if($status === false) {
                 return false;
             }
             $result = $this->removeStatus($status);
-            if($result == false) {
+            if($result === false) {
                 return false;
             }
         }
@@ -315,7 +315,7 @@ class statusEngine {
         }
         $id = $database->escapeString($id);
         $result = $database->removeData("statusRevision", "revisionID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -334,7 +334,7 @@ class statusEngine {
         $supporterCount = 0;
         $nodeID = $database->escapeString($toAdd->getNodeID());
         $result = $database->insertData("status", "posterID, parentStatus, supporterCount, nodeID", "{$posterID}, {$parentStatus}, {$supporterCount}, {$nodeID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $statusID = $database->getLastInsertID();
@@ -354,20 +354,20 @@ class statusEngine {
         $timePosted = $database->escapeString($statusRevision->getTimePosted()->format('Y-m-d H:i:s'));
         $statusID = $database->escapeString($statusID);
         $revisorID = $database->escapeString($statusRevision->getRevisorID());
-        if($statusRevision->getIsCurrent() == true) {
+        if($statusRevision->getIsCurrent() === true) {
             $isCurrent = 1;
         } else {
             $isCurrent = 0;
         }
         $result = $database->insertData("statusRevision", "status, timePosted, statusID, revisorID, isCurrent", "'{$status}', '{$timePosted}', {$statusID}, {$revisorID}, {$isCurrent}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         if($statusRevision->getIsCurrent()) {
             return true;
         }
         $result = $database->updateTable("statusRevision", "isCurrent=0", "statusID={$statusID} AND isCurrent=1");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -392,7 +392,7 @@ class statusEngine {
         $userID = $database->escapeString($user->getUserID());
         $statusID = $database->escapeString($toSupport->getID());
         $results = $database->getData("supporterID", "statusSupporter", "supporterID={$userID} AND statusID={$statusID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         if($results != null) {
@@ -406,11 +406,11 @@ class statusEngine {
             return false;
         }
         $result = $database->insertData("statusSupporter", "supporterID, statusID", "{$supporterID}, {$statusID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $result = $database->updateTable("status", "supporterCount=supporterCount+1", "statusID={$statusID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -421,11 +421,11 @@ class statusEngine {
             return false;
         }
         $result = $database->removeData("statusSupporter", "supporterID={$supporterID} AND statusID={$statusID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $result = $database->updateTable("status", "supporterCount=supporterCount-1", "statusID={$statusID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;

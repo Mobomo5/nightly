@@ -51,7 +51,7 @@ class login implements block {
             $content = '<div id="login-form-background">';
             $content .= '<h2>You\'re Locked Out</h2>';
             $lockout = $lockoutEngine->getLockout($_SERVER['REMOTE_ADDR']);
-            if($lockout == false) {
+            if($lockout === false) {
                 $content .= '</div>';
                 return $content;
             }

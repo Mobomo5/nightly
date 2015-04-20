@@ -29,23 +29,23 @@ class authenticateWithLDAP implements plugin{
             return;
         }
         $pluginEnabled = variableEngine::getInstance()->getVariable('ldapEnabled');
-        if($pluginEnabled == false) {
+        if($pluginEnabled === false) {
             return;
         }
-        if($pluginEnabled->getValue() == 'false') {
+        if($pluginEnabled->getValue() === 'false') {
             return;
         }
         $variableEngine = variableEngine::getInstance();
         $ldapServer = $variableEngine->getVariable('ldapServer');
-        if($ldapServer == false) {
+        if($ldapServer === false) {
             return;
         }
         $ldapDomain = $variableEngine->getVariable('ldapDomain');
-        if($ldapDomain == false) {
+        if($ldapDomain === false) {
             return;
         }
         $ldapIsActiveDirectory = $variableEngine->getVariable('ldapIsActiveDirectory');
-        if($ldapIsActiveDirectory == false) {
+        if($ldapIsActiveDirectory === false) {
             return;
         }
         $ldapConnection = ldap_connect($ldapServer->getValue());
@@ -57,16 +57,16 @@ class authenticateWithLDAP implements plugin{
         ldap_start_tls($ldapConnection);
         $userName = htmlspecialchars($_POST['username']);
         $password = htmlspecialchars($_POST['password']);
-        if($userName == null) {
+        if($userName === null) {
             return;
         }
-        if($userName == '') {
+        if($userName === '') {
             return;
         }
-        if($password == null) {
+        if($password === null) {
             return;
         }
-        if($password == '') {
+        if($password === '') {
             return;
         }
         $authenticated = ldap_bind($ldapConnection, $userName . '@' . $ldapDomain->getValue(), $password);
@@ -79,9 +79,9 @@ class authenticateWithLDAP implements plugin{
         $database = database::getInstance();
         $userName = $database->escapeString($userName);
         $haveSeenBefore = $database->getData('userID', 'activeDirectory', 'WHERE adUsername=\'' . $userName . '\'');
-        if($haveSeenBefore == null) {
+        if($haveSeenBefore === null) {
             $ou = $variableEngine->getVariable('ldapOrganizationUnit');
-            if($ou == false) {
+            if($ou === false) {
                 ldap_close($ldapConnection);
                 return;
             }
@@ -98,22 +98,22 @@ class authenticateWithLDAP implements plugin{
             }
             $info = ldap_get_entries($ldapConnection, $search);
             ldap_close($ldapConnection);
-            if($info['count'] != 1) {
+            if($info['count'] !== 1) {
                 return;
             }
             $function = new general('generateRandomString');
             $password = $function->run(array('length' => 50));
             $defaultRoleID = $variableEngine->getVariable('ldapDefaultRoleID');
-            if($defaultRoleID == false) {
+            if($defaultRoleID === false) {
                 return;
             }
             $defaultRoleID = $defaultRoleID->getValue();
             //No email found in ad
-            if($info[0]['count'] == 2) {
-                if($info[0]['sn']['count'] != 1) {
+            if($info[0]['count'] === 2) {
+                if($info[0]['sn']['count'] !== 1) {
                     return;
                 }
-                if($info[0]['givenname']['count'] != 1) {
+                if($info[0]['givenname']['count'] !== 1) {
                     return;
                 }
                 $firstName = $info[0]['givenname'][0];
@@ -125,19 +125,19 @@ class authenticateWithLDAP implements plugin{
                 return;
             }
             //3 = the number of fields requested.
-            if($info[0]['count'] != 3) {
+            if($info[0]['count'] !== 3) {
                 ldap_close($ldapConnection);
                 return;
             }
-            if($info[0]['sn']['count'] != 1) {
+            if($info[0]['sn']['count'] !== 1) {
                 ldap_close($ldapConnection);
                 return;
             }
-            if($info[0]['givenname']['count'] != 1) {
+            if($info[0]['givenname']['count'] !== 1) {
                 ldap_close($ldapConnection);
                 return;
             }
-            if($info[0]['mail']['count'] != 1) {
+            if($info[0]['mail']['count'] !== 1) {
                 ldap_close($ldapConnection);
                 return;
             }
@@ -155,28 +155,28 @@ class authenticateWithLDAP implements plugin{
     }
     //Had to make this due to permission check in the core.
     private static function addUser($firstName, $lastName, $adUsername, $password, $roleID, $email='not@entered.com') {
-        if($firstName == '') {
+        if($firstName === '') {
             return false;
         }
-        if($firstName == null) {
+        if($firstName === null) {
             return false;
         }
-        if($lastName == '') {
+        if($lastName === '') {
             return false;
         }
-        if($lastName == null) {
+        if($lastName === null) {
             return false;
         }
-        if($adUsername == '') {
+        if($adUsername === '') {
             return false;
         }
-        if($adUsername == null) {
+        if($adUsername === null) {
             return false;
         }
-        if($password == '') {
+        if($password === '') {
             return false;
         }
-        if($password == null) {
+        if($password === null) {
             return false;
         }
         if(! is_numeric($roleID)) {
@@ -205,7 +205,7 @@ class authenticateWithLDAP implements plugin{
         $database = database::getInstance();
         $database->connect();
         $userData = $database->getData('u.firstName, u.lastName, u.userID, u.roleID', 'users u, activeDirectory ad', 'WHERE u.userID = ad.userID AND ad.adUsername = \'' . $userName . '\'');
-        if($userData == null) {
+        if($userData === null) {
             return;
         }
         if(count($userData) > 1) {

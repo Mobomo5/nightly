@@ -13,7 +13,7 @@ class failedLoginRemovalOfLockout implements plugin{
     public static function run($inContent = '') {
         $lockoutEngine = lockoutEngine::getInstance();
         $lockout = $lockoutEngine->getLockout($_SERVER['REMOTE_ADDR']);
-        if($lockout == false) {
+        if($lockout === false) {
             return;
         }
         $lockoutEngine->removeLockout($lockout);

@@ -65,7 +65,7 @@ class statusRevision {
         if(! is_bool($inIsCurrent)) {
             return;
         }
-        if($inIsCurrent == false) {
+        if($inIsCurrent === false) {
             $this->isCurrent = false;
             return;
         }

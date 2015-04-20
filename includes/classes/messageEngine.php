@@ -31,21 +31,21 @@ class messageEngine {
             return false;
         }
         $results = $database->getData("messageID, trashed, isRead, statusID, senderID, nodeID", "message", "messageID = {$inID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) < 1) {
             return false;
         }
-        if((int)$results[0]['trashed'] == 1) {
+        if((int)$results[0]['trashed'] === 1) {
             $trashed = true;
         } else {
             $trashed = false;
         }
-        if((int)$results[0]['isRead'] == 1) {
+        if((int)$results[0]['isRead'] === 1) {
             $isRead = true;
         } else {
             $isRead = false;
@@ -83,13 +83,13 @@ class messageEngine {
         $nodeID = $database->escapeString($toAdd->getNodeID());
         $recipientID = $database->escapeString($recipientID);
         $result = $database->insertData("message", "trashed, isRead, statusID, senderID, nodeID", "{$isTrashed}, {$isRead}, {$statusID}, {$senderID}, {$nodeID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $messageID = $database->getLastInsertID();
         $messageID = $database->escapeString($messageID);
         $result = $database->insertData("messageRecipient", "messageID, recipientID", "{$messageID}, {$recipientID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -117,7 +117,7 @@ class messageEngine {
         $isTrashed = $database->escapeString($isTrashed);
         $messageID = $database->escapeString($toSave->getID());
         $result = $database->updateTable("message", "isRead={$isRead}, trashed={$isTrashed}", "messageID={$messageID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -133,20 +133,20 @@ class messageEngine {
         }
         $messageID = $database->escapeString($toDelete->getID());
         $result = $database->removeData("messageRecipient","messageID={$messageID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $statusEngine = statusEngine::getInstance();
         $status = $statusEngine->getStatus($toDelete->getStatusID());
-        if($status == false) {
+        if($status === false) {
             return false;
         }
         $result = $statusEngine->removeStatus($status);
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $result = $database->removeData("message", "messageID={$messageID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -161,10 +161,10 @@ class messageEngine {
             return false;
         }
         $results = $database->getData("messageID", "message", "trashed=0");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) < 1) {
@@ -172,7 +172,7 @@ class messageEngine {
         }
         foreach($results as $messageID) {
             $messageToRemove = $this->getMessage((int) $messageID);
-            if($messageToRemove == false) {
+            if($messageToRemove === false) {
                 continue;
             }
             $this->deleteMessage($messageToRemove);

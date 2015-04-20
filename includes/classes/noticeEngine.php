@@ -36,7 +36,7 @@ class noticeEngine {
         $numberOfNotices = count($this->notices);
         $newArray = array();
         for ($i = 0; $i < $numberOfNotices; $i++) {
-            if ($this->notices[$i] == null) {
+            if ($this->notices[$i] === null) {
                 continue;
             }
             if ($this->notices[$i]->removeOnceDisplayed()) {
@@ -49,7 +49,7 @@ class noticeEngine {
     }
     public function removeNotice(notice $toRemove) {
         $positionToRemove = $this->findNotice($toRemove);
-        if ($positionToRemove == -1) {
+        if ($positionToRemove === -1) {
             return;
         }
         $this->notices[$positionToRemove] = null;
@@ -58,7 +58,7 @@ class noticeEngine {
     private function findNotice(notice $toFind) {
         $numberOfNotices = count($this->notices);
         for ($i = 0; $i < $numberOfNotices; $i++) {
-            if ($this->notices[$i] == null) {
+            if ($this->notices[$i] === null) {
                 continue;
             }
             if ($this->notices[$i]->getMessage() != $toFind->getMessage()) {

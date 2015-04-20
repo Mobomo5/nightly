@@ -24,7 +24,7 @@ class link {
             return;
         }
         if (strlen($inHref) > 0) {
-            if ($inHref[0] == '/') {
+            if ($inHref[0] === '/') {
                 $inHref = substr($inHref, 1);
             }
         }
@@ -46,7 +46,7 @@ class link {
         if($this->physicalFile) {
             return EDUCASK_WEB_ROOT . '/' . $this->href;
         }
-        if ($this->cleanURLEnabled == false) {
+        if ($this->cleanURLEnabled === false) {
             return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
         }
         return EDUCASK_WEB_ROOT . '/' . $this->href;
@@ -73,10 +73,10 @@ class link {
         return $this->localLinkOnly;
     }
     public function isLocalLink() {
-        if (substr($this->href, 0, 4) == "http") {
+        if (substr($this->href, 0, 4) === "http") {
             return false;
         }
-        if (substr($this->href, 0, 2) == "//") {
+        if (substr($this->href, 0, 2) === "//") {
             return false;
         }
         return true;

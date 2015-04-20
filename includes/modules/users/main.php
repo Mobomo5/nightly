@@ -37,15 +37,15 @@ class users implements module {
             $this->force404 = true;
             return;
         }
-        if($this->params[1] == "login") {
+        if($this->params[1] === "login") {
             $this->loginContent();
             return;
         }
-        if($this->params[1] == "logout") {
+        if($this->params[1] === "logout") {
             $this->doLogOut();
             return;
         }
-        if($this->params[1] == "forgotPassword") {
+        if($this->params[1] === "forgotPassword") {
             $this->forgotPasswordContent();
             return;
         }
@@ -64,7 +64,7 @@ class users implements module {
         if($lockoutEngine->isLockedOut($_SERVER['REMOTE_ADDR'])) {
             $this->title .= 'You\'re Locked Out';
             $lockout = $lockoutEngine->getLockout($_SERVER['REMOTE_ADDR']);
-            if($lockout == false) {
+            if($lockout === false) {
                 return;
             }
             $totalLockoutLength = $lockout->getNumberOfFailedAttempts() * $lockoutEngine->getLockoutPeriod();
@@ -193,17 +193,17 @@ class users implements module {
     }
     private function doForgotPasswordByEmail($username) {
         $user = userEngine::getInstance()->getUserByEmail($username);
-        if($user == false) {
+        if($user === false) {
             $this->showSuccessMessageForForgotPassword();
             return;
         }
         $forgotPasswordEngine = forgotPasswordEngine::getInstance();
         $exists = $forgotPasswordEngine->getForgotPasswordByUserID($user->getUserID());
-        if($exists != false) {
+        if($exists !== false) {
             $forgotPasswordEngine->removeForgotPassword($exists);
         }
         $forgotPassword = $forgotPasswordEngine->generateNewForgotPassword($user->getUserID());
-        if($forgotPassword == false) {
+        if($forgotPassword === false) {
             $this->showErrorMessageForForgotPassword();
             return;
         }
@@ -217,7 +217,7 @@ class users implements module {
     }
 
     private function isPostRequest() {
-        if($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return false;
         }
         return true;

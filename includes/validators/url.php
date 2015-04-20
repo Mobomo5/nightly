@@ -14,27 +14,27 @@ class url implements subValidator {
             $options[$option] = $this->$option($inValue);
         }
         if (isset($options['noDirectories'])) {
-            if ($options['noDirectories'] == false) {
+            if ($options['noDirectories'] === false) {
                 return false;
             }
         }
         if (isset($options['httpOrHttpsOnly'])) {
-            if ($options['httpOrHttpsOnly'] == false) {
+            if ($options['httpOrHttpsOnly'] === false) {
                 return false;
             }
         }
         if (isset($options['httpOnly'])) {
-            if ($options['httpOnly'] == false) {
+            if ($options['httpOnly'] === false) {
                 return false;
             }
         }
         if (isset($options['httpsOnly'])) {
-            if ($options['httpsOnly'] == false) {
+            if ($options['httpsOnly'] === false) {
                 return false;
             }
         }
         if (isset($options['mightBeIP'])) {
-            if ($options['mightBeIP'] == true) {
+            if ($options['mightBeIP'] === true) {
                 return true;
             }
         }
@@ -63,7 +63,7 @@ class url implements subValidator {
         if (empty($parsed['scheme'])) {
             return false;
         }
-        if ($parsed['scheme'] != 'http' || $parsed['scheme'] != 'https') {
+        if ($parsed['scheme'] !== 'http' || $parsed['scheme'] !== 'https') {
             return false;
         }
         return true;
@@ -73,7 +73,7 @@ class url implements subValidator {
         if (empty($parsed['scheme'])) {
             return false;
         }
-        if ($parsed['scheme'] != 'http') {
+        if ($parsed['scheme'] !== 'http') {
             return false;
         }
         return true;
@@ -83,7 +83,7 @@ class url implements subValidator {
         if (empty($parsed['scheme'])) {
             return false;
         }
-        if ($parsed['scheme'] != 'https') {
+        if ($parsed['scheme'] !== 'https') {
             return false;
         }
         return true;

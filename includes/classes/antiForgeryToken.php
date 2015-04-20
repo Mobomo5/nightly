@@ -17,7 +17,7 @@ class antiForgeryToken {
         $this->knownToken = $general->run(array('randomLength' => true));
     }
     public function getHtmlElement() {
-        if($this->knownToken == null) {
+        if($this->knownToken === null) {
             return '';
         }
         $_SESSION['educaskCSRF'] = $this->knownToken;
@@ -31,7 +31,7 @@ class antiForgeryToken {
             return false;
         }
         $knownToken = $_SESSION['educaskCSRF'];
-        if($knownToken == null) {
+        if($knownToken === null) {
             return false;
         }
         $_SESSION['educaskCSRF'] = null;
@@ -39,7 +39,7 @@ class antiForgeryToken {
             return false;
         }
         $givenToken = $_POST['educaskCSRF'];
-        if($givenToken != $knownToken) {
+        if($givenToken !== $knownToken) {
             return false;
         }
         return true;

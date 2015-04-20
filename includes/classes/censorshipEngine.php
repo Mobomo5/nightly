@@ -33,7 +33,7 @@ class censorshipEngine {
                 break;
             }
             $repWord = $row['replacement'];
-            if ($row['replacement'] == null) {
+            if ($row['replacement'] === null) {
                 $repWord = "*" * strlen($row['word']);
             }
             $badWords[$row['word']] = $repWord;

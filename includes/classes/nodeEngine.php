@@ -44,10 +44,10 @@ class nodeEngine {
         }
         $fieldName = $database->escapeString(preg_replace('/\s+/', '', strip_tags($fieldName)));
         $results = $database->getData('*', 'nodeFieldType', "fieldName='{$fieldName}'");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
@@ -133,7 +133,7 @@ class nodeEngine {
         $sanitizerOptions = $database->escapeString(serialize($sanitizerOptions));
         $sanitizerParameterForData = $database->escapeString(preg_replace('/\s+/', '', strip_tags($toEdit->getSanitizerParameterForData())));
         $results = $database->updateTable('nodeFieldType', "validator='{$validator}', validatorOptions='{$validatorOptions}', sanitizer='{$sanitizer}', parameterForData='{$sanitizerParameterForData}', sanitizerOptions='{$sanitizerOptions}'", "fieldName='{$fieldName}' AND dataType='{$dataType}'");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -157,7 +157,7 @@ class nodeEngine {
             return false;
         }
         $results = $database->removeData('nodeFieldType', "fieldName='{$fieldName}'");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -175,10 +175,10 @@ class nodeEngine {
         }
         $revisionID = $database->escapeString($revisionID);
         $data = $database->getData('*', 'nodeFieldRevision', "revisionID={$revisionID}");
-        if($data == null) {
+        if($data === null) {
             return false;
         }
-        if($data == false) {
+        if($data === false) {
             return false;
         }
         if(count($data) > 1) {
@@ -187,10 +187,10 @@ class nodeEngine {
         $fieldRevisionData = $data[0];
         $date = new DateTime($fieldRevisionData['timePosted']);
         $nodeFieldType = $this->getNodeFieldType($fieldRevisionData['nodeFieldType']);
-        if($nodeFieldType == false) {
+        if($nodeFieldType === false) {
             return false;
         }
-        if($fieldRevisionData['isCurrent'] == 1) {
+        if($fieldRevisionData['isCurrent'] === 1) {
             $toReturn = new nodeFieldRevision($fieldRevisionData['revisionID'], $fieldRevisionData['content'], $date, $fieldRevisionData['authorID'], $fieldRevisionData['nodeID'], $nodeFieldType);
             $this->foundNodeFieldRevisions[$toReturn->getID()] = $toReturn;
             return $toReturn;
@@ -209,10 +209,10 @@ class nodeEngine {
         }
         $nodeID = $database->escapeString($nodeID);
         $rawData = $database->getData('*', 'nodeFieldRevision', "nodeID={$nodeID}");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         $toReturn = array();
@@ -223,10 +223,10 @@ class nodeEngine {
             }
             $date = new DateTime($rawDataForRevision['timePosted']);
             $nodeFieldType = $this->getNodeFieldType($rawDataForRevision['nodeFieldType']);
-            if($nodeFieldType == false) {
+            if($nodeFieldType === false) {
                 continue;
             }
-            if($rawDataForRevision['isCurrent'] == 1) {
+            if($rawDataForRevision['isCurrent'] === 1) {
                 $nodeField = new nodeFieldRevision($rawDataForRevision['revisionID'], $rawDataForRevision['content'], $date, $rawDataForRevision['authorID'], $rawDataForRevision['nodeID'], $nodeFieldType);
                 $this->foundNodeFieldRevisions[$nodeField->getID()] = $nodeField;
                 $toReturn[] = $nodeField;
@@ -252,10 +252,10 @@ class nodeEngine {
             }
             $nodeID = $database->escapeString($toAdd->getNodeID());
             $nodeData = $database->getData('authorID', 'node', "nodeID={$nodeID}");
-            if($nodeData == false) {
+            if($nodeData === false) {
                 return false;
             }
-            if($nodeData == null) {
+            if($nodeData === null) {
                 return false;
             }
             if(count($nodeData) > 1) {
@@ -276,7 +276,7 @@ class nodeEngine {
             $isCurrent = 0;
         }
         $result = $database->insertData('nodeFieldRevision', 'content, timePosted, authorID, nodeID, nodeFieldType, isCurrent', "'{$content}', '{$timePosted}', {$authorID}, {$nodeID}, '{$fieldType}', {$isCurrent}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -295,10 +295,10 @@ class nodeEngine {
             }
             $nodeID = $database->escapeString($toDelete->getNodeID());
             $nodeData = $database->getData('authorID', 'node', "nodeID={$nodeID}");
-            if($nodeData == false) {
+            if($nodeData === false) {
                 return false;
             }
-            if($nodeData == null) {
+            if($nodeData === null) {
                 return false;
             }
             if(count($nodeData) > 1) {
@@ -310,7 +310,7 @@ class nodeEngine {
         }
         $id = $database->escapeString($toDelete->getID());
         $result = $database->removeData('nodeFieldRevision', "revisionID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -329,10 +329,10 @@ class nodeEngine {
             }
             $nodeID = $database->escapeString($toEdit->getNodeID());
             $nodeData = $database->getData('authorID', 'node', "nodeID={$nodeID}");
-            if($nodeData == false) {
+            if($nodeData === false) {
                 return false;
             }
-            if($nodeData == null) {
+            if($nodeData === null) {
                 return false;
             }
             if(count($nodeData) > 1) {
@@ -372,10 +372,10 @@ class nodeEngine {
         }
         $nodeTypeID = $database->escapeString($nodeTypeID);
         $results = $database->getData('nt.nodeTypeID, nt.humanName, m.moduleName, nt.description', 'nodeType nt, module m', "nt.module=m.moduleID AND nt.nodeTypeID={$nodeTypeID}");
-        if($results == null) {
+        if($results === null) {
             return false;
         }
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         if(count($results) > 1) {
@@ -389,7 +389,7 @@ class nodeEngine {
         $nodeFieldTypes = array();
         foreach($nodeFieldTypesRawData as $nodeFieldTypeRawData) {
             $nodeFieldType = $this->getNodeFieldType($nodeFieldTypeRawData['fieldName']);
-            if($nodeFieldType == false) {
+            if($nodeFieldType === false) {
                 continue;
             }
             $nodeFieldTypes[] = $nodeFieldType;
@@ -420,7 +420,7 @@ class nodeEngine {
         }
         $moduleID = $moduleIDData[0]['moduleID'];
         $result = $database->updateTable('nodeType', "humanName='{$humanName}', module={$moduleID}, description='{$description}'", "nodeTypeID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -446,7 +446,7 @@ class nodeEngine {
         }
         $moduleID = $moduleIDData[0]['moduleID'];
         $result = $database->insertData('nodeType', 'humanName, module, description', "'{$humanName}', {$moduleID}, '{$description}'");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -471,7 +471,7 @@ class nodeEngine {
             return false;
         }
         $result = $database->removeData('nodeType', "nodeTypeID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -489,21 +489,21 @@ class nodeEngine {
         }
         $nodeFieldID = $database->escapeString($nodeFieldID);
         $rawData = $database->getData('*', 'nodeField', "id={$nodeFieldID}");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
             return false;
         }
         $nodeFieldType = $this->getNodeFieldType($rawData[0]['nodeFieldType']);
-        if($nodeFieldType == false) {
+        if($nodeFieldType === false) {
             return false;
         }
         $nodeType = $this->getNodeType($rawData[0]['nodeType']);
-        if($nodeType == false) {
+        if($nodeType === false) {
             return false;
         }
         $toReturn = new nodeField($rawData[0]['id'], $nodeFieldType, $nodeType, $rawData[0]['weight']);
@@ -534,7 +534,7 @@ class nodeEngine {
         }
         $weight = $database->escapeString($weight);
         $result = $database->insertData('nodeField', 'nodeFieldType, nodeType, weight', "'{$nodeFieldTypeID}', {$nodeTypeID}, {$weight}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -559,7 +559,7 @@ class nodeEngine {
         }
         $weight = $database->escapeString($weight);
         $result = $database->updateTable('nodeField', "weight={$weight}", "id={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -579,7 +579,7 @@ class nodeEngine {
         }
         $id = $database->escapeString($id);
         $result = $database->removeData('nodeField', "id={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -597,21 +597,21 @@ class nodeEngine {
         }
         $id = $database->escapeString($id);
         $rawData = $database->getData('*', 'node', "id={$id}");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
             return false;
         }
         $nodeType = $this->getNodeType($rawData[0]['nodeType']);
-        if($nodeType == false) {
+        if($nodeType === false) {
             return false;
         }
         $fieldRevisions = $this->getNodeFieldRevisionsForNode($id);
-        if($fieldRevisions == false) {
+        if($fieldRevisions === false) {
             return false;
         }
         $toReturn = new node($rawData[0]['nodeID'], $rawData[0]['title'], $rawData[0]['author'], $nodeType, $fieldRevisions);
@@ -631,7 +631,7 @@ class nodeEngine {
         $author = $database->escapeString($toAdd->getAuthorID());
         $nodeTypeID = $database->escapeString($toAdd->getNodeType()->getID());
         $result = $database->insertData('node', 'title, nodeType, authorID', "'{$title}', {$author}, {$nodeTypeID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $lastInsertID = $database->getLastInsertID();
@@ -640,7 +640,7 @@ class nodeEngine {
         foreach($fieldRevisions as $fieldRevision) {
             $fieldRevision->setNodeID($lastInsertID);
             $added = $this->addNodeFieldRevision($fieldRevision);
-            if($added == false) {
+            if($added === false) {
                 $this->removeBulkFieldRevisions($completed);
                 return false;
             }
@@ -668,7 +668,7 @@ class nodeEngine {
         $id = $database->escapeString($id);
         $title = $database->escapeString(strip_tags($toEdit->getTitle()));
         $result = $database->updateTable('node', "title='{$title}'", "nodeID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -692,34 +692,34 @@ class nodeEngine {
             return false;
         }
         $removedRevisions = $database->removeData('nodeFieldRevisions', "nodeID={$id}");
-        if($removedRevisions == false) {
+        if($removedRevisions === false) {
             return false;
         }
         $modifiedFiles = $database->updateTable('file', 'nodeID=0', "nodeID={$id}");
-        if($modifiedFiles == false) {
+        if($modifiedFiles === false) {
             return false;
         }
         $removedAssignmentMarked = $database->removeData('assignmentMark', "assignmentID={$id}");
-        if($removedAssignmentMarked == false) {
+        if($removedAssignmentMarked === false) {
             return false;
         }
         $removedGroupMembers = $database->removeData('groupMember', "nodeID={$id}");
-        if($removedGroupMembers == false) {
+        if($removedGroupMembers === false) {
             return false;
         }
         $removedMessages = $database->removeData('message m, messageRecipient mr', "mr.messageID = m.messageID AND m.nodeID={$id}");
-        if($removedMessages == false) {
+        if($removedMessages === false) {
             return false;
         }
         $statusesToRemove = $database->getData('statusID', 'status', "nodeID={$id}");
-        if($statusesToRemove == false) {
+        if($statusesToRemove === false) {
             return false;
         }
         foreach($statusesToRemove as $status) {
             //@ToDo: delete statuses on the node individually. Status System has to be rewritten first.
         }
         $nodeRemoved = $database->removeData('node', "nodeID={$id}");
-        if($nodeRemoved == false) {
+        if($nodeRemoved === false) {
             return false;
         }
         return true;

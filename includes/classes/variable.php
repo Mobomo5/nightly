@@ -34,7 +34,7 @@ class variable {
             return;
         }
         $inName = preg_replace('/\s+/', '', $inName);
-        if ($this->oldName == null) {
+        if ($this->oldName === null) {
             $this->oldName = $this->name;
         }
         $this->name = $inName;

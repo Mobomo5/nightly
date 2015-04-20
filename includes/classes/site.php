@@ -120,13 +120,13 @@ class site {
         self::setInstance($this);
     }
     public function getWebAddress($secure = false, $withBaseDirectory = false) {
-        if ($secure == true) {
-            if ($withBaseDirectory == true) {
+        if ($secure === true) {
+            if ($withBaseDirectory === true) {
                 return $this->urlSecure . $this->baseDirectory;
             }
             return $this->urlSecure;
         }
-        if ($withBaseDirectory == true) {
+        if ($withBaseDirectory === true) {
             return $this->url . $this->baseDirectory;
         }
         return $this->url;
@@ -195,7 +195,7 @@ class site {
         self::setInstance($this);
     }
     public function areCleanURLsEnabled() {
-        if($this->cleanURLs->getValue() == 'false') {
+        if($this->cleanURLs->getValue() === 'false') {
             return false;
         }
         return true;
@@ -204,7 +204,7 @@ class site {
         if (!is_bool($areEnabled)) {
             return false;
         }
-        if ($areEnabled == false) {
+        if ($areEnabled === false) {
             if (!$this->cleanURLs->setValue('false')) {
                 return false;
             }
@@ -251,7 +251,7 @@ class site {
         if (!is_bool($maintenanceMode)) {
             return false;
         }
-        if ($maintenanceMode == false) {
+        if ($maintenanceMode === false) {
             if (!$this->timeZone->setValue('false')) {
                 return false;
             }

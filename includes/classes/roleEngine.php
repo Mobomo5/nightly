@@ -92,7 +92,7 @@ class roleEngine {
         }
         $roleName = $db->escapeString($inRole->getName());
         $roleDesc = $db->escapeString($inRole->getDescription());
-        if ($roleDesc == '') {
+        if ($roleDesc === '') {
             $results = $db->insertData('role', 'roleName', '\'' . $roleName . '\'');
         } else {
             $results = $db->insertData('role', 'roleName, description', '\'' . $roleName . '\',\'' . $roleDesc . '\'');

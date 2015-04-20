@@ -38,7 +38,7 @@ class bootstrap {
         if(! isset($_SESSION['numberOfRequestsSinceLastRegenerate'])) {
             $_SESSION['numberOfRequestsSinceLastRegenerate'] = 0;
         }
-        if($_SESSION['numberOfRequestsSinceLastRegenerate'] == 10) {
+        if($_SESSION['numberOfRequestsSinceLastRegenerate'] === 10) {
             session_regenerate_id(true);
             $_SESSION['numberOfRequestsSinceLastRegenerate'] = 0;
         }
@@ -173,7 +173,7 @@ class bootstrap {
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
         $moduleInCharge = $moduleEngine->includeModule($moduleInCharge);
-        if ($moduleInCharge == false) {
+        if ($moduleInCharge === false) {
             $moduleInCharge = $moduleEngine->includeModule('fiveHundred');
         }
         $module = new $moduleInCharge();
@@ -235,13 +235,13 @@ class bootstrap {
     private function noGUIWork($module) {
         $link = $module->getReturnPage();
         //verify the variable given is a link object. If it is not, go to the home page.
-        if (get_class($link) == 'link') {
+        if (get_class($link) === 'link') {
             header('Location: ' . $link);
             exit();
         }
         $router = router::getInstance();
         $past = $router->getPreviousParameters();
-        if ($past == null) {
+        if ($past === null) {
             header('Location: ' . new link('home'));
             exit();
         }

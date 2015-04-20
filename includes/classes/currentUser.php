@@ -104,7 +104,7 @@ class currentUser extends user {
             $results = null;
         }
         //If there weren't any accounts found or too many accounts found
-        if ($results == null) {
+        if ($results === null) {
             $hookEngine->runAction('userFailedToLogIn');
             return false;
         }

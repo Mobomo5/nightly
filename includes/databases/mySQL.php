@@ -36,7 +36,7 @@ class mySQL implements databaseInterface {
         if (empty($this->mysqli)) {
             return false;
         }
-        if ($this->mysqli == '') {
+        if ($this->mysqli === '') {
             return false;
         }
         if (!is_object($this->mysqli)) {
@@ -57,7 +57,7 @@ class mySQL implements databaseInterface {
         if (empty($this->dbUsername) or empty($this->db) or empty($this->dbPassword) or empty($this->dbServer)) {
             return false;
         }
-        if ($this->dbUsername == '' or $this->db == '' or $this->dbPassword == '' or $this->dbServer == '') {
+        if ($this->dbUsername === '' or $this->db === '' or $this->dbPassword === '' or $this->dbServer === '') {
             return false;
         }
         $this->mysqli = $mysql = new mysqli($this->dbServer, $this->dbUsername, $this->dbPassword, $this->db);
@@ -92,7 +92,7 @@ class mySQL implements databaseInterface {
             return false;
         }
         $numRows = $results->num_rows;
-        if ($numRows == 0) {
+        if ($numRows === 0) {
             return null;
         }
         $resultsArray = $this->makeAssoc($results);
@@ -143,7 +143,10 @@ class mySQL implements databaseInterface {
     public function removeData($from, $where) {
         $query = 'DELETE FROM ' . $from . ' WHERE ' . $where . ';';
         $results = $this->mysqli->query($query);
-        return $results;
+        if(! $results) {
+            return false;
+        }
+        return true;
     }
     public function __wakeup() {
         $this->connect();

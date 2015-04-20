@@ -104,27 +104,27 @@ class mail {
         $siteEmail = SITE_EMAIL;
         $variableEngine = variableEngine::getInstance();
         $smtpServer = $variableEngine->getVariable('smtpServer');
-        if($smtpServer == false) {
+        if($smtpServer === false) {
             return false;
         }
         $smtpPort = $variableEngine->getVariable('smtpPort');
-        if($smtpPort == false) {
+        if($smtpPort === false) {
             return false;
         }
         $smtpUserName = $variableEngine->getVariable('smtpUserName');
-        if($smtpUserName == false) {
+        if($smtpUserName === false) {
             return false;
         }
         $smtpPassword = $variableEngine->getVariable('smtpPassword');
-        if($smtpPassword == false) {
+        if($smtpPassword === false) {
             return false;
         }
         $smtpUseEncryption = $variableEngine->getVariable('smtpUseEncryption');
-        if($smtpUseEncryption == false) {
+        if($smtpUseEncryption === false) {
             return false;
         }
         $smtpUseEncryption = $smtpUseEncryption->getValue();
-        if($smtpUseEncryption == 'false') {
+        if($smtpUseEncryption === 'false') {
             $encryption = "";
         } else {
             $encryption = "tls";
@@ -176,7 +176,7 @@ class mail {
         return $this->errors;
     }
     public function doReplacement($emailForReplacement) {
-        if ($this->replacements == null) {
+        if ($this->replacements === null) {
             return $this->body;
         }
         if (!filter_var($emailForReplacement, FILTER_VALIDATE_EMAIL)) {

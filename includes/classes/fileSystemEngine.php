@@ -34,10 +34,10 @@ class fileSystemEngine {
         }
         $inFileID = $database->escapeString($inFileID);
         $results = $database->getData("*", "file", "fileID = {$inFileID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
@@ -62,10 +62,10 @@ class fileSystemEngine {
         }
         $inUploaderID = $database->escapeString($inUploaderID);
         $results = $database->getData("*", "file", "uploader={$inUploaderID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         $toReturn = array();
@@ -98,10 +98,10 @@ class fileSystemEngine {
         }
         $inFolderID = $database->escapeString($inFolderID);
         $results = $database->getData('*', 'folder', "folderID={$inFolderID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
@@ -110,23 +110,23 @@ class fileSystemEngine {
         $timeCreated = new DateTime($results[0]['created']);
         $childItems = array();
         $childFolders = $database->getData('folderID', 'folder', "parentFolder={$inFolderID}");
-        if($childFolders == false) {
+        if($childFolders === false) {
             return false;
         }
         foreach($childFolders as $childFolder) {
             $child = $this->getFolder($childFolder['folderID']);
-            if($child == false) {
+            if($child === false) {
                 continue;
             }
             $childItems[] = $child;
         }
         $childFiles = $database->getData('fileID', 'file', "folderID={$inFolderID}");
-        if($childFiles == false) {
+        if($childFiles === false) {
             return false;
         }
         foreach($childFiles as $childFile) {
             $child = $this->getFile($childFile['fileID']);
-            if($child == false) {
+            if($child === false) {
                 continue;
             }
             $childItems[] = $child;
@@ -160,7 +160,7 @@ class fileSystemEngine {
         $uploader = $database->escapeString($toAdd->getUploaderID());
         $folder = $database->escapeString($toAdd->getFolderID());
         $result = $database->insertData('file', 'uploaded, title, mimeType, size, location, nodeID, uploader, folderID', "'{$dateUploaded}', '{$title}', '{$mimeType}', {$size}, '{$location}', {$nodeID}, {$uploader}, {$folder}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -179,7 +179,7 @@ class fileSystemEngine {
         $owner = $database->escapeString($toAdd->getOwnerID());
         $parent = $database->escapeString($toAdd->getParentFolderID());
         $result = $database->insertData('folder', 'title, created, ownerID, parentFolder', "'{$title}', '{$dateCreated}', {$owner}, {$parent}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -210,7 +210,7 @@ class fileSystemEngine {
         $uploader = $database->escapeString($toSave->getUploaderID());
         $folder = $database->escapeString($toSave->getFolderID());
         $result = $database->updateTable('file', "uploaded='{$dateUploaded}', title='{$title}', mimeType='{$mimeType}', size={$size}, location='{$location}', nodeID={$nodeID}, uploader={$uploader}, folderID={$folder}", "fileID='{$id}'");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -230,7 +230,7 @@ class fileSystemEngine {
         $owner = $database->escapeString($toSave->getOwnerID());
         $parent = $database->escapeString($toSave->getParentFolderID());
         $result = $database->updateTable('folder', "title='{$title}', created='{$dateCreated}', ownerID={$owner}, parentFolder={$parent}", "folderID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -246,11 +246,11 @@ class fileSystemEngine {
         }
         $id = $database->escapeString($toDelete->getID());
         $result = $database->removeData('fileSystemShare', "referenceID={$id} AND referenceType='file'");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $result = $database->removeData('file', "fileID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -268,7 +268,7 @@ class fileSystemEngine {
         $childFiles = $toDelete->getChildFiles();
         foreach($childFiles as $childFile) {
             $deleted = $this->deleteFile($childFile);
-            if($deleted == false) {
+            if($deleted === false) {
                 return false;
             }
         }
@@ -276,17 +276,17 @@ class fileSystemEngine {
         $childFolders = $toDelete->getChildFolders();
         foreach($childFolders as $childFolder) {
             $deleted = $this->deleteFolder($childFolder);
-            if($deleted == false) {
+            if($deleted === false) {
                 return false;
             }
         }
         unset($childFolders);
         $result = $database->removeData('fileSystemShare', "referenceID={$id} AND referenceType='folder'");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         $result = $database->removeData('folder', "folderID={$id}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -306,7 +306,7 @@ class fileSystemEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        if($shared == true) {
+        if($shared === true) {
             $insertShare = 1;
         } else {
             $insertShare = 0;
@@ -319,13 +319,13 @@ class fileSystemEngine {
             return $this->updateFileShare($fileID, $userIDToShareTo, $insertShare, $alreadyIn[0]['shared']);
         }
         $result = $database->insertData('fileSystemShare', 'referenceID, referenceType, shared, userID', "{$fileID}, 'file', {$insertShare}, {$userIDToShareTo}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
     }
     private function updateFileShare($fileID, $userID, $shared, $currentShared) {
-        if((int)$currentShared == (int)$shared) {
+        if((int)$currentShared === (int)$shared) {
             return true;
         }
         if(! is_numeric($fileID)) {
@@ -346,7 +346,7 @@ class fileSystemEngine {
             return false;
         }
         $result = $database->updateTable('fileSystemShare', "shared={$shared}", "referenceID={$fileID} AND referenceType='file' AND userID={$userID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -366,7 +366,7 @@ class fileSystemEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        if($shared == true) {
+        if($shared === true) {
             $insertShare = 1;
         } else {
             $insertShare = 0;
@@ -379,13 +379,13 @@ class fileSystemEngine {
             return $this->updateFolderShare($folderID, $userIDToShareTo, $insertShare, $alreadyIn[0]['shared']);
         }
         $result = $database->insertData('fileSystemShare', 'referenceID, referenceType, shared, userID', "{$folderID}, 'folder', {$insertShare}, {$userIDToShareTo}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
     }
     private function updateFolderShare($folderID, $userID, $shared, $currentShared) {
-        if((int)$currentShared == (int)$shared) {
+        if((int)$currentShared === (int)$shared) {
             return true;
         }
         if(! is_numeric($folderID)) {
@@ -406,7 +406,7 @@ class fileSystemEngine {
             return false;
         }
         $result = $database->updateTable('fileSystemShare', "shared={$shared}", "referenceID={$folderID} AND referenceType='folder' AND userID={$userID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return true;
@@ -421,17 +421,17 @@ class fileSystemEngine {
         }
         $id = $database->escapeString($toCheck->getID());
         $results = $database->getData('shared', 'fileSystemShare', "referenceID={$id} AND referenceType='file' AND userID={$userIDToCheck}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
             return false;
         }
         $shared = (int) $results[0]['shared'];
-        if($shared == 0) {
+        if($shared === 0) {
             return false;
         }
         return true;
@@ -446,17 +446,17 @@ class fileSystemEngine {
         }
         $id = $database->escapeString($toCheck->getID());
         $results = $database->getData('shared', 'fileSystemShare', "referenceID={$id} AND referenceType='folder' AND userID={$userIDToCheck}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if(count($results) > 1) {
             return false;
         }
         $shared = (int) $results[0]['shared'];
-        if($shared == 0) {
+        if($shared === 0) {
             return false;
         }
         return true;

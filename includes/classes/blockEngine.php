@@ -28,10 +28,10 @@ class blockEngine {
         // get all enabled blocks
         $results = $database->getData('b.blockID, m.moduleName, b.blockName, b.themeRegion, b.title', 'block b, module m', 'b.theme = \'' . $theme . '\' AND b.enabled = 1 AND m.moduleID = b.module ORDER BY weight');
         // if there are none available, return false.
-        if ($results == false) {
+        if ($results === false) {
             return null;
         }
-        if ($results == null) {
+        if ($results === null) {
             return null;
         }
         $blocks = array();
@@ -39,12 +39,12 @@ class blockEngine {
             if (!$this->blockVisible($blockData['blockID'], $pageType, $roleID)) {
                 continue;
             }
-            if ($blockData['blockName'] == 'page') {
+            if ($blockData['blockName'] === 'page') {
                 $blocks[$blockData['themeRegion']][] = $pageBlock;
                 continue;
             }
             $block = $this->getBlock($blockData['moduleName'], $blockData['blockName'], $blockData['blockID']);
-            if ($block == false) {
+            if ($block === false) {
                 continue;
             }
             if ($blockData['title'] != '') {
@@ -140,13 +140,13 @@ class blockEngine {
                 continue;
             }
             //If the first character is an !, then negate the operation.
-            if ($rule['referenceID'][0] == '!') {
+            if ($rule['referenceID'][0] === '!') {
                 $vote = $this->blockVisibleNegate($rule, $finalComparators);
-                if ($vote == -1) {
+                if ($vote === -1) {
                     $countOfDoNotDisplays += 1;
                     continue;
                 }
-                if ($vote == 1) {
+                if ($vote === 1) {
                     $countOfDoDisplays += 1;
                     continue;
                 }
@@ -156,7 +156,7 @@ class blockEngine {
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
-            if ($rule['visible'] == 0) {
+            if ($rule['visible'] === 0) {
                 $countOfDoNotDisplays += 1;
                 continue;
             }
@@ -174,10 +174,10 @@ class blockEngine {
             return 0;
         }
         //Negate means vote for anything that does not match. Move on if it matches; don't vote.
-        if ($finalComparators[$rule['referenceType']] == $rule['referenceID']) {
+        if ($finalComparators[$rule['referenceType']] === $rule['referenceID']) {
             return 0;
         }
-        if ($rule['visible'] == 0) {
+        if ($rule['visible'] === 0) {
             return -1;
         }
         return 1;
@@ -203,22 +203,22 @@ class blockEngine {
         $inBlockID = $database->escapeString($inBlockID);
         $whereClause = "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}";
         $exists = $database->getData('ruleID', 'blockVisibility', $whereClause);
-        if ($exists == false) {
+        if ($exists === false) {
             return false;
         }
         if ($exists != null) {
             return $this->insertNewVisibilityRule($inBlockID, $referenceID, $referenceType, $isVisible);
         }
-        if ($isVisible == true) {
+        if ($isVisible === true) {
             $visible = 1;
         } else {
             $visible = 0;
         }
         $success = $database->updateTable('blockVisibility', "visibile={$visible}", $whereClause);
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -242,16 +242,16 @@ class blockEngine {
         $referenceType = $database->escapeString($referenceType);
         $referenceID = $database->escapeString($referenceID);
         $inBlockID = $database->escapeString($inBlockID);
-        if ($isVisible == true) {
+        if ($isVisible === true) {
             $visible = 1;
         } else {
             $visible = 0;
         }
         $success = $database->insertData('blockVisibility', 'referenceID, referenceType, visible, blockID', "'{$referenceID}', '{$referenceType}', {$visible}, {$inBlockID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -273,10 +273,10 @@ class blockEngine {
         $referenceID = $database->escapeString($referenceID);
         $inBlockID = $database->escapeString($inBlockID);
         $success = $database->removeData('blockVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND blockID={$inBlockID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -294,7 +294,7 @@ class blockEngine {
         $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
         $theme = preg_replace('/\s+/', '', strip_tags($theme));
         $themeRegion = preg_replace('/\s+/', '', strip_tags($themeRegion));
-        if ($enabled == true) {
+        if ($enabled === true) {
             $isEnabled = 1;
         } else {
             $isEnabled = 0;
@@ -304,10 +304,10 @@ class blockEngine {
         $theme = $database->escapeString($theme);
         $themeRegion = $database->escapeString($themeRegion);
         $success = $database->insertData('block', 'blockName, theme, themeRegion, weight, enabled, module', "'{$blockName}', '{$theme}', '{$themeRegion}', {$weight}, {$isEnabled}, {$moduleInCharge}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -320,10 +320,10 @@ class blockEngine {
         $title = $database->escapeString(strip_tags($title));
         $blockID = $database->escapeString($blockID);
         $success = $database->updateTable('block', "title='{$title}'", "blockID={$blockID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -344,7 +344,7 @@ class blockEngine {
         $blockName = preg_replace('/\s+/', '', strip_tags($blockName));
         $theme = preg_replace('/\s+/', '', strip_tags($theme));
         $themeRegion = preg_replace('/\s+/', '', strip_tags($themeRegion));
-        if ($enabled == true) {
+        if ($enabled === true) {
             $isEnabled = 1;
         } else {
             $isEnabled = 0;
@@ -355,10 +355,10 @@ class blockEngine {
         $themeRegion = $database->escapeString($themeRegion);
         $blockID = $database->escapeString($blockID);
         $success = $database->updateTable('block', "blockName='{$blockName}', theme='{$theme}', themeRegion='{$themeRegion}', weight={$weight}, enabled={$enabled}, module={$moduleInCharge}", "blockID={$blockID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -370,10 +370,10 @@ class blockEngine {
         $database = database::getInstance();
         $blockID = $database->escapeString($blockID);
         $success = $database->removeData('block', "blockID={$blockID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -383,10 +383,10 @@ class blockEngine {
         $database = database::getInstance();
         $blockName = $database->escapeString($blockName);
         $data = $database->getData('*', 'block', "blockName='{$blockName}'");
-        if ($data == false) {
+        if ($data === false) {
             return false;
         }
-        if ($data == null) {
+        if ($data === null) {
             return false;
         }
         if (count($data) > 1) {
@@ -401,10 +401,10 @@ class blockEngine {
         $database = database::getInstance();
         $blockID = $database->escapeString($blockID);
         $data = $database->getData('*', 'block', "blockID={$blockID}");
-        if ($data == false) {
+        if ($data === false) {
             return false;
         }
-        if ($data == null) {
+        if ($data === null) {
             return false;
         }
         return $data;

@@ -29,10 +29,10 @@ class forgotPasswordEngine {
         }
         $id = $database->escapeString($id);
         $rawData = $database->getData('*', 'forgotPassword', "requestID={$id}");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
@@ -53,11 +53,12 @@ class forgotPasswordEngine {
         }
         $token = $cleanString->run(array('stringToClean' => $token));
         $id = $database->escapeString($token);
-        $rawData = $database->getData('*', 'forgotPassword', "token='{$id}''");
-        if($rawData == false) {
+        $rawData = $database->getData('*', 'forgotPassword', "token='{$id}'");
+        if($rawData === false) {
+            die();
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
@@ -76,10 +77,10 @@ class forgotPasswordEngine {
         }
         $userID = $database->escapeString($userID);
         $rawData = $database->getData('*', 'forgotPassword', "userID={$userID}");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
@@ -104,7 +105,7 @@ class forgotPasswordEngine {
         if($existingTokens === false) {
             return false;
         }
-        if($existingTokens == null) {
+        if($existingTokens === null) {
             $existingTokens = array();
         }
         do {
@@ -116,7 +117,7 @@ class forgotPasswordEngine {
         $date = $database->escapeString($date);
         $userID = $database->escapeString($userID);
         $result = $database->insertData('forgotPassword', 'token, requestDate, userID', "'{$token}', '{$date}', {$userID}");
-        if($result == false) {
+        if($result === false) {
             return false;
         }
         return $this->getForgotPasswordByToken($token);
@@ -138,8 +139,8 @@ class forgotPasswordEngine {
         }
         $token = $cleanString->run(array('stringToClean' => $token));
         $token = $database->escapeString($token);
-        $result = $database->removeData('forgotPassword', "id={$id} AND token='{$token}'");
-        if($result == false) {
+        $result = $database->removeData('forgotPassword', "requestID={$id} AND token='{$token}'");
+        if($result === false) {
             return false;
         }
         return true;

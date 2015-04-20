@@ -42,10 +42,10 @@ class menuEngine {
         $inMenuID = $database->escapeString($inMenuID);
         // get the menu specified
         $results = $database->getData("*", "menu", "menuID = {$inMenuID}");
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         if (count($results) > 1) {
@@ -65,7 +65,7 @@ class menuEngine {
                 continue;
             }
             $menuItem = $this->getMenuItem($itemID);
-            if($menuItem == false) {
+            if($menuItem === false) {
                 continue;
             }
             $menuItems[] = $menuItem;
@@ -92,10 +92,10 @@ class menuEngine {
         $inMenuItemID = $database->escapeString($inMenuItemID);
         // get all menu items for this menu
         $results = $database->getData("*", "menuItem", "menuItemID = {$inMenuItemID} ORDER BY weight");
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if ($results == null) {
+        if ($results === null) {
             return false;
         }
         if(count($results) > 1) {
@@ -104,11 +104,11 @@ class menuEngine {
         // are there children?
         $children = null;
         $hasChildren = null;
-        if ($results[0]['hasChildren'] == 1) {
+        if ($results[0]['hasChildren'] === 1) {
             $hasChildren = true;
             $children = $this->getMenuItemChildren($results[0]['menuItemID']);
         }
-        if ($children == false) {
+        if ($children === false) {
             $hasChildren = false;
             $children = array();
         }
@@ -134,10 +134,10 @@ class menuEngine {
         }
         $inID = $database->escapeString($inID);
         $results = $database->getData('*', 'menuItem', "parent = {$inID}");
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if($results == null) {
+        if($results === null) {
             return false;
         }
         foreach ($results as $row) {
@@ -163,13 +163,13 @@ class menuEngine {
         $menuName = $database->escapeString($inMenu->getName());
         $themeRegion = $database->escapeString($inMenu->getThemeRegion());
         $enabled = $inMenu->isEnabled();
-        if($enabled == true) {
+        if($enabled === true) {
             $enabled = 1;
         } else {
             $enabled = 0;
         }
         $results = $database->updateTable("menu", "menuName = '{$menuName}', themeRegion = '{$themeRegion}', enabled = {$enabled}", "menuID = {$menuID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -189,18 +189,18 @@ class menuEngine {
         $linkHref = $database->escapeString($inMenuItem->getHref()->getRawHref());
         $weight = $database->escapeString($inMenuItem->getWeight());
         $parent = $database->escapeString($inMenuItem->getParent());
-        if($inMenuItem->hasChildren() == true) {
+        if($inMenuItem->hasChildren() === true) {
             $hasChildren = 1;
         } else {
             $hasChildren = 0;
         }
-        if($inMenuItem->isEnabled() == true) {
+        if($inMenuItem->isEnabled() === true) {
             $enabled = 1;
         } else {
             $enabled = 0;
         }
         $results = $database->updateTable("menuItem", "menuID = {$menuID}, linkText = '{$linkText}', href = '{$linkHref}', weight = {$weight}, parent={$parent}, hasChildren = {$hasChildren}, enabled = {$enabled}", "menuItemID = {$menuItemID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -222,7 +222,7 @@ class menuEngine {
             $enabled = 0;
         }
         $results = $database->insertData("menu", "'menuName', 'themeRegion', 'enabled'", "'{$menuName}', '{$themeRegion}', {$enabled}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -252,7 +252,7 @@ class menuEngine {
             $enabled = 0;
         }
         $results = $database->insertData("menuItem", "menuID, linkText, href, weight, hasChildren, enabled, parent", "{$menuID}, '{$linkText}', '{$linkHref}', {$weight}, {$hasChildren}, {$enabled}, {$parent}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -271,7 +271,7 @@ class menuEngine {
         }
         $inMenuID = $database->escapeString($inMenuID);
         $results = $database->removeData("menu", "menuID = {$inMenuID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -290,7 +290,7 @@ class menuEngine {
         }
         $inMenuItemID = $database->escapeString($inMenuItemID);
         $results = $database->removeData("menuItem", "menuItemID = {$inMenuItemID}");
-        if($results == false) {
+        if($results === false) {
             return false;
         }
         return true;
@@ -342,13 +342,13 @@ class menuEngine {
                 continue;
             }
             //If the first character is an !, then negate the operation.
-            if ($rule['referenceID'][0] == '!') {
+            if ($rule['referenceID'][0] === '!') {
                 $vote = $this->menuItemVisibleNegate($rule, $finalComparators);
-                if ($vote == -1) {
+                if ($vote === -1) {
                     $countOfDoNotDisplays += 1;
                     continue;
                 }
-                if ($vote == 1) {
+                if ($vote === 1) {
                     $countOfDoDisplays += 1;
                     continue;
                 }
@@ -358,7 +358,7 @@ class menuEngine {
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
-            if ($rule['visible'] == 0) {
+            if ($rule['visible'] === 0) {
                 $countOfDoNotDisplays += 1;
                 continue;
             }
@@ -376,10 +376,10 @@ class menuEngine {
             return 0;
         }
         //Negate means vote for anything that does not match. Move on if it matches; don't vote.
-        if ($finalComparators[$rule['referenceType']] == $rule['referenceID']) {
+        if ($finalComparators[$rule['referenceType']] === $rule['referenceID']) {
             return 0;
         }
-        if ($rule['visible'] == 0) {
+        if ($rule['visible'] === 0) {
             return -1;
         }
         return 1;
@@ -405,22 +405,22 @@ class menuEngine {
         $inMenuItemID = $database->escapeString($inMenuItemID);
         $whereClause = "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND menuItemID={$inMenuItemID}";
         $exists = $database->getData('ruleID', 'menuItemVisibility', $whereClause);
-        if ($exists == false) {
+        if ($exists === false) {
             return false;
         }
         if ($exists != null) {
             return $this->insertNewVisibilityRule($inMenuItemID, $referenceID, $referenceType, $isVisible);
         }
-        if ($isVisible == true) {
+        if ($isVisible === true) {
             $visible = 1;
         } else {
             $visible = 0;
         }
         $success = $database->updateTable('menuItemVisibility', "visibile={$visible}", $whereClause);
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -444,16 +444,16 @@ class menuEngine {
         $referenceType = $database->escapeString($referenceType);
         $referenceID = $database->escapeString($referenceID);
         $inMenuItemID = $database->escapeString($inMenuItemID);
-        if ($isVisible == true) {
+        if ($isVisible === true) {
             $visible = 1;
         } else {
             $visible = 0;
         }
         $success = $database->insertData('menuItemVisibility', 'referenceID, referenceType, visible, menuItemID', "'{$referenceID}', '{$referenceType}', {$visible}, {$inMenuItemID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;
@@ -475,10 +475,10 @@ class menuEngine {
         $referenceID = $database->escapeString($referenceID);
         $inMenuItemID = $database->escapeString($inMenuItemID);
         $success = $database->removeData('menuItemVisibility', "referenceID='{$referenceID}' AND referenceType='{$referenceType}' AND menuItemID={$inMenuItemID}");
-        if ($success == false) {
+        if ($success === false) {
             return false;
         }
-        if ($success == null) {
+        if ($success === null) {
             return false;
         }
         return true;

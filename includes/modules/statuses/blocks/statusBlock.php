@@ -28,7 +28,7 @@ class statusBlock implements block {
         }
 
         // is it a user page?
-        if (strtolower($params[0]) == 'users') {
+        if (strtolower($params[0]) === 'users') {
 
             $statuses = statusEngine::getInstance()->retrieveStatusFromDatabaseByUser($params[1]);
         } else {

@@ -30,10 +30,10 @@ class mailTemplateEngine {
         }
         $inTemplateName = $database->escapeString(htmlspecialchars($inTemplateName));
         $results = $database->getData('*', 'mailTemplate', "name='{$inTemplateName}'");
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if ($results == null) {
+        if ($results === null) {
             return false;
         }
         if (count($results) > 1) {
@@ -45,10 +45,10 @@ class mailTemplateEngine {
     }
     public function loadTemplate($inTemplateName) {
         $template = $this->getTemplate($inTemplateName);
-        if ($template == null) {
+        if ($template === null) {
             return false;
         }
-        if ($template == false) {
+        if ($template === false) {
             return false;
         }
         return new mail($template->getSenderEmail(), $template->getSenderName(), array(), $template->getSubject(), $template->getBody(), false);

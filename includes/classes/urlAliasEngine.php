@@ -29,10 +29,10 @@ class urlAliasEngine {
         }
         $id = $database->escapeString($id);
         $rawData = $database->getData('*', 'urlAlias', "aliasID={$id}");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
@@ -47,10 +47,10 @@ class urlAliasEngine {
         }
         $alias = $database->escapeString(preg_replace('/\s+/', '', $alias));
         $rawData = $database->getData('*', 'urlAlias', "alias='{$alias}'");
-        if($rawData == false) {
+        if($rawData === false) {
             return false;
         }
-        if($rawData == null) {
+        if($rawData === null) {
             return false;
         }
         if(count($rawData) > 1) {
@@ -70,7 +70,7 @@ class urlAliasEngine {
         $source = $database->escapeString($toAdd->getSource());
         $alias = $database->escapeString($toAdd->getAlias());
         $added = $database->insertData('urlAlias', 'source, alias', "'{$source}', '{$alias}'");
-        if($added == false) {
+        if($added === false) {
             return false;
         }
         return true;
@@ -91,7 +91,7 @@ class urlAliasEngine {
         $source = $database->escapeString($toEdit->getSource());
         $alias = $database->escapeString($toEdit->getAlias());
         $edited = $database->updateTable('urlAlias', "source='{$source}', alias='{$alias}'", "aliasID={$id}");
-        if($edited == false) {
+        if($edited === false) {
             return false;
         }
         return true;
@@ -110,7 +110,7 @@ class urlAliasEngine {
             return false;
         }
         $deleted = $database->removeData('urlAlias', "aliasID={$id}");
-        if($deleted == false) {
+        if($deleted === false) {
             return false;
         }
         return true;

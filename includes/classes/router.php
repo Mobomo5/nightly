@@ -49,7 +49,7 @@ class router {
         $database = database::getInstance();
         $page = self::$currentURL;
         $results = $database->getData('source', 'urlAlias', 'alias=\'' . $database->escapeString($page) . '\'');
-        if ($results == null) {
+        if ($results === null) {
             $this->sourceURL = $page;
             return false;
         }
@@ -62,22 +62,22 @@ class router {
     }
     public function getDecodedParameters($asArray = false) {
         $this->determineAlias();
-        if ($asArray == true) {
+        if ($asArray === true) {
             return explode('/', $this->sourceURL);
         }
         return $this->sourceURL;
     }
     public function getParameters($asArray = false) {
-        if ($asArray == true) {
+        if ($asArray === true) {
             return explode('/', self::$currentURL);
         }
         return self::$currentURL;
     }
     public function getPreviousParameters($asArray = false) {
-        if (self::$previousURL == null) {
+        if (self::$previousURL === null) {
             return null;
         }
-        if ($asArray == true) {
+        if ($asArray === true) {
             return explode('/', self::$previousURL);
         }
         return self::$previousURL;

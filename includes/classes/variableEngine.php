@@ -20,10 +20,10 @@ class variableEngine {
         $this->foundVariables = array();
     }
     public function getVariable($variableName) {
-        if ($variableName == '') {
+        if ($variableName === '') {
             return false;
         }
-        if ($variableName == null) {
+        if ($variableName === null) {
             return false;
         }
         $variableName = preg_replace('/\s+/', '', $variableName);
@@ -36,16 +36,16 @@ class variableEngine {
         }
         $variableName = $database->escapeString(htmlspecialchars($variableName));
         $variableValue = $database->getData('variableValue, readOnly', 'variable', 'variableName=\'' . $variableName . '\'');
-        if ($variableValue == false) {
+        if ($variableValue === false) {
             return false;
         }
-        if($variableValue == null) {
+        if($variableValue === null) {
             return false;
         }
         if (count($variableValue) > 1) {
             return false;
         }
-        if ($variableValue[0]['readOnly'] == 1) {
+        if ($variableValue[0]['readOnly'] === 1) {
             $toReturn = new variable($variableName, $variableValue[0]['variableValue'], true);
             $this->foundVariables[$toReturn->getName()] = $toReturn;
             return $toReturn;
@@ -55,7 +55,7 @@ class variableEngine {
         return $toReturn;
     }
     public function getVariables(array $variables = array()) {
-        if (count($variables) == 0) {
+        if (count($variables) === 0) {
             return false;
         }
         $database = database::getInstance();
@@ -65,10 +65,10 @@ class variableEngine {
         $where = '';
         $toReturn = array();
         foreach ($variables as $variable) {
-            if ($variable == null) {
+            if ($variable === null) {
                 continue;
             }
-            if ($variable == '') {
+            if ($variable === '') {
                 continue;
             }
             $variable = preg_replace('/\s+/', '', $variable);
@@ -77,29 +77,29 @@ class variableEngine {
                 continue;
             }
             $variable = $database->escapeString(htmlspecialchars($variable));
-            if ($where == '') {
+            if ($where === '') {
                 $where .= 'variableName = \'' . $variable . '\'';
             }
             $where .= ' OR variableName = \'' . $variable . '\'';
         }
-        if ($where == '') {
+        if ($where === '') {
             if(count($toReturn) > 0) {
                 return $toReturn;
             }
             return false;
         }
         $results = $database->getData('variableName, variableValue, readOnly', 'variable', $where);
-        if ($results == false) {
+        if ($results === false) {
             return false;
         }
-        if ($results == null) {
+        if ($results === null) {
             return false;
         }
         foreach ($results as $result) {
             $variableName = $result['variableName'];
             $variableValue = $result['variableValue'];
             $readOnly = $result['readOnly'];
-            if ($readOnly == 1) {
+            if ($readOnly === 1) {
                 $variable = new variable($variableName, $variableValue, true);
                 $toReturn[$variableName] = $variable;
                 $this->foundVariables[$variableName] = $variable;
@@ -119,7 +119,7 @@ class variableEngine {
         $variableName = $database->escapeString(htmlspecialchars($variableToSave->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToSave->getValue()));
         $isReadOnly = $variableToSave->isReadOnly();
-        if ($isReadOnly == true) {
+        if ($isReadOnly === true) {
             $isReadOnly = 1;
         } else {
             $isReadOnly = 0;
@@ -143,7 +143,7 @@ class variableEngine {
         $variableName = $database->escapeString(htmlspecialchars($variableToAdd->getName()));
         $variableValue = $database->escapeString(htmlspecialchars($variableToAdd->getValue()));
         $isReadOnly = $variableToAdd->isReadOnly();
-        if ($isReadOnly == true) {
+        if ($isReadOnly === true) {
             $isReadOnly = 1;
         } else {
             $isReadOnly = 0;

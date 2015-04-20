@@ -90,7 +90,7 @@ class hookEngine {
             return;
         }
         //If the two plugins priority is the same, return 0;
-        if ($a::getPriority() == $b::getPriority()) {
+        if ($a::getPriority() === $b::getPriority()) {
             return 0;
         }
         //If the first plugin has a lesser priority, return -1
