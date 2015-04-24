@@ -57,6 +57,13 @@ class mailTemplate {
         $this->name = $inName;
     }
     public function getSubject() {
+        $altSubject = "An Email from Educask";
+        if(is_null($this->subject)) {
+            return $altSubject;
+        }
+        if($this->subject === "") {
+            return $altSubject;
+        }
         return $this->subject;
     }
     public function setSubject($inSubject) {
@@ -71,6 +78,13 @@ class mailTemplate {
         $this->body = $inBody;
     }
     public function getSenderEmail() {
+        $altEmail = SITE_EMAIL;
+        if(is_null($this->subject)) {
+            return $altEmail;
+        }
+        if($this->subject === "") {
+            return $altEmail;
+        }
         return $this->senderEmail;
     }
     public function setSenderEmail($inSenderEmail) {
@@ -80,6 +94,13 @@ class mailTemplate {
         $this->senderEmail = $inSenderEmail;
     }
     public function getSenderName() {
+        $altSender = "Educask";
+        if(is_null($this->senderName)) {
+            return $altSender;
+        }
+        if($this->senderName === "") {
+            return $altSender;
+        }
         return $this->senderName;
     }
     public function setSenderName($inSenderName) {

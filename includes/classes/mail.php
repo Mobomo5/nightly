@@ -15,7 +15,7 @@ class mail {
     private $subject;
     private $body;
     private $isBulkMail;
-    private $allowedTags = "<p><a><img><ul><li>";
+    private $allowedTags = "<p><a><img><ul><li><br>";
     private $replacements;
     private $errors;
     public function __construct($inSenderEmail = SITE_EMAIL, $inSenderName = SITE_TITLE, array $inRecipients = array(), $inSubject = 'Email', $inBody = '<p>This is an email.</p>', $isBulkMail = false) {
@@ -189,7 +189,7 @@ class mail {
         return $body;
     }
     public function addReplacementValue($replacementPattern, $email, $replacement) {
-        $firstChars = substr($replacementPattern, 0, 1);
+        $firstChars = substr($replacementPattern, 0, 2);
         if ($firstChars != '[[') {
             return;
         }

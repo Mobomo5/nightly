@@ -139,8 +139,15 @@ class lockoutEngine {
     public function getLockoutPeriod() {
         $variableEngine = variableEngine::getInstance();
         $lockoutPeriod = $variableEngine->getVariable('lockoutPeriod');
+        $default = 10;
         if($lockoutPeriod === null) {
-            return 10;
+            return $default;
+        }
+        if($lockoutPeriod === false) {
+            return $default;
+        }
+        if(! is_numeric($lockoutPeriod)) {
+            return false;
         }
         return intval($lockoutPeriod->getValue());
     }

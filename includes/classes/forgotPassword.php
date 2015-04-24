@@ -51,10 +51,10 @@ class forgotPassword {
             return false;
         }
         $inToken = $cleanString->run(array('stringToClean' => $inToken));
-        if($this->token != $inToken) {
+        if(strcasecmp($this->token, $inToken) !== 0) {
             return false;
         }
-        if($this->userID != $inUserID) {
+        if($this->userID !== $inUserID) {
             return false;
         }
         return true;

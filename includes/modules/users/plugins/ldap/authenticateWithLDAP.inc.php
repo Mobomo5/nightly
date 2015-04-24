@@ -10,8 +10,6 @@ require_once(HOOK_ENGINE_OBJECT_FILE);
 require_once(VARIABLE_ENGINE_OBJECT_FILE);
 require_once(VARIABLE_OBJECT_FILE);
 require_once(CURRENT_USER_OBJECT_FILE);
-require_once(VARIABLE_OBJECT_FILE);
-require_once(VARIABLE_ENGINE_OBJECT_FILE);
 require_once(DATABASE_OBJECT_FILE);
 require_once(GENERAL_ENGINE_OBJECT_FILE);
 require_once(USER_OBJECT_FILE);

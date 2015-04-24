@@ -88,6 +88,7 @@ input {
     box-sizing: border-box;
     border: 1px solid #ccc;
     transition: border-color 0.15s ease-in-out 0s, background-color 0.15s ease-in-out 0s;
+    outline: none;
 }
 input:hover, input:focus {
     border-color: #66afe9;

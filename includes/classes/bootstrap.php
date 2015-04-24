@@ -144,11 +144,8 @@ class bootstrap {
         foreach (glob(EDUCASK_ROOT . '/includes/modules/*/plugins/*/*.inc.php') as $toInclude) {
             require_once($toInclude);
             $pluginPath = explode('/', $toInclude);
-            //Get the name of the PHP file (the last element in the path array).
             $plugin = end($pluginPath);
-            //Remove the .inc.php to get the class name.
             $plugin = str_replace('.inc.php', '', $plugin);
-            //Initialize the plugin.
             $plugin::init();
         }
         $hookEngine = hookEngine::getInstance();

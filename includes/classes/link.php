@@ -12,8 +12,9 @@ class link {
     private $physicalFile;
     private $href;
     private $localLinkOnly;
+    private $fullLocalURL;
 
-    public function __construct($inHref, $isPhysicalFile = false, $forceCleanURLS = false, $localLinkOnly = false) {
+    public function __construct($inHref, $isPhysicalFile = false, $forceCleanURLS = false, $localLinkOnly = false, $fullLocalURL = false) {
         if(! is_bool($isPhysicalFile)) {
             return;
         }
@@ -21,6 +22,9 @@ class link {
             return;
         }
         if(! is_bool($localLinkOnly)) {
+            return;
+        }
+        if(! is_bool($fullLocalURL)) {
             return;
         }
         if (strlen($inHref) > 0) {
@@ -31,6 +35,7 @@ class link {
         $inHref = strip_tags($inHref);
         $this->href = $inHref;
         $this->physicalFile = $isPhysicalFile;
+        $this->fullLocalURL = $fullLocalURL;
         if ($forceCleanURLS) {
             $this->cleanURLEnabled = true;
             return;
@@ -42,6 +47,9 @@ class link {
     public function getHref() {
         if(! $this->isLocalLink()) {
             return $this->externalLink();
+        }
+        if($this->fullLocalURL) {
+            return $this->fullLocalURL();
         }
         if($this->physicalFile) {
             return EDUCASK_WEB_ROOT . '/' . $this->href;
@@ -56,6 +64,14 @@ class link {
             return EDUCASK_WEB_ROOT . '/home';
         }
         return $this->href;
+    }
+    private function fullLocalURL() {
+        $site = site::getInstance();
+        $base = $site->getWebAddress(true, true);
+        if ($this->cleanURLEnabled === false) {
+            return $base . '?p=' . $this->href;
+        }
+        return $base . $this->href;
     }
     public function getRawHref() {
         return $this->href;

@@ -8,6 +8,10 @@
 require_once(DATABASE_OBJECT_FILE);
 require_once(FORGOT_PASSWORD_OBJECT_FILE);
 require_once(GENERAL_ENGINE_OBJECT_FILE);
+require_once(HASHER_OBJECT_FILE);
+require_once(CURRENT_USER_OBJECT_FILE);
+require_once(VARIABLE_OBJECT_FILE);
+require_once(VARIABLE_ENGINE_OBJECT_FILE);
 class forgotPasswordEngine {
     private static $instance;
     public static function getInstance() {
@@ -53,9 +57,8 @@ class forgotPasswordEngine {
         }
         $token = $cleanString->run(array('stringToClean' => $token));
         $id = $database->escapeString($token);
-        $rawData = $database->getData('*', 'forgotPassword', "token='{$id}'");
+        $rawData = $database->getData('*', 'forgotPassword', "BINARY token='{$id}'");
         if($rawData === false) {
-            die();
             return false;
         }
         if($rawData === null) {
@@ -90,6 +93,9 @@ class forgotPasswordEngine {
         return new forgotPassword($rawData[0]['requestID'], $rawData[0]['token'], $date, $rawData[0]['userID']);
     }
     public function generateNewForgotPassword($userID) {
+        if(currentUser::getUserSession()->isLoggedIn()) {
+            return false;
+        }
         if(! is_numeric($userID)) {
             return false;
         }
@@ -144,5 +150,97 @@ class forgotPasswordEngine {
             return false;
         }
         return true;
+    }
+    public function removeExpiredTokens() {
+        $maxAge = $this->getForgotPasswordTimePeriod();
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $result = $database->removeData('forgotPassword', "requestDate < DATE_SUB(NOW(), INTERVAL {$maxAge} MINUTE)");
+        if(! $result) {
+            return false;
+        }
+        return true;
+    }
+    public function resetUsersPassword(forgotPassword $forgotPassword1, forgotPassword $forgotPassword2, $chosenPassword, $chosenPasswordConfirmation) {
+        if($chosenPassword !== $chosenPasswordConfirmation) {
+            return false;
+        }
+        if(strlen($chosenPassword) < $this->getMinimumPasswordLength()) {
+            return false;
+        }
+        $database = database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        if(!$forgotPassword1->verify($forgotPassword2->getToken(), $forgotPassword2->getUserID())) {
+            return false;
+        }
+        if(!$forgotPassword2->verify($forgotPassword1->getToken(), $forgotPassword1->getUserID())) {
+            return false;
+        }
+        $hasher = new hasher();
+        $newHash = $hasher->generateHash($chosenPassword);
+        $newHash = $database->escapeString($newHash);
+        $userID = $database->escapeString($forgotPassword1->getUserID());
+        $result = $database->updateTable('user', "password = '$newHash'", "userID = $userID");
+        if (!$result) {
+            return false;
+        }
+        return true;
+    }
+    public function forgotPasswordIsOfValidAge(forgotPassword $toCheck) {
+        $period = $this->getForgotPasswordTimePeriod();
+        $requestDate = clone $toCheck->getRequestDate();
+        $currentTime = new DateTime();
+        $validTill = $requestDate->add(DateInterval::createFromDateString($period . ' minutes'));
+        if($currentTime >= $validTill) {
+            return false;
+        }
+        return true;
+    }
+    public function getForgotPasswordTimePeriod() {
+        $variableEngine = variableEngine::getInstance();
+        $period = $variableEngine->getVariable('forgotPasswordPeriod');
+        $default = 10;
+        if($period === null) {
+            return $default;
+        }
+        if($period === false) {
+            return $default;
+        }
+        if(! is_numeric($period->getValue())) {
+            return $default;
+        }
+        return intval($period->getValue());
+    }
+    public function setForgotPasswordTimePeriod($inTime) {
+        if(! is_int($inTime)) {
+            return false;
+        }
+        $variableEngine = variableEngine::getInstance();
+        $period = $variableEngine->getVariable('forgotPasswordPeriod');
+        $period->setValue($inTime);
+        $success = $period->save();
+        if($success === false) {
+            return false;
+        }
+        return true;
+    }
+    public function getMinimumPasswordLength() {
+        $variableEngine = variableEngine::getInstance();
+        $minimumPasswordLength = $variableEngine->getVariable('minimumPasswordLength');
+        $default = 10;
+        if($minimumPasswordLength === null) {
+            return $default;
+        }
+        if($minimumPasswordLength === false) {
+            return $default;
+        }
+        if(! is_numeric($minimumPasswordLength->getValue())) {
+            return $default;
+        }
+        return intval($minimumPasswordLength->getValue());
     }
 } 

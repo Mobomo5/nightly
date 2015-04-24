@@ -171,10 +171,13 @@ class userEngine {
         if (!permissionEngine::getInstance()->currentUserCanDo('userCanUpdatePassword')) {
             return false;
         }
-        if (strlen($newPassword) < 6) {
+        if (strlen($newPassword) < $this->getMinimumPasswordLength()) {
             return false;
         }
         $userID = $inUser->getUserID();
+        if(! is_numeric($userID)) {
+            return false;
+        }
         $db = database::getInstance();
         if(! $db->isConnected()) {
             return false;
@@ -196,6 +199,7 @@ class userEngine {
             return false;
         }
         $newHashed = $hasher->generateHash($newPassword);
+        $newHashed = $db->escapeString($newHashed);
         $results = $db->updateTable('user', "password = '$newHashed'", "userID = $userID");
         if (!$results) {
             return false;
@@ -223,5 +227,20 @@ class userEngine {
             return 'No bio yet!';
         }
         return $results[0]['bio'];
+    }
+    public function getMinimumPasswordLength() {
+        $variableEngine = variableEngine::getInstance();
+        $minimumPasswordLength = $variableEngine->getVariable('minimumPasswordLength');
+        $default = 10;
+        if($minimumPasswordLength === null) {
+            return $default;
+        }
+        if($minimumPasswordLength === false) {
+            return $default;
+        }
+        if(! is_numeric($minimumPasswordLength->getValue())) {
+            return $default;
+        }
+        return intval($minimumPasswordLength->getValue());
     }
 } 

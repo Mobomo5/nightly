@@ -14,7 +14,10 @@ class generateRandomString implements generalFunction {
         }
         $length = $this->determineLength($inParams);
         $availableCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.';
-        $availableCharacters = str_shuffle($availableCharacters);
+        $timesToShuffle = 7;
+        for($i = 0; $i < $timesToShuffle; $i++) {
+            $availableCharacters = str_shuffle($availableCharacters);
+        }
         $randomString = '';
         $numberOfAvailableCharacters = strlen($availableCharacters) - 1;
         for ($i = 0; $i < $length; $i++) {
