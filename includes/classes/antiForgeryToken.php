@@ -42,6 +42,9 @@ class antiForgeryToken {
         if($givenToken !== $knownToken) {
             return false;
         }
+        if(strcasecmp($givenToken, $knownToken) !== 0) {
+            return false;
+        }
         return true;
     }
     public function __toString() {
