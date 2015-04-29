@@ -7,9 +7,6 @@
  */
 require_once(PLUGIN_INTERFACE_FILE);
 require_once(HOOK_ENGINE_OBJECT_FILE);
-require_once(VARIABLE_OBJECT_FILE);
-require_once(VARIABLE_ENGINE_OBJECT_FILE);
-require_once(DATABASE_OBJECT_FILE);
 require_once(FORGOT_PASSWORD_ENGINE_OBJECT_FILE);
 
 class clearOldForgotPasswords implements plugin{

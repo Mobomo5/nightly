@@ -261,7 +261,7 @@ class forgotPasswordForm {
             $this->showErrorMessageForForgotPasswordNonMatch($minimumPasswordLength);
             return;
         }
-        if(! $forgotPasswordEngine->resetUsersPassword($forgotPassword1, $forgotPassword2, $_POST['newPassword'], $_POST['confirmNewPassword'])) {
+        if(! $forgotPasswordEngine->resetUsersPassword($forgotPassword1->getToken(), $forgotPassword2->getUserID(), $_POST['newPassword'], $_POST['confirmNewPassword'])) {
             $this->showErrorMessageForForgotPasswordNonMatch($minimumPasswordLength);
             return;
         }

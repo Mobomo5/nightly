@@ -163,7 +163,7 @@ class forgotPasswordEngine {
         }
         return true;
     }
-    public function resetUsersPassword(forgotPassword $forgotPassword1, forgotPassword $forgotPassword2, $chosenPassword, $chosenPasswordConfirmation) {
+    public function resetUsersPassword($token, $userID, $chosenPassword, $chosenPasswordConfirmation) {
         if($chosenPassword !== $chosenPasswordConfirmation) {
             return false;
         }
@@ -172,6 +172,14 @@ class forgotPasswordEngine {
         }
         $database = database::getInstance();
         if(! $database->isConnected()) {
+            return false;
+        }
+        $forgotPassword1 = $this->getForgotPasswordByToken($token);
+        if($forgotPassword1 === false) {
+            return false;
+        }
+        $forgotPassword2 = $this->getForgotPasswordByUserID($userID);
+        if($forgotPassword2 === false) {
             return false;
         }
         if(!$forgotPassword1->verify($forgotPassword2->getToken(), $forgotPassword2->getUserID())) {
@@ -214,19 +222,6 @@ class forgotPasswordEngine {
             return $default;
         }
         return intval($period->getValue());
-    }
-    public function setForgotPasswordTimePeriod($inTime) {
-        if(! is_int($inTime)) {
-            return false;
-        }
-        $variableEngine = variableEngine::getInstance();
-        $period = $variableEngine->getVariable('forgotPasswordPeriod');
-        $period->setValue($inTime);
-        $success = $period->save();
-        if($success === false) {
-            return false;
-        }
-        return true;
     }
     public function getMinimumPasswordLength() {
         $variableEngine = variableEngine::getInstance();
