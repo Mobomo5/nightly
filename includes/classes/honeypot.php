@@ -30,7 +30,7 @@ class honeypot {
     public function getHtmlElement() {
         $_SESSION['educaskHoneypot'] = $this->pickedField->getPostName();
         $subElement = $this->pickedField->getHtmlElement();
-        return "<div class='hide'><p>If you see this, leave the field for the following question empty.</p>{$subElement}</div>";
+        return "<div class='educaskHP'><p>If you see this, leave the field for the following question empty.</p>{$subElement}</div>";
     }
     public static function validate() {
         if($_SERVER['REQUEST_METHOD'] != 'POST') {
