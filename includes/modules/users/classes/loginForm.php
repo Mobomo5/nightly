@@ -11,6 +11,7 @@ require_once(ANTI_FORGERY_TOKEN_OBJECT_FILE);
 require_once(LINK_OBJECT_FILE);
 require_once(LOCKOUT_ENGINE_OBJECT_FILE);
 require_once(LOCKOUT_OBJECT_FILE);
+require_once(HONEYPOT_OBJECT_FILE);
 class loginForm {
     private $title;
     private $content;
@@ -60,6 +61,8 @@ class loginForm {
         $toReturn = "<form action=\"{$postLink}\" method='POST' id=\"loginForm\">";
         $antiForgeryToken = new antiForgeryToken();
         $toReturn .= $antiForgeryToken->getHtmlElement();
+        $honeyPot = new honeypot();
+        $toReturn .= $honeyPot->getHtmlElement();
         $toReturn .= "<label for='username'>Username or email address:</label>";
         $toReturn .= "<input type='text' id='username' name='username' />";
         $toReturn .= "<label for='username'>Password:</label>";
@@ -90,8 +93,11 @@ class loginForm {
             $this->force404 = true;
             return;
         }
-        $antiForgery = new antiForgeryToken();
-        if(! $antiForgery->validate()) {
+        if(! antiForgeryToken::validate()) {
+            $this->force404 = true;
+            return;
+        }
+        if(! honeypot::validate()) {
             $this->force404 = true;
             return;
         }

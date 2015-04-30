@@ -15,15 +15,16 @@ class antiForgeryToken {
             return;
         }
         $this->knownToken = $general->run(array('randomLength' => true));
+        $_SESSION['educaskCSRF'] = null;
     }
     public function getHtmlElement() {
         if($this->knownToken === null) {
             return '';
         }
         $_SESSION['educaskCSRF'] = $this->knownToken;
-        return '<input type="hidden" value="' . $this->knownToken . '" id="educaskCSRF" name="educaskCSRF" />';
+        return "<input type='hidden' value='$this->knownToken' id='educaskCSRF' name='educaskCSRF' />";
     }
-    public function validate() {
+    public static function validate() {
         if($_SERVER['REQUEST_METHOD'] != 'POST') {
             return false;
         }

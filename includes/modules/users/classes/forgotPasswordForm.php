@@ -17,6 +17,7 @@ require_once(MAIL_TEMPLATE_OBJECT_FILE);
 require_once(MAIL_TEMPLATE_ENGINE_OBJECT_FILE);
 require_once(LOCKOUT_ENGINE_OBJECT_FILE);
 require_once(LOCKOUT_OBJECT_FILE);
+require_once(HONEYPOT_OBJECT_FILE);
 class forgotPasswordForm {
     private $title;
     private $content;
@@ -68,6 +69,8 @@ class forgotPasswordForm {
         $toReturn .= "<form action=\"{$postLink}\" method='POST' id=\"forgotPasswordForm\">";
         $antiForgeryToken = new antiForgeryToken();
         $toReturn .= $antiForgeryToken->getHtmlElement();
+        $honeypot = new honeypot();
+        $toReturn .= $honeypot->getHtmlElement();
         $toReturn .= "<label for='username'>Username or email address:</label>";
         $toReturn .= "<input type='text' id='username' name='username' />";
         $toReturn .= "<input type='submit' value='Request Password Reset Token' />";
@@ -80,8 +83,11 @@ class forgotPasswordForm {
         if(! $this->isPostRequest) {
             return;
         }
-        $antiForgery = new antiForgeryToken();
-        if(! $antiForgery->validate()) {
+        if(! antiForgeryToken::validate()) {
+            $this->force404 = true;
+            return;
+        }
+        if(! honeypot::validate()) {
             $this->force404 = true;
             return;
         }
@@ -170,6 +176,8 @@ class forgotPasswordForm {
         $toReturn .= "<form action=\"{$postLink}\" method='POST' id=\"forgotPasswordForm\">";
         $antiForgeryToken = new antiForgeryToken();
         $toReturn .= $antiForgeryToken->getHtmlElement();
+        $honeypot = new honeypot();
+        $toReturn .= $honeypot->getHtmlElement();
         $toReturn .= "<label for='email'>Email address:</label>";
         $toReturn .= "<input type='email' id='email' name='email' />";
         $toReturn .= "<label for='newPassword'>New password:</label>";
@@ -186,8 +194,11 @@ class forgotPasswordForm {
             $this->force404 = true;
             return;
         }
-        $antiForgery = new antiForgeryToken();
-        if(! $antiForgery->validate()) {
+        if(! antiForgeryToken::validate()) {
+            $this->force404 = true;
+            return;
+        }
+        if(! honeypot::validate()) {
             $this->force404 = true;
             return;
         }

@@ -75,6 +75,11 @@ header {
     border-right: 1px solid #35733D;
     border-bottom: 1px solid #35733D;
 }
+.hide {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
 form {
     width: 100%;
     box-sizing: border-box;

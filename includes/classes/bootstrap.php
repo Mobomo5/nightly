@@ -114,6 +114,7 @@ class bootstrap {
         define('MESSAGE_ENGINE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/messageEngine.php');
         define('MESSAGE_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/message.php');
         define('ANTI_FORGERY_TOKEN_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/antiForgeryToken.php');
+        define('HONEYPOT_OBJECT_FILE', EDUCASK_ROOT . '/includes/classes/honeypot.php');
     }
     private function doRequires() {
         require_once(EDUCASK_ROOT . '/thirdPartyLibraries/twig/lib/Twig/Autoloader.php');
