@@ -878,7 +878,7 @@ CREATE TABLE IF NOT EXISTS `mailTemplate` (
   `id` INT NOT NULL COMMENT 'The unique identifier for the row.',
   `name` VARCHAR(50) NOT NULL COMMENT 'The name for the template.',
   `subject` VARCHAR(50) NOT NULL COMMENT 'The subject for the email.',
-  `body` VARCHAR(50) NOT NULL COMMENT 'The body of the email.',
+  `body` VARCHAR(500) NOT NULL COMMENT 'The body of the email.',
   `senderEmail` VARCHAR(50) NOT NULL COMMENT 'The email that the template should email from.',
   `senderName` VARCHAR(50) NOT NULL COMMENT 'The name of the sender.',
   `modifier` INT NOT NULL COMMENT 'The id of the last user to modify the template.',

@@ -6,7 +6,7 @@
  * Date: 6/2/14
  * Time: 9:25 PM
  */
-class menuBlock implements block {
+class mainMenu implements block {
 
     private $content;
 
@@ -15,11 +15,11 @@ class menuBlock implements block {
     }
 
     public function getTitle() {
-        // TODO: Implement getTitle() method.
+        return "";
     }
 
     public function setTitle($inTitle) {
-        // TODO: Implement setTitle() method.
+        //Do nothing.
     }
 
     public function getContent() {

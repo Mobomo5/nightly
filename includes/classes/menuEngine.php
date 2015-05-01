@@ -102,9 +102,9 @@ class menuEngine {
             return false;
         }
         // are there children?
-        $children = null;
-        $hasChildren = null;
-        if ($results[0]['hasChildren'] === 1) {
+        $children = array();
+        $hasChildren = false;
+        if ((int)$results[0]['hasChildren'] === 1) {
             $hasChildren = true;
             $children = $this->getMenuItemChildren($results[0]['menuItemID']);
         }
@@ -118,7 +118,7 @@ class menuEngine {
             $results[0]['linkText'],
             new link($results[0]['href']),
             $results[0]['weight'],
-            $hasChildren, // !! as workaround for lack of boolval in php 5.3
+            $hasChildren,
             !!$results[0]['enabled'],
             $results[0]['parent'],
             $children);
@@ -309,11 +309,11 @@ class menuEngine {
         $menuItemID = $database->escapeString($menuItemID);
         // check to see if it's in the visibility table
         $results = $database->getData('*', 'menuItemVisibility', 'menuItemID = ' . $menuItemID);
-        //Default is to display the block unless specified.
+        //Default is to display the menu item unless specified.
         if ($results === null) {
             return true;
         }
-        //Query failed. Play it safe and don't display the block.
+        //Query failed. Play it safe and don't display the menu item.
         if ($results === false) {
             return false;
         }
@@ -358,7 +358,7 @@ class menuEngine {
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
-            if ($rule['visible'] === 0) {
+            if ((int)$rule['visible'] === 0) {
                 $countOfDoNotDisplays += 1;
                 continue;
             }
@@ -379,7 +379,7 @@ class menuEngine {
         if ($finalComparators[$rule['referenceType']] === $rule['referenceID']) {
             return 0;
         }
-        if ($rule['visible'] === 0) {
+        if ((int)$rule['visible'] === 0) {
             return -1;
         }
         return 1;

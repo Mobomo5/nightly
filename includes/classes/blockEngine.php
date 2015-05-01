@@ -47,7 +47,7 @@ class blockEngine {
             if ($block === false) {
                 continue;
             }
-            if ($blockData['title'] != '') {
+            if ($blockData['title'] !== '') {
                 $block->setTitle($blockData['title']);
             }
             $blocks[$blockData['themeRegion']][] = $block;
@@ -156,7 +156,7 @@ class blockEngine {
             if ($finalComparators[$rule['referenceType']] != $rule['referenceID']) {
                 continue;
             }
-            if ($rule['visible'] === 0) {
+            if ((int)$rule['visible'] === 0) {
                 $countOfDoNotDisplays += 1;
                 continue;
             }
@@ -177,7 +177,7 @@ class blockEngine {
         if ($finalComparators[$rule['referenceType']] === $rule['referenceID']) {
             return 0;
         }
-        if ($rule['visible'] === 0) {
+        if ((int)$rule['visible'] === 0) {
             return -1;
         }
         return 1;

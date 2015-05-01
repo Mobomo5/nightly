@@ -4,7 +4,11 @@
     <link rel="icon" href="{{ site.getBaseDirectory }}includes/images/educaskFavicon.ico">
 {% endblock %}
 {% block body %}
-    <header></header>
+    <header>
+        {% for block in blocks.mainMenu %}
+            {{ block.getContent() | raw }}
+        {% endfor %}
+    </header>
     <div id="headerGap"></div>
     <div id="contentWrapper">
         <section id="content">
