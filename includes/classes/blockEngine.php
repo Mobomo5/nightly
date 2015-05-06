@@ -174,7 +174,7 @@ class blockEngine {
             return 0;
         }
         //Negate means vote for anything that does not match. Move on if it matches; don't vote.
-        if ($finalComparators[$rule['referenceType']] === $rule['referenceID']) {
+        if ($finalComparators[$rule['referenceType']] == $rule['referenceID']) {
             return 0;
         }
         if ((int)$rule['visible'] === 0) {

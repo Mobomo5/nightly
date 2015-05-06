@@ -56,10 +56,11 @@ class menu {
         return $this->menuItems;
     }
     public function getHTML() {
-        $toReturn = '';
+        $toReturn = '<ul>';
         foreach ($this->menuItems as $child) {
             $toReturn .= '<li>' . $child->getHTML() . '</li>';
         }
+        $toReturn .= '</ul>';
         return $toReturn;
     }
     public function isEnabled() {
