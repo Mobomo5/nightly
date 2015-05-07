@@ -20,6 +20,7 @@ class site {
     private $cleanURLs;
     private $timeZone;
     private $maintenanceMode;
+    private $cronRunning;
     private $lastCronRun;
     private $cronFrequency;
     //@TODO: Add logo and favicon.
@@ -49,6 +50,7 @@ class site {
         $variablesWanted[] = 'cleanURLsEnabled';
         $variablesWanted[] = 'siteTimeZone';
         $variablesWanted[] = 'maintenanceMode';
+        $variablesWanted[] = 'cronRunning';
         $variablesWanted[] = 'cronFrequency';
         $variablesWanted[] = 'lastCronRun';
         $variables = $variableEngine->getVariables($variablesWanted);
@@ -63,6 +65,7 @@ class site {
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
         $this->maintenanceMode = $variables['maintenanceMode'];
+        $this->cronRunning = $variables['cronRunning'];
         $this->cronFrequency = $variables['cronFrequency'];
         $this->lastCronRun = $variables['lastCronRun'];
     }
@@ -270,6 +273,31 @@ class site {
         self::setInstance($this);
         return true;
     }
+    public function isCronRunning() {
+        if($this->cronRunning->getValue() == 'false') {
+            return false;
+        }
+        return true;
+    }
+    public function setCronRunning($isRunning = false) {
+        if(! is_bool($isRunning)) {
+            return false;
+        }
+        if($isRunning === false) {
+            $this->cronRunning->setValue('false');
+            if(! $this->cronRunning->save()) {
+                return false;
+            }
+            self::setInstance($this);
+            return true;
+        }
+        $this->cronRunning->setValue('true');
+        if(! $this->cronRunning->save()) {
+            return false;
+        }
+        self::setInstance($this);
+        return true;
+    }
     public function getCronFrequency() {
         return $this->cronFrequency;
     }
@@ -279,6 +307,7 @@ class site {
             return false;
         }
         self::setInstance($this);
+        return true;
     }
     public function getLastCronRun() {
         return DateTime::createFromFormat('Y-m-d H:i:s', $this->lastCronRun->getValue());
@@ -289,6 +318,7 @@ class site {
             return false;
         }
         self::setInstance($this);
+        return true;
     }
     public function doesCronNeedToRun() {
         $lastCronRun = $this->getLastCronRun();

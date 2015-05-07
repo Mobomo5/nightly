@@ -8,10 +8,21 @@
 
 require_once(MODULE_INTERFACE_FILE);
 require_once(ROUTER_OBJECT_FILE);
+require_once(LINK_OBJECT_FILE);
+require_once(CURRENT_USER_OBJECT_FILE);
 class home implements module {
-
+    private $title;
+    private $body;
     public function __construct() {
-        // TODO: Implement __construct() method.
+        $user = currentUser::getUserSession();
+        if(! $user->isLoggedIn()) {
+            $this->title = "Welcome";
+            $loginLink = new link("users/login");
+            $this->body = "<p>Welcome to Educask. You're not logged in - please <a href='{$loginLink}'>login</a>.</p>";
+            return;
+        }
+        $this->title = "Hi " . $user->getFirstName();
+        $this->body = "<p>You're logged in. Eventually your timeline will be located here.</p>";
     }
 
     public static function getPageType() {
@@ -19,18 +30,18 @@ class home implements module {
     }
 
     public function noGUI() {
-        // TODO: Implement noGUI() method.
+        return false;
     }
 
     public function getReturnPage() {
-        // TODO: Implement getReturnPage() method.
+        return new link('');
     }
 
     public function getPageContent() {
-        // TODO: Implement getPageContent() method.
+        return $this->body;
     }
     public function getTitle() {
-        return 'Home';
+        return $this->title;
     }
     public function forceFourOhFour() {
         $params = router::getInstance()->getParameters(true);

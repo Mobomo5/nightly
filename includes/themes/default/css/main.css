@@ -25,7 +25,6 @@ header {
 #sidebar {
     width: 20%;
     height: Calc(100% - 76px);
-    min-width: 150px;
     position: fixed;
     top: 76px;
     right: 0;

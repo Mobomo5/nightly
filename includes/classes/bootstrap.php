@@ -198,11 +198,16 @@ class bootstrap {
         if(! $this->site->doesCronNeedToRun()) {
             return;
         }
+        if($this->site->isCronRunning()) {
+            return;
+        }
+        $this->site->setCronRunning(true);
+        $this->site->setLastCronRun(new DateTime());
         $hookEngine = hookEngine::getInstance();
         $hookEngine->runAction('cronRun');
-        $this->site->setLastCronRun(new DateTime());
         $logger = logger::getInstance();
         $logger->logIt(new logEntry(1, logEntryType::info, "Cron ran.", 0, new DateTime()));
+        $this->site->setCronRunning(false);
     }
     private function render() {
         Twig_Autoloader::register();
