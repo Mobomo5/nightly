@@ -42,6 +42,7 @@ menu.mainMenu {
     position: absolute;
     top: 75px;
     left: 0;
+    z-index: 100;
 }
 .mainMenu ul > li:hover ul {
     display: block;
