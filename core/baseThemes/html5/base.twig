@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if title != "" %}{{ title }} | {% endif %}{{ site.getTitle }}</title>
+    <meta name="Generator" content="Educask version {{ site.getEducaskVersion }}">
+    <meta http-equiv="X-FRAME-OPTIONS" content="DENY">
+    <meta charset="UTF-8">
+    <script src="{{ site.getBaseDirectory }}thirdPartyLibraries/jQuery/jquery.js"></script>
+    <script src="{{ site.getBaseDirectory }}js/main.jquery.js"></script>
+
+    {{ site.getScriptLinks|raw }}
+    <script type="text/javascript">
+        {{ site.getScripts|raw }}
+    </script>
+
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+{% endblock %}
+</body>
+</html>

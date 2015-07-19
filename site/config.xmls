@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<educaskConfiguration>
+    <config appkey="sIYuIbhdvyt_sh65vdtTEG7dg">
+        <database server="localhost" name="educask" username="educask" password="RsdEv8NVY96ypABb" type="mySQL" />
+        <session provider="secureSession" />
+    </config>
+</educaskConfiguration>
