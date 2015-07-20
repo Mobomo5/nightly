@@ -39,13 +39,7 @@ class forgotPasswordForm implements IModule {
             $this->doForgotPassword();
             return;
         }
-        $model = array(
-            'formPostLink' => new Link("users/forgotPassword"),
-            'loginLink' => new Link("users/login"),
-            'csrfToken'=> AntiForgeryToken::getInstance(),
-            'honeypot' => Honeypot::getInstance()
-        );
-        $this->response = new Response(200, "@users/forgotPassword.twig", "Forgot Password", "users", $model);
+        $this->response = new Response(200, "@users/forgotPassword.twig", "Forgot Password", "users");
     }
     private function doForgotPassword() {
         if(! $this->request->isPostRequest()) {
@@ -135,13 +129,7 @@ class forgotPasswordForm implements IModule {
             $this->response = Response::fourOhFour();
             return;
         }
-        $model = array(
-            'postLink' => new Link('users/forgotPassword/' . $forgotPassword->getToken()),
-            'csrfToken' => AntiForgeryToken::getInstance(),
-            'honeypot' => Honeypot::getInstance(),
-            'token' => $forgotPassword->getToken()
-        );
-        $this->response = new Response(200, "@users/forgotPasswordResetPassword.twig", "Reset Password", "users", $model);
+        $this->response = new Response(200, "@users/forgotPasswordResetPassword.twig", "Reset Password", "users", $forgotPassword);
     }
     private function secondStepPost($inParam2) {
         if(!$this->request->isPostRequest()) {

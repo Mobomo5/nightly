@@ -14,7 +14,7 @@ class home implements IModule {
         }
         $user = CurrentUser::getUserSession();
         if(! $user->isLoggedIn()) {
-            $this->response = new Response(200, "@home/notLoggedIn.twig", "Welcome", "home", new Link('users/login'));
+            $this->response = new Response(200, "@home/notLoggedIn.twig", "Welcome", "home");
             return;
         }
         $this->response = new Response(200, "@home/main.twig", "Hi {$user->getFirstName()}", "home", $user);

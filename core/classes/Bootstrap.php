@@ -160,6 +160,7 @@ class Bootstrap {
         }
         $twig = new Twig_Environment($loader, array('debug' => true,));
         $twig->addExtension(new Twig_Extension_Debug());
+        $twig->addExtension(new TwigExtensions());
         if ($site->isInMaintenanceMode()) {
             if (!PermissionEngine::getInstance()->currentUserCanDo('bypasssMaintenanceMode')) {
                 echo $twig->render('maintenance.twig', array('site' => $site));
