@@ -24,7 +24,7 @@ class HookEngine {
         if (!is_object($plugin)) {
             return false;
         }
-        if (!in_array('plugin', class_implements($plugin))) {
+        if (!in_array('IPlugin', class_implements($plugin))) {
             return false;
         }
         $this->actionEvents[$inEventName][] = $plugin;
@@ -43,7 +43,7 @@ class HookEngine {
         if (!is_object($plugin)) {
             return false;
         }
-        if (!in_array('plugin', class_implements($plugin))) {
+        if (!in_array('IPlugin', class_implements($plugin))) {
             return false;
         }
         $this->filterEvents[$inEventName][] = $plugin;
@@ -80,13 +80,13 @@ class HookEngine {
         if (!is_object($a)) {
             return;
         }
-        if (!in_array('plugin', class_implements($a))) {
+        if (!in_array('IPlugin', class_implements($a))) {
             return;
         }
         if (!is_object($b)) {
             return;
         }
-        if (!in_array('plugin', class_implements($b))) {
+        if (!in_array('IPlugin', class_implements($b))) {
             return;
         }
         //If the two plugins priority is the same, return 0;

@@ -17,23 +17,19 @@ class users implements IModule {
             $this->response = Response::fourOhFour();
             return;
         }
-        if($params[1] === "login") {
-            require_once('classes/loginForm.php');
-            $this->subModule = new loginForm($params, $this->isPostRequest());
+        $className = str_replace('.', '', trim($params[1])) . 'Form';
+        $file = EDUCASK_ROOT . "/site/modules/users/classes/{$className}.php";
+        if(! is_readable($file)) {
+            $this->response = Response::fourOhFour();
             return;
         }
-        if($params[1] === "logout") {
-            require_once('classes/logoutForm.php');
-            $this->subModule = new logoutForm($params, $this->isPostRequest());
+        require_once($file);
+        if(! class_exists($className)) {
+            $this->response = Response::fiveHundred();
             return;
         }
-        if($params[1] === "forgotPassword") {
-            require_once('classes/forgotPasswordForm.php');
-            $subMod = new forgotPasswordForm($request);
-            $this->response = $subMod->getResponse();
-            return;
-        }
-        $this->response = Response::fourOhFour();
+        $subModule = new $className($request);
+        $this->response = $subModule->getResponse();
     }
     public function getResponse() {
         return $this->response;

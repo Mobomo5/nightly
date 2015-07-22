@@ -135,8 +135,8 @@ class LockoutEngine {
         if($lockoutPeriod === false) {
             return $default;
         }
-        if(! is_numeric($lockoutPeriod)) {
-            return false;
+        if(! is_numeric($lockoutPeriod->getValue())) {
+            return $default;
         }
         return intval($lockoutPeriod->getValue());
     }

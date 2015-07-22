@@ -5,80 +5,70 @@
  * Date: 21/04/2015
  * Time: 7:18 PM
  */
-require_once(USER_OBJECT_FILE);
-require_once(CURRENT_USER_OBJECT_FILE);
-require_once(ANTI_FORGERY_TOKEN_OBJECT_FILE);
-require_once(LINK_OBJECT_FILE);
-require_once(LOCKOUT_ENGINE_OBJECT_FILE);
-require_once(LOCKOUT_OBJECT_FILE);
-require_once(HONEYPOT_OBJECT_FILE);
-class loginForm {
-    private $title;
-    private $content;
-    private $force404;
-    private $redirectTo;
-    private $noGUI;
-    private $isPostRequest;
-    public function __construct(array $inParams, $isPostRequest = false) {
-        if(isset($inParams[2])) {
-            $this->force404= true;
+class loginForm implements IModule {
+    private $response;
+    public function __construct(Request $request) {
+        if(count($request->getParameters(true)) > 2) {
+            $this->response = Response::fourOhFour();
             return;
         }
-        if(! is_bool($isPostRequest)) {
-            $this->isPostRequest = false;
-            return;
-        }
-        $this->isPostRequest = $isPostRequest;
-        if($inParams[1] !== "login") {
-            $this->force404 = true;
-            return;
-        }
-        $this->loginContent();
-    }
-    private function loginContent() {
         if(currentUser::getUserSession()->isLoggedIn()) {
-            $this->force404 = true;
+            $this->response = Response::fourOhFour();
             return;
         }
-        $lockoutEngine = lockoutEngine::getInstance();
+        $lockoutEngine = LockoutEngine::getInstance();
         if($lockoutEngine->isLockedOut($_SERVER['REMOTE_ADDR'])) {
-            $this->lockoutContent();
+            $minutesLeft = $this->minutesLeftInLockout();
+            $this->response = new Response(403, "@users/lockedOut.twig", "Locked Out", "lockedOut", $minutesLeft);
             return;
         }
-        $this->title = 'Login';
-        if($this->isPostRequest) {
-            $this->doLogIn();
+        if($request->isPostRequest()) {
+            $this->response = $this->doLogIn();
             return;
         }
-        $this->content = $this->buildLoginForm();
+        $this->response = new Response(200, "@users/login.twig", "Login", "login");
     }
-    private function buildLoginForm() {
-        $url = "users/login";
-        if(isset($_GET['redirectTo'])) {
-            $url .= "?redirectTo=" . $_GET['redirectTo'];
+    private function doLogIn() {
+        if(! AntiForgeryToken::getInstance()->validate()) {
+            return Response::fiveHundred();
         }
-        $postLink = new link($url);
-        $toReturn = "<form action=\"{$postLink}\" method='POST' id=\"loginForm\">";
-        $antiForgeryToken = new antiForgeryToken();
-        $toReturn .= $antiForgeryToken->getHtmlElement();
-        $honeyPot = new honeypot();
-        $toReturn .= $honeyPot->getHtmlElement();
-        $toReturn .= "<label for='username'>Username or email address:</label>";
-        $toReturn .= "<input type='text' id='username' name='username' />";
-        $toReturn .= "<label for='username'>Password:</label>";
-        $toReturn .= "<input type='password' id='password' name='password' />";
-        $toReturn .= "<input type='submit' value='Login' />";
-        $toReturn .= '</form>';
-        $forgotPasswordLink = new link("users/forgotPassword");
-        $toReturn .= "<p>Forgot your password? Click <a href=\"{$forgotPasswordLink}\">here</a> to reset it.";
-        return $toReturn;
+        if(! Honeypot::getInstance()->validate()) {
+            return Response::fiveHundred();
+        }
+        $hookEngine = HookEngine::getInstance();
+        $hookEngine->runAction('userIsLoggingIn');
+        $user = CurrentUser::getUserSession();
+        if($user->isLoggedIn()) {
+            return Response::redirect(new Link(""));
+        }
+        $username = Request::getPostParameter("username");
+        $password = Request::getPostParameter("password");
+        if(! $username) {
+            return $this->showErrorMessage();
+        }
+        if(! $password) {
+            return $this->showErrorMessage();
+        }
+        $lockoutEngine = LockoutEngine::getInstance();
+        if($lockoutEngine->isLockedOut($_SERVER['REMOTE_ADDR'])) {
+            return Response::redirect(new Link("users/login"));
+        }
+        $logger = Logger::getInstance();
+        $username = preg_replace('/\s+/', '', strip_tags($username));
+        if (!$user->logIn($username, $password)) {
+            $logger->logIt(new LogEntry(0, logEntryType::warning, 'Someone failed to log into ' . $username . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()));
+            return $this->showErrorMessage();
+        }
+        $user = CurrentUser::getUserSession();
+        $logger->logIt( new LogEntry(0, logEntryType::info, 'A new session was opened for ' . $user->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $user->getUserID(), new DateTime()));
+        $hookEngine->runAction('userLoggedIn');
+        return Response::redirect(new Link(""));
     }
-    private function lockoutContent() {
-        $this->title .= 'You\'re Locked Out';
-        $lockoutEngine = lockoutEngine::getInstance();
+    private function minutesLeftInLockout() {
+        $lockoutEngine = LockoutEngine::getInstance();
         $lockout = $lockoutEngine->getLockout($_SERVER['REMOTE_ADDR']);
         if($lockout === false) {
-            return;
+            return $lockoutEngine->getLockoutPeriod();
         }
         $totalLockoutLength = $lockout->getNumberOfFailedAttempts() * $lockoutEngine->getLockoutPeriod();
         $lockoutStart = clone $lockout->lastUpdated();
@@ -86,60 +76,16 @@ class loginForm {
         $currentTime = new DateTime();
         $minutesLeft = $currentTime->diff($lockedOutUntil);
         $minutesLeft = ($minutesLeft->days * 24 * 60) + ($minutesLeft->h * 60) + $minutesLeft->i;
-        $this->content = "<p>Please wait {$minutesLeft} minutes before trying to log in again.</p>";
+        $minutesLeft += 1;
+        return $minutesLeft;
     }
-    private function doLogIn() {
-        if(! $this->isPostRequest) {
-            $this->force404 = true;
-            return;
-        }
-        if(! antiForgeryToken::validate()) {
-            $this->force404 = true;
-            return;
-        }
-        if(! honeypot::validate()) {
-            $this->force404 = true;
-            return;
-        }
-        if(! isset($_POST['username']) || ! isset($_POST['password'])) {
-            $this->force404 = true;
-            return;
-        }
-        $this->noGUI = true;
-        $lockoutEngine = lockoutEngine::getInstance();
-        if($lockoutEngine->isLockedOut($_SERVER['REMOTE_ADDR'])) {
-            $this->redirectTo = new link("users/login");
-            return;
-        }
-        $username = preg_replace('/\s+/', '', strip_tags($_POST['username']));
-        if (!currentUser::getUserSession()->logIn($username, $_POST['password'])) {
-            logger::getInstance()->getInstance()->logIt(new logEntry('1', logEntryType::warning, 'Someone failed to log into ' . $username . '\'s account from IP:' . $_SERVER['REMOTE_ADDR'], 0, new DateTime()), 0);
-            noticeEngine::getInstance()->addNotice(new notice(noticeType::warning, 'I couldn\'t log you in.'));
-            $this->redirectTo = new link('users/login');
-            return;
-        }
-        if(isset($_GET['redirectTo'])) {
-            $this->redirectTo = new link($_GET['redirectTo'],false, false, true);
-            return;
-        }
-        $this->redirectTo = new link('');
+    private function showErrorMessage() {
+        $hookEngine = HookEngine::getInstance();
+        $hookEngine->runAction('userFailedToLogIn');
+        NoticeEngine::getInstance()->addNotice(new Notice(noticeType::warning, 'I couldn\'t log you in.'));
+        return Response::redirect(new Link("users/login"));
     }
-    public function getTitle() {
-        return $this->title;
-    }
-    public function getContent() {
-        if($this->force404) {
-            return '';
-        }
-        return $this->content;
-    }
-    public function forceFourOhFour() {
-        return $this->force404;
-    }
-    public function getReturnPage() {
-        return $this->redirectTo;
-    }
-    public function noGUI() {
-        return $this->noGUI;
+    public function getResponse() {
+        return $this->response;
     }
 }

@@ -19,7 +19,6 @@ class CurrentUser extends User {
     }
     private static function destroySession() {
         unset($_SESSION['educaskCurrentUser']);
-        session_destroy();
     }
     public function __construct($inUserID = 0, $inUserRole = GUEST_ROLE_ID, $inGivenIdentifier = 'anonymous', $inUserName = 'anonymous', $inFirstName = 'Anonymous', $inLastName = 'Guest', $inEmail = 'anon@anon.ca', Link $inProfilePictureLocation = null, DateTime $inBirthday = null, $isLoggedIn = false) {
         if($inProfilePictureLocation === null) {
@@ -47,8 +46,6 @@ class CurrentUser extends User {
         if (LockoutEngine::getInstance()->isLockedOut($_SERVER['REMOTE_ADDR'])) {
             return false;
         }
-        $hookEngine = HookEngine::getInstance();
-        $hookEngine->runAction('userLoggingIn');
         //repeated twice just in case a plugin logs the user in
         if ($this->isLoggedIn) {
             return true;
@@ -69,34 +66,25 @@ class CurrentUser extends User {
         }
         //If there weren't any accounts found or too many accounts found
         if ($results === null) {
-            $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
         if (count($results) > 1) {
-            $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
         $dbPassword = $results[0]['password'];
         if (!Hasher::verifyHash($password, $dbPassword)) {
-            $hookEngine->runAction('userFailedToLogIn');
             return false;
         }
         self::setUserSession(new CurrentUser($results[0]['userID'], $results[0]['roleID'], $results[0]['givenIdentifier'], $results[0]['userName'], $results[0]['firstName'], $results[0]['lastName'], $results[0]['email'], new Link($results[0]['profilePictureLocation'], true), new DateTime($results[0]['birthday']), true));
         $this->isLoggedIn = true;
         $userID = $database->escapeString($this->getUserID());
         $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', "userID={$userID}");
-        $logEntry = new LogEntry(1, logEntryType::info, 'A new session was opened for ' . $this->getFullName() . ', who has an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $this->getUserID(), new DateTime());
-        Logger::getInstance()->logIt($logEntry);
-        $hookEngine->runAction('userLoggedIn');
         return true;
     }
     public function logOut() {
-        $hookEngine = HookEngine::getInstance();
-        $hookEngine->runAction('userIsLoggingOut');
         //Destroy the current user session and create a new user object.
         self::destroySession();
         self::setUserSession(new CurrentUser());
         $this->isLoggedIn = false;
-        $hookEngine->runAction('userLoggedOut');
     }
 }

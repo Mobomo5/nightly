@@ -42,6 +42,9 @@ class ObjectCache {
         $this->objects = array();
         $this->lastClear = time();
     }
+    public function getLastClearTime() {
+        return $this->lastClear;
+    }
     public function getObject($inObjectName) {
         if(! is_string($inObjectName)) {
             return false;

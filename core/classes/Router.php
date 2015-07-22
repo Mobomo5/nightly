@@ -90,9 +90,6 @@ class Router {
             }
             $module = $newModule;
         }
-        if (!ModuleEngine::getInstance()->moduleExists($module)) {
-            return 'fourOhFour';
-        }
         return $module;
     }
     public static function moveCurrentParametersToPrevious() {

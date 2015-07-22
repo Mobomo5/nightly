@@ -55,7 +55,8 @@ class forgotPasswordForm implements IModule {
         }
         $username = Request::getPostParameter('username');
         if(!$username) {
-            $this->response = Response::fiveHundred();
+            NoticeEngine::getInstance()->addNotice(new Notice(noticeType::warning, "All fields are required."));
+            $this->response = Response::redirect(new Link("users/forgotPassword"));
             return;
         }
         $this->response = Response::redirect(new Link("users/forgotPassword"));

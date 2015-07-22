@@ -8,7 +8,7 @@
 class home implements IModule {
     private $response;
     public function __construct(Request $request) {
-        if(false) {
+        if(count($request->getParameters(true)) > 1) {
             $this->response = Response::fourOhFour();
             return;
         }

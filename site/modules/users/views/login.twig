@@ -1,0 +1,10 @@
+<form action="{{ Href("users/login") }}" method='POST' id="loginForm">
+    {{ AntiForgeryToken() }}
+    {{ Honeypot() }}
+    <label for='username'>Username or email address:</label>
+    <input type='text' id='username' name='username' />
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password">
+    <input type='submit' value='Login' />
+</form>
+<p>Forgot your password? Click {{ Link("here to recover it", "users/forgotPassword") }}.</p>

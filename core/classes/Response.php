@@ -14,7 +14,8 @@ class Response {
     private $objectToPassToView;
     private $redirectTo;
     private $headers;
-    public function __construct($responseCode, $view, $pageTitle, $pageType, $objectToPassToView = null, Link $redirectTo = null) {
+    private $rawContent;
+    public function __construct($responseCode, $view, $pageTitle, $pageType, $objectToPassToView = null, Link $redirectTo = null, $rawContent = "") {
         $this->headers = array();
         if(! is_numeric($responseCode)) {
             return;
@@ -28,12 +29,16 @@ class Response {
         if(! is_string($pageType)) {
             return;
         }
+        if(! is_string($rawContent)) {
+            return;
+        }
         $this->responseCode = $responseCode;
         $this->view = $view;
         $this->pageTitle = $pageTitle;
         $this->pageType = $pageType;
         $this->objectToPassToView = $objectToPassToView;
         $this->redirectTo = $redirectTo;
+        $this->rawContent = $rawContent;
     }
     public function getResponseCode() {
         return $this->responseCode;
@@ -129,14 +134,26 @@ class Response {
     public function getHeaders() {
         return $this->headers;
     }
+    public function setRawContent($inRawContent) {
+        if(! is_string($inRawContent)) {
+            return;
+        }
+        $this->rawContent = $inRawContent;
+    }
+    public function getRawContent() {
+        return $this->rawContent;
+    }
+    public static function fourOhThree() {
+        return new Response(403, "@httpErrors/fourOhThree.twig", "403: Access Denied", "fourOhThree", Router::getInstance()->getParameters());
+    }
     public static function fourOhFour() {
-        return new Response(404, "@fourOhFour/main.twig", "404: Page not Found", "fourOhFour", Router::getInstance()->getParameters());
+        return new Response(404, "@httpErrors/fourOhFour.twig", "404: Page not Found", "fourOhFour", Router::getInstance()->getParameters());
     }
     public static function fiveHundred() {
-        return new Response(500, "@fiveHundred/main.twig", "500: Internal Server Error", "fiveHundred");
+        return new Response(500, "@httpErrors/fiveHundred.twig", "500: Internal Server Error", "fiveHundred");
     }
     public static function redirect(Link $to) {
         //Defaults to a 500 if the redirect didn't work.
-        return new Response(500, "fiveHundred/main.twig", "500: Internal Server Error", "internal", null, $to);
+        return new Response(500, "@httpErrors/fiveHundred.twig", "500: Internal Server Error", "fiveHundred", null, $to);
     }
 }

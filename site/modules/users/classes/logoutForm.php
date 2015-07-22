@@ -5,53 +5,27 @@
  * Date: 21/04/2015
  * Time: 7:18 PM
  */
-require_once(USER_OBJECT_FILE);
-require_once(CURRENT_USER_OBJECT_FILE);
-require_once(ANTI_FORGERY_TOKEN_OBJECT_FILE);
-require_once(LINK_OBJECT_FILE);
-class logoutForm {
-    private $force404;
-    private $redirectTo;
-    private $noGUI;
-    private $isPostRequest;
-    public function __construct(array $inParams, $isPostRequest = false) {
-        if(isset($inParams[2])) {
-            $this->force404= true;
+class logoutForm implements IModule {
+    private $response;
+    public function __construct(Request $request) {
+        if(count($request->getParameters(true)) > 2) {
+            $this->response = Response::fourOhFour();
             return;
         }
-        if(! is_bool($isPostRequest)) {
-            $this->isPostRequest = false;
+        $currentUser = CurrentUser::getUserSession();
+        if(! $currentUser->isLoggedIn()) {
+            $this->response = Response::fourOhFour();
             return;
         }
-        $this->isPostRequest = $isPostRequest;
-        if($inParams[1] !== "logout") {
-            $this->force404 = true;
-            return;
-        }
-        $this->doLogOut();
+        $hookEngine = HookEngine::getInstance();
+        $hookEngine->runAction('userIsLoggingOut');
+        $currentUser->logOut();
+        session_regenerate_id(true);
+        $hookEngine->runAction('userLoggedOut');
+        NoticeEngine::getInstance()->addNotice(new Notice("neutral", "You're now logged out."));
+        $this->response = Response::redirect(new Link(""));
     }
-    private function doLogOut() {
-        if(! currentUser::getUserSession()->isLoggedIn()) {
-            $this->force404 = true;
-            return;
-        }
-        $this->noGUI = true;
-        $this->redirectTo = new link('');
-        currentUser::getUserSession()->logOut();
-    }
-    public function getTitle() {
-        return 'Logout';
-    }
-    public function getContent() {
-        return '';
-    }
-    public function forceFourOhFour() {
-        return $this->force404;
-    }
-    public function getReturnPage() {
-        return $this->redirectTo;
-    }
-    public function noGUI() {
-        return $this->noGUI;
+    public function getResponse() {
+        return $this->response;
     }
 }

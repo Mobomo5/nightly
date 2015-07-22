@@ -86,8 +86,14 @@ class Request {
         }
         return true;
     }
-    public static function getParameters($asArray = false) {
+    public static function getParameters($asArray = false, $decoded = true) {
         $router = Router::getInstance();
+        if(! is_bool($decoded)) {
+            return $router->getDecodedParameters($asArray);
+        }
+        if($decoded) {
+            return $router->getDecodedParameters($asArray);
+        }
         return $router->getParameters($asArray);
     }
     public static function getPreviousParameters($asArray = false) {

@@ -86,24 +86,9 @@ class Bootstrap {
         $user = CurrentUser::getUserSession();
         $hookEngine = HookEngine::getInstance();
         $router = Router::getInstance();
-        $moduleEngine = ModuleEngine::getInstance();
         $hookEngine->runAction('addStaticRoutes');
         $moduleInCharge = $router->whichModuleHandlesRequest();
-        $moduleInCharge = $moduleEngine->includeModule($moduleInCharge);
-        if ($moduleInCharge === false) {
-            $moduleInCharge = $moduleEngine->includeModule('fourOhFour');
-        }
-        if($moduleInCharge === false) {
-            die("500: Internal Server Error");
-        }
-        $module = new $moduleInCharge(Request::getInstance());
-        $response = $module->getResponse();
-        if(! is_object($response)) {
-            $response = Response::fiveHundred();
-        }
-        if(get_class($response) !== "Response") {
-            $response = Response::fiveHundred();
-        }
+        $response = self::getResponse($moduleInCharge);
         http_response_code($response->getResponseCode());
         $headers = $response->getHeaders();
         foreach($headers as $header => $value) {
@@ -115,6 +100,22 @@ class Bootstrap {
             $blocks = array();
         }
         self::render($site, $response, $blocks);
+    }
+    private static function getResponse($moduleInCharge) {
+        $moduleEngine = ModuleEngine::getInstance();
+        $moduleInCharge = $moduleEngine->includeModule($moduleInCharge);
+        if ($moduleInCharge === false) {
+            return Response::fourOhFour();
+        }
+        $module = new $moduleInCharge(Request::getInstance());
+        $response = $module->getResponse();
+        if(! is_object($response)) {
+            return Response::fiveHundred();
+        }
+        if(get_class($response) !== "Response") {
+            return Response::fiveHundred();
+        }
+        return $response;
     }
     private static function cron() {
         $site = Site::getInstance();
@@ -137,6 +138,11 @@ class Bootstrap {
         if($redirectTo !== null) {
             header("Location: " . $redirectTo, true, 303);
             die();
+        }
+        $rawContent = $response->getRawContent();
+        if($rawContent !== "") {
+            echo $rawContent;
+            return;
         }
         require_once(EDUCASK_ROOT . "/core/thirdPartyLibraries/twig/lib/Twig/Autoloader.php");
         Twig_Autoloader::register();
