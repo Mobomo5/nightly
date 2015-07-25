@@ -31,6 +31,9 @@ class CurrentUser extends User {
         parent::__construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, $inProfilePictureLocation, $inBirthday);
     }
     public function isLoggedIn() {
+        if($this->getUserID() == 0) {
+            return false;
+        }
         return $this->isLoggedIn;
     }
     public function logIn($userName, $password) {

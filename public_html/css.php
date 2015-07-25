@@ -2,20 +2,11 @@
 /**
  * Created by PhpStorm.
  * User: Keegan Laur
- * Date: 16/06/2015
- * Time: 9:17 PM
+ * Date: 22/07/2015
+ * Time: 8:56 PM
  */
-class css implements IModule {
-    private $response;
-    public function __construct(Request $request) {
-        if(count($request->getParameters(true)) > 1) {
-            $this->response = Response::fourOhFour();
-            return;
-        }
-        if(Request::isPostRequest()) {
-            $this->response = Response::fiveHundred();
-            return;
-        }
+class CssBuilder {
+    public function __construct() {
         $response = Response::fiveHundred();
         $objectCache = ObjectCache::getInstance();
         $minifiedAlready = $objectCache->getObject('minifiedCSS');
@@ -102,3 +93,15 @@ class css implements IModule {
         return $this->response;
     }
 }
+define('EDUCASK_ROOT', dirname(getcwd()));
+require_once(EDUCASK_ROOT . '/core/classes/Bootstrap.php');
+Bootstrap::registerAutoloader();
+Bootstrap::initializePlugins();
+$cssBuilder = new CssBuilder();
+$response = $cssBuilder->getResponse();
+http_response_code($response->getResponseCode());
+$headers = $response->getHeaders();
+foreach($headers as $header => $value) {
+    header($header . ": " . $value, true);
+}
+echo $response->getRawContent();

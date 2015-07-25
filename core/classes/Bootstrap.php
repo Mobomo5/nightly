@@ -59,7 +59,7 @@ class Bootstrap {
             die('<html><head><title>:( Database is a no-go | Educask</title></head><body><h1>:( The database is a no-go.</h1><p>Sorry, but I had problems connecting to the database.</p></body></html>');
         }
     }
-    private static function initializePlugins() {
+    public static function initializePlugins() {
         foreach (glob(EDUCASK_ROOT . '/site/modules/*/plugins/*/*.inc.php') as $toInclude) {
             require_once($toInclude);
             $pluginPath = explode('/', $toInclude);
@@ -118,20 +118,13 @@ class Bootstrap {
         return $response;
     }
     private static function cron() {
-        $site = Site::getInstance();
-        if(! $site->doesCronNeedToRun()) {
+        $config = Config::getInstance();
+        if(! $config->cronIsEnabled()) {
             return;
         }
-        if($site->isCronRunning()) {
-            return;
-        }
-        $site->setCronRunning(true);
-        $site->setLastCronRun(new DateTime());
-        $hookEngine = HookEngine::getInstance();
-        $hookEngine->runAction('cronRun');
-        $logger = Logger::getInstance();
-        $logger->logIt(new LogEntry(1, logEntryType::info, "Cron ran.", 0, new DateTime()));
-        $site->setCronRunning(false);
+        require_once(EDUCASK_ROOT . "/public_html/cron.php");
+        $cron = new Cron(Config::getInstance()->getCronToken());
+        $cron->run();
     }
     private static function render(Site $site, Response $response, array $blocks) {
         $redirectTo = $response->getRedirectTo();

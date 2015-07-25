@@ -4,7 +4,7 @@ ob_start();
 session_start();
 define('CURRENTLY_INSTALLING', true);
 define('EDUCASK_ROOT', dirname(getcwd()));
-define('EDUCASK_VERSION', '3.0Alpha3.1');
+define('EDUCASK_VERSION', '3.0Alpha3.2');
 require_once(EDUCASK_ROOT . '/core/classes/Bootstrap.php');
 Bootstrap::registerAutoloader();
 function getErrorDiv() {
@@ -256,8 +256,14 @@ function doDatabaseContent() {
     $file = EDUCASK_ROOT . '/site/config.xml';
     $general = new generateRandomString(25);
     $appKey = $general->run();
+    $cronToken = $general->run();
     if($appKey === false) {
         $_SESSION['errors'][] = 'I couldn\'t generate an app key. Please try again by refreshing the page. If this problem persists, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: Make this link to actual help.
+        header('Location: install.php?action=database');
+        return;
+    }
+    if($cronToken === false) {
+        $_SESSION['errors'][] = 'I couldn\'t generate a cron token. Please try again by refreshing the page. If this problem persists, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: Make this link to actual help.
         header('Location: install.php?action=database');
         return;
     }
@@ -273,6 +279,9 @@ function doDatabaseContent() {
     $databaseTag->addAttribute("type", $engine);
     $sessionTag = $configTag->addChild("session");
     $sessionTag->addAttribute("provider", "secureSession");
+    $cronTag = $configTag->addChild("cron");
+    $cronTag->addAttribute("token", $cronToken);
+    $cronTag->addAttribute("enabled", "true");
     $dom = dom_import_simplexml($xml)->ownerDocument;
     $dom->formatOutput = TRUE;
     if (($dom->save($file)) === false) {
@@ -282,7 +291,7 @@ function doDatabaseContent() {
         return;
     }
     chmod($file, 440);
-    $database = IDatabase::getInstance();
+    $database = Database::getInstance();
     $database->connect();
     if (!$database->isConnected()) {
         unset($_SESSION['databaseComplete']);
@@ -517,11 +526,6 @@ function doConfigureContent() {
         header('Location: install.php?action=configure');
         return;
     }
-    if (!isset($_POST['smtpUseEncryption'])) {
-        unset($_SESSION['configureComplete']);
-        header('Location: install.php?action=configure');
-        return;
-    }
     $siteName = strip_tags(trim($_POST['siteName']));
     $siteEmail = strip_tags(trim($_POST['siteEmail']));
     $nonSecureURL = strip_tags(trim($_POST['nonSecureURL']));
@@ -536,8 +540,9 @@ function doConfigureContent() {
     $smtpServers = strip_tags(trim($_POST['smtpServer']));
     $smtpPort = intval($_POST['smtpPort']);
     $smtpUserName = strip_tags(trim($_POST['smtpUserName']));
-    $smtpPassword = strip_tags(trim($_POST['smtpPassword1']));
-    $smtpUseEncryption = strip_tags(trim($_POST['smtpUseEncryption']));
+    $enc = new Encrypter();
+    $smtpPassword = $enc->encrypt(trim($_POST['smtpPassword1']));
+    $smtpUseEncryption = isset($_POST['smtpUseEncryption']);
     $emailValidator = new emailValidator();
     if (!$emailValidator->validate($siteEmail)) {
         unset($_SESSION['configureComplete']);
@@ -590,7 +595,7 @@ function doConfigureContent() {
         header('Location: install.php?action=configure');
         return;
     }
-    $database = IDatabase::getInstance();
+    $database = Database::getInstance();
     $database->connect();
     if (!$database->isConnected()) {
         unset($_SESSION['configureComplete']);
@@ -629,6 +634,7 @@ function doConfigureContent() {
         'minimumPasswordLength' => '5',
         'lockoutPeriod'        => '10',
         'numberOfAttemptsBeforeLockout' => '3',
+        'maxSessionIdAge' => '600',
     );
     foreach ($variables as $name => $value) {
         $name = $database->escapeString($name);
@@ -666,13 +672,16 @@ function doConfigureContent() {
     $lastName = $database->escapeString($lastName);
     $email = $database->escapeString($email);
     $password = $database->escapeString($password);
-    $success = $database->insertData('user', 'userName, firstName, lastName, email, password, roleID', "'{$username}', '{$firstName}', '{$lastName}', '{$email}', '{$password}', 4");
+    $success = $database->insertData('user', 'userID, userName, firstName, lastName, email, password, roleID', "0, 'anonGuest', 'Anonymous', 'Guest', 'anon@anon.ca', '', 1");
+    $success = $success && $database->updateTable("user", "userID=0", "userID=1");
+    $success = $success && $database->insertData('user', 'userID, userName, firstName, lastName, email, password, roleID', "1, '{$username}', '{$firstName}', '{$lastName}', '{$email}', '{$password}', 4");
     if (!$success) {
         unset($_SESSION['configureComplete']);
         $_SESSION['errors'][] = 'I couldn\'t create the new user account. Please try again. For help on this, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: make the link point to actual help
         header('Location: install.php?action=configure');
         return;
     }
+    $database->makeCustomQuery("ALTER TABLE user AUTO_INCREMENT=2");
     header('Location: install.php?action=install');
 }
 
@@ -688,7 +697,7 @@ function installContent() {
     $_SESSION['moduleProgress'] = 0;
     $toReturn = '<h1>Installing Educask</h1>';
     $toReturn .= '<p>Please be patient while I install Educask.</p>';
-    $toReturn .= '<div id="progressBar"><div id="progress" style="width: 0%;"></div></div>';
+    $toReturn .= '<div id="progressBar"><div id="progress" style="width: 0;"></div></div>';
     $toReturn .= '<p id="currentStep">Installing...</p>';
     $toReturn .= '<p id="addLink"></p>';
     $toReturn .= "<script type=\"text/javascript\">
@@ -787,7 +796,7 @@ function finishContent() {
         return;
     }
     $toReturn = '<h1>All Done</h1>';
-    $toReturn .= '<p>Congratulations! Educask is now installed!</p><p>You should delete install.php, installModules.php, educaskInstallsafe.sql, and defaultRolesInstallSafe.sql.</p>';
+    $toReturn .= '<p>Congratulations! Educask is now installed!</p><p>You should delete public_html/install.php, public_html/installModules.php, core/sql/educaskInstallsafe.sql, and core/sql/defaultRolesInstallSafe.sql.</p>';
     $toReturn .= '<p><a class="button" href="index.php">Visit the Site</a></p>';
     session_destroy();
     return $toReturn;
@@ -989,6 +998,7 @@ function configFileTest() {
             return false;
         }
         file_put_contents($config, '');
+        return true;
     }
     $couldWrite = file_put_contents($config, 'Test Write');
     if (!$couldWrite) {
@@ -1044,7 +1054,7 @@ if (!validateAction()) {
     <html>
     <head>
         <title>Install | Educask Development Core</title>
-        <link rel="icon" type="image/png" href="images/favicon.png">
+        <link rel="icon" type="image/png" href="images/educaskFavicon.ico">
         <style type="text/css">
             body {
                 margin: 0;
@@ -1146,14 +1156,14 @@ if (!validateAction()) {
                 border: none;
                 font-size: 18px;
                 text-decoration: none;
-                text-shadow: 0px -1px 0px rgba(0, 0, 0, .5);
+                text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 -o-border-radius: 5px;
             }
 
             a.button:hover, a.button:active {
-                text-shadow: 0px -1px 0px rgba(0, 0, 0, .5);
+                text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
                 background: #166A8A;
                 color: #FFFFFF;
                 cursor: pointer;
@@ -1193,14 +1203,14 @@ if (!validateAction()) {
                 border: none;
                 font-size: 18px;
                 text-decoration: none;
-                text-shadow: 0px -1px 0px rgba(0, 0, 0, .5);
+                text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 -o-border-radius: 5px;
             }
 
             .formbutton:hover, .formbutton:focus {
-                text-shadow: 0px -1px 0px rgba(0, 0, 0, .5);
+                text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
                 background: #166A8A;
                 color: #FFFFFF;
                 cursor: pointer;
@@ -1263,8 +1273,6 @@ if (!validateAction()) {
                             src="images/github.png"/></a></li>
                 <li><a href="https://twitter.com/educask" target="_blank"><img
                             src="images/twitter.png"/></a></li>
-                <li><a href="https://plus.google.com/+Educask/posts" target="_blank"><img
-                            src="images/googleplus.png"/></a></li>
             </ul>
         </div>
     </div>

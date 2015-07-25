@@ -59,7 +59,7 @@ class forgotPasswordForm implements IModule {
             $this->response = Response::redirect(new Link("users/forgotPassword"));
             return;
         }
-        $this->response = Response::redirect(new Link("users/forgotPassword"));
+        $this->response = Response::redirect(new Link("users/forgotPassword/confirmation"));
         $username = preg_replace('/\s+/', '', strip_tags($_POST['username']));
         $validator = new emailValidator();
         if($validator->validate($username)) {
@@ -68,7 +68,6 @@ class forgotPasswordForm implements IModule {
         }
         $user = UserEngine::getInstance()->getUserByUsername($username);
         if($user === false) {
-            $this->showSuccessMessageForForgotPassword();
             return;
         }
         $this->addForgotPasswordToDatabase($user);
@@ -76,7 +75,6 @@ class forgotPasswordForm implements IModule {
     private function doForgotPasswordByEmail($username) {
         $user = UserEngine::getInstance()->getUserByEmail($username);
         if($user === false) {
-            $this->showSuccessMessageForForgotPassword();
             return;
         }
         $this->addForgotPasswordToDatabase($user);
@@ -86,7 +84,6 @@ class forgotPasswordForm implements IModule {
         $exists = $forgotPasswordEngine->getForgotPasswordByUserID($user->getUserID());
         if(is_object($exists)) {
             if($forgotPasswordEngine->forgotPasswordIsOfValidAge($exists)) {
-                $this->showSuccessMessageForForgotPassword();
                 return;
             }
             $forgotPasswordEngine->removeForgotPassword($exists);
@@ -111,9 +108,12 @@ class forgotPasswordForm implements IModule {
             $this->showErrorMessageForForgotPassword();
             return;
         }
-        $this->showSuccessMessageForForgotPassword();
     }
     private function secondStep($inParam2) {
+        if($inParam2 === "confirmation") {
+            $this->response = new Response(200, "@users/forgotPasswordConfirmation.twig", "Recover your Password", "users");
+            return;
+        }
         if($this->request->isPostRequest()) {
             $this->secondStepPost($inParam2);
             return;
@@ -233,9 +233,6 @@ class forgotPasswordForm implements IModule {
         $forgotPasswordEngine->removeForgotPassword($forgotPassword1);
         $this->showSuccessMessageForForgotPasswordChange();
         $this->response = Response::redirect(new Link("users/login"));
-    }
-    private function showSuccessMessageForForgotPassword() {
-        NoticeEngine::getInstance()->addNotice(new Notice(noticeType::success, "Please check your email to continue."));
     }
     private function showErrorMessageForForgotPassword() {
         NoticeEngine::getInstance()->addNotice(new Notice(noticeType::warning, "Sorry, something went wrong when I tried to generate a password reset token for you. If this keeps happening, please see an administrator."));

@@ -133,7 +133,8 @@ class Mail {
         $toSend->Host = $smtpServer->getValue();
         $toSend->SMTPAuth = true;
         $toSend->Username = $smtpUserName->getValue();
-        $toSend->Password = $smtpPassword->getValue();
+        $enc = new Encrypter();
+        $toSend->Password = $enc->decrypt($smtpPassword->getValue());
         $toSend->SMTPSecure = $encryption;
         $toSend->Port = intval($smtpPort->getValue());
         $toSend->From = $siteEmail;
