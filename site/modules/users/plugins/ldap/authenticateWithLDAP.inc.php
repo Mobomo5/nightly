@@ -9,7 +9,7 @@
 class authenticateWithLDAP implements IPlugin {
     public static function init() {
         $hookEngine = HookEngine::getInstance();
-        $hookEngine->addAction('userLoggingIn', new authenticateWithLDAP());
+        $hookEngine->addAction('userIsLoggingIn', new authenticateWithLDAP());
     }
     public static function run($inContent = '') {
         $user = currentUser::getUserSession();
@@ -32,11 +32,11 @@ class authenticateWithLDAP implements IPlugin {
         if($ldapDomain === false) {
             return;
         }
-        $ldapIsActiveDirectory = $variableEngine->getVariable('ldapIsActiveDirectory');
-        if($ldapIsActiveDirectory === false) {
+        $ldapPort = $variableEngine->getVariable('ldapServerPort');
+        if($ldapPort === false) {
             return;
         }
-        $ldapConnection = ldap_connect($ldapServer->getValue());
+        $ldapConnection = ldap_connect("ldap://{$ldapServer->getValue()}", (int) $ldapPort->getValue());
         if(! $ldapConnection) {
             return;
         }
@@ -63,28 +63,36 @@ class authenticateWithLDAP implements IPlugin {
             ldap_close($ldapConnection);
             return;
         }
-        $database = database::getInstance();
+        $database = Database::getInstance();
         $userName = $database->escapeString($userName);
-        $haveSeenBefore = $database->getData('userID', 'activeDirectory', 'WHERE adUsername=\'' . $userName . '\'');
+        $haveSeenBefore = $database->getData("userID", "user", "userName='{$userName}' AND isExternalAuthentication=1");
         if($haveSeenBefore === null) {
-            $ou = $variableEngine->getVariable('ldapOrganizationUnit');
-            if($ou === false) {
+            $memberGroup = $variableEngine->getVariable('ldapMemberGroup');
+            if($memberGroup === false) {
                 ldap_close($ldapConnection);
                 return;
             }
-            $dn = 'cn=' . $userName . ',ou=' . $ou->getValue();
+            $dn ="";
             $domain = explode('.', $ldapDomain->getValue());
-            $numberOfSubServers = count($domain);
-            for($i=0;$i<$numberOfSubServers;$i++) {
-                $dn .= ',dc=' . $domain[$i];
+            foreach($domain as $subDomain) {
+                if($dn==="") {
+                    $dn = "dc={$subDomain}";
+                    continue;
+                }
+                $dn .= ",dc={$subDomain}";
             }
-            $search = ldap_read($ldapConnection, $dn, '(objectclass=*)', array('sn', 'givenname', 'mail'));
+            $filter = "(&(objectclass=*)(cn={$userName})(memberOf=cn={$memberGroup->getValue()}))";
+            var_dump($dn);
+            var_dump($filter);
+            $search = ldap_read($ldapConnection, $dn, $filter, array('sn', 'givenname', 'mail'));
             if(! $search) {
                 ldap_close($ldapConnection);
                 return;
             }
             $info = ldap_get_entries($ldapConnection, $search);
             ldap_close($ldapConnection);
+            var_dump($info);
+            die();
             if($info['count'] !== 1) {
                 return;
             }

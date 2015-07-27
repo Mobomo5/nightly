@@ -27,6 +27,8 @@ class Cron {
             return;
         }
         Bootstrap::initializePlugins();
+        $site = Site::getInstance();
+        date_default_timezone_set($site->getTimeZone());
         $cron = new Cron($_GET['cronTok']);
         $cron->run();
     }

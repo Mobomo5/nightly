@@ -49,10 +49,6 @@ class CurrentUser extends User {
         if (LockoutEngine::getInstance()->isLockedOut($_SERVER['REMOTE_ADDR'])) {
             return false;
         }
-        //repeated twice just in case a plugin logs the user in
-        if ($this->isLoggedIn) {
-            return true;
-        }
         $database = Database::getInstance();
         $database->connect();
         if (!$database->isConnected()) {
@@ -61,7 +57,7 @@ class CurrentUser extends User {
         $userName = $database->escapeString(trim($userName));
         $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email, profilePictureLocation, birthday';
         $table = 'user';
-        $where = '((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
+        $where = 'active=1 AND isExternalAuthentication=0 AND ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
         if ($database->isConnected()) {
             $results = $database->getData($column, $table, $where);
         } else {
