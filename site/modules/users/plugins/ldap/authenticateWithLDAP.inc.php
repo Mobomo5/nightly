@@ -43,7 +43,9 @@ class authenticateWithLDAP implements IPlugin {
         ldap_set_option($ldapConnection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($ldapConnection, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_start_tls($ldapConnection);
-        $userName = htmlspecialchars($_POST['username']);
+        $userName = htmlspecialchars(str_replace('@', '', $_POST['username']));
+        $userName = str_replace("(", "", $userName);
+        $userName = str_replace(")", "", $userName);
         $password = htmlspecialchars($_POST['password']);
         if($userName === null) {
             return;
@@ -66,86 +68,85 @@ class authenticateWithLDAP implements IPlugin {
         $database = Database::getInstance();
         $userName = $database->escapeString($userName);
         $haveSeenBefore = $database->getData("userID", "user", "userName='{$userName}' AND isExternalAuthentication=1");
-        if($haveSeenBefore === null) {
-            $memberGroup = $variableEngine->getVariable('ldapMemberGroup');
-            if($memberGroup === false) {
-                ldap_close($ldapConnection);
-                return;
-            }
-            $dn ="";
-            $domain = explode('.', $ldapDomain->getValue());
-            foreach($domain as $subDomain) {
-                if($dn==="") {
-                    $dn = "dc={$subDomain}";
-                    continue;
-                }
-                $dn .= ",dc={$subDomain}";
-            }
-            $filter = "(&(objectclass=*)(cn={$userName})(memberOf=cn={$memberGroup->getValue()}))";
-            var_dump($dn);
-            var_dump($filter);
-            $search = ldap_read($ldapConnection, $dn, $filter, array('sn', 'givenname', 'mail'));
-            if(! $search) {
-                ldap_close($ldapConnection);
-                return;
-            }
-            $info = ldap_get_entries($ldapConnection, $search);
+        if(is_array($haveSeenBefore)) {
             ldap_close($ldapConnection);
-            var_dump($info);
-            die();
-            if($info['count'] !== 1) {
-                return;
+            self::logIn($userName);
+            return;
+        }
+        $ldapMemberGroup = $variableEngine->getVariable('ldapMemberGroup');
+        if($ldapMemberGroup === false) {
+            ldap_close($ldapConnection);
+            return;
+        }
+        $dn="";
+        $domain = explode('.', $ldapDomain->getValue());
+        foreach($domain as $subDomain) {
+            if($dn === "") {
+                $dn = "dc={$subDomain}";
+                continue;
             }
-            $function = new general('generateRandomString');
-            $password = $function->run(array('length' => 50));
-            $defaultRoleID = $variableEngine->getVariable('ldapDefaultRoleID');
-            if($defaultRoleID === false) {
-                return;
-            }
-            $defaultRoleID = $defaultRoleID->getValue();
-            //No email found in ad
-            if($info[0]['count'] === 2) {
-                if($info[0]['sn']['count'] !== 1) {
-                    return;
-                }
-                if($info[0]['givenname']['count'] !== 1) {
-                    return;
-                }
-                $firstName = $info[0]['givenname'][0];
-                $lastName = $info[0]['sn'][0];
-                if(! self::addUser($firstName, $lastName, $userName, $password, $defaultRoleID)) {
-                    return;
-                }
-                self::logIn($userName);
-                return;
-            }
-            //3 = the number of fields requested.
-            if($info[0]['count'] !== 3) {
-                ldap_close($ldapConnection);
-                return;
-            }
+            $dn .= ",dc={$subDomain}";
+        }
+        $filter = "(&(objectclass=*)(samaccountname={$userName}))";
+        $search = ldap_search($ldapConnection, $dn, $filter, array('sn', 'givenname', 'mail', 'memberOf'));
+        if(! $search) {
+            ldap_close($ldapConnection);
+            return;
+        }
+        $info = ldap_get_entries($ldapConnection, $search);
+        ldap_close($ldapConnection);
+        if($info['count'] !== 1) {
+            return;
+        }
+        if(strpos($info[0]['memberof'][0], "CN={$ldapMemberGroup->getValue()}") === false) {
+            return;
+        }
+        $password = new generateRandomString(50, true, 30, 75);
+        $password = $password->run();
+        $defaultRoleID = $variableEngine->getVariable('ldapDefaultRoleID');
+        if($defaultRoleID === false) {
+            return;
+        }
+        $defaultRoleID = $defaultRoleID->getValue();
+        //No email found in ad
+        if($info[0]['count'] === 3) {
             if($info[0]['sn']['count'] !== 1) {
-                ldap_close($ldapConnection);
                 return;
             }
             if($info[0]['givenname']['count'] !== 1) {
-                ldap_close($ldapConnection);
-                return;
-            }
-            if($info[0]['mail']['count'] !== 1) {
-                ldap_close($ldapConnection);
                 return;
             }
             $firstName = $info[0]['givenname'][0];
             $lastName = $info[0]['sn'][0];
-            $email = $info[0]['mail'][0];
-            if(! self::addUser($firstName, $lastName, $userName, $password, $defaultRoleID, $email)) {
+            if(! self::addUser($firstName, $lastName, $userName, $password, $defaultRoleID)) {
                 return;
             }
             self::logIn($userName);
             return;
         }
-        ldap_close($ldapConnection);
+        //4 = the number of fields requested.
+        if($info[0]['count'] !== 4) {
+            ldap_close($ldapConnection);
+            return;
+        }
+        if($info[0]['sn']['count'] !== 1) {
+            ldap_close($ldapConnection);
+            return;
+        }
+        if($info[0]['givenname']['count'] !== 1) {
+            ldap_close($ldapConnection);
+            return;
+        }
+        if($info[0]['mail']['count'] !== 1) {
+            ldap_close($ldapConnection);
+            return;
+        }
+        $firstName = $info[0]['givenname'][0];
+        $lastName = $info[0]['sn'][0];
+        $email = $info[0]['mail'][0];
+        if(! self::addUser($firstName, $lastName, $userName, $password, $defaultRoleID, $email)) {
+            return;
+        }
         self::logIn($userName);
     }
     //Had to make this due to permission check in the core.
@@ -187,34 +188,27 @@ class authenticateWithLDAP implements IPlugin {
         $adUsername = $database->escapeString(htmlspecialchars($adUsername));
         $password = $database->escapeString(htmlspecialchars($password));
         $email = $database->escapeString(htmlspecialchars($email));
-        if(! $database->insertData('user', 'userName, firstName, lastName, email, password, roleID', '\'' . $adUsername . '\', \'' . $firstName . '\', \'' . $lastName . '\', \'' . $email . '\', \'' . $password . '\', ' . $roleID)) {
-            return false;
-        }
-        if(! $database->insertData('activeDirectory', 'userID, adUsername', 'LAST_INSERT_ID(), \'' . $adUsername . '\'')) {
+        if(! $database->insertData('user', 'userName, firstName, lastName, email, password, roleID, active, isExternalAuthentication', "'{$adUsername}', '{$firstName}', '{$lastName}', '{$email}', '{$password}', {$roleID}, 1, 1")) {
             return false;
         }
         return true;
     }
     private static function logIn($userName) {
-        $user = currentUser::getUserSession();
-        $database = database::getInstance();
+        $database = Database::getInstance();
         $database->connect();
-        $userData = $database->getData('u.firstName, u.lastName, u.userID, u.roleID', 'users u, activeDirectory ad', 'WHERE u.userID = ad.userID AND ad.adUsername = \'' . $userName . '\'');
+        $userData = $database->getData("userID, roleID, userName, givenIdentifier, password, firstName, lastName, email, profilePictureLocation, birthday", "user", "active=1 AND isExternalAuthentication=1 AND userName='{$userName}'");
         if($userData === null) {
             return;
         }
         if(count($userData) > 1) {
             return;
         }
-        $user->setLoggedIn(true);
-        $user->setFirstName($userData[0]['firstName']);
-        $user->setLastName($userData[0]['lastName']);
-        $user->setUserID($userData[0]['userID']);
-        $user->setRoleID($userData[0]['roleID']);
-        currentUser::setUserSession($user);
-        $database->updateTable('users', 'lastAccess = CURRENT_TIMESTAMP', 'userID = ' . $user->getUserID());
-        $log = new logEntry(1, logEntryType::neutral, $user->getUserID(), $user->getFullName() . ' logged in using Active Directory from an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $user->getUserID);
-        logger::getInstance()->logIt($log);
+        $profilePictureLocation = new Link($userData[0]['profilePictureLocation'], true);
+        $birthday = new DateTime($userData[0]['birthday']);
+        $currentUser = new CurrentUser($userData[0]['userID'], $userData[0]['roleID'], $userData[0]['givenIdentifier'], $userData[0]['userName'], $userData[0]['firstName'], $userData[0]['lastName'], $userData[0]['email'], $profilePictureLocation, $birthday, true, true, true);
+        CurrentUser::setUserSession($currentUser);
+        $database->updateTable('user', 'lastAccess=CURRENT_TIMESTAMP', 'userID=' . $currentUser->getUserID());
+        Logger::getInstance()->logIt(new LogEntry(0, logEntryType::info, $currentUser->getFullName() . ' logged in using Active Directory from an IP of ' . $_SERVER['REMOTE_ADDR'] . '.', $currentUser->getUserID(), new DateTime()));
     }
     public static function getPriority() {
         return 5;

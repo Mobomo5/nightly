@@ -29,7 +29,7 @@ class UserEngine {
             return false;
         }
         $inID = $db->escapeString($inID);
-        $results = $db->getData('userID, userName, firstName, lastName, email, givenIdentifier, roleID, profilePictureLocation, birthday', 'user', "userID = $inID");
+        $results = $db->getData('userID, userName, firstName, lastName, email, givenIdentifier, roleID, profilePictureLocation, birthday, active, isExternalAuthentication', 'user', "userID={$inID}");
         if (!$results) {
             return false;
         }
@@ -48,7 +48,17 @@ class UserEngine {
         $roleID = $results[0]['roleID'];
         $profilePictureLocation = new Link($results[0]['profilePictureLocation'], true);
         $birthday = new DateTime($results[0]['birthday']);
-        $user = new User($userID, $roleID, $givenIdentifier, $userName, $firstName, $lastName, $email, $profilePictureLocation, $birthday);
+        if($results[0]['active'] == 1) {
+            $active = true;
+        } else {
+            $active = false;
+        }
+        if($results[0]['isExternalAuthentication'] == 1) {
+            $isExternalAuthentication = true;
+        } else {
+            $isExternalAuthentication = false;
+        }
+        $user = new User($userID, $roleID, $givenIdentifier, $userName, $firstName, $lastName, $email, $profilePictureLocation, $birthday, $active, $isExternalAuthentication);
         return $user;
     }
     public function getUserByUsername($inUserName) {
@@ -106,7 +116,17 @@ class UserEngine {
         $birthday = $inUser->getBirthday();
         $birthday = $db->escapeString($birthday->format("Y-m-d H:i:s"));
         $profilePictureLocation = $db->escapeString($inUser->getProfilePictureLocation()->getRawHref());
-        $results = $db->updateTable('user', "roleID = $roleID, firstName= '$firstName' , lastName = '$lastName', userName='$userName', givenIdentifier='$givenID', birthday = '" . $birthday . "', profilePictureLocation = '$profilePictureLocation'", "userID = $userID");
+        if($inUser->isActive()) {
+            $active = 1;
+        } else {
+            $active = 0;
+        }
+        if($inUser->isExternalAuthentication()) {
+            $isExternalAuthentication = 1;
+        } else {
+            $isExternalAuthentication = 0;
+        }
+        $results = $db->updateTable('user', "roleID={$roleID}, firstName='{$firstName}', lastName='{$lastName}', userName='{$userName}', givenIdentifier='{$givenID}', birthday='{$birthday}', profilePictureLocation='{$profilePictureLocation}', active={$active}, isExternalAuthentication={$isExternalAuthentication}", "userID={$userID}");
         if (!$results) {
             return false;
         }
@@ -136,8 +156,18 @@ class UserEngine {
         $birthday = $db->escapeString($birthday->format("Y-m-d H:i:s"));
         $picture = $db->escapeString($inUser->getProfilePictureLocation()->getRawHref());
         $password = $db->escapeString($pass);
-        $results = $db->insertData('user', 'roleID, firstName,lastName, userName, email, givenIdentifier, birthday, profilePictureLocation, password',
-            "$roleID, '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$picture', '$password'");
+        if($inUser->isActive()) {
+            $active = 1;
+        } else {
+            $active = 0;
+        }
+        if($inUser->isExternalAuthentication()) {
+            $isExternalAuthentication = 1;
+        } else {
+            $isExternalAuthentication = 0;
+        }
+        $results = $db->insertData('user', 'roleID, firstName,lastName, userName, email, givenIdentifier, birthday, profilePictureLocation, password, active, isExternalAuthentication',
+            "$roleID, '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$picture', '$password', $active, $isExternalAuthentication");
         if (!$results) {
             return false;
         }

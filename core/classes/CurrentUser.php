@@ -20,7 +20,7 @@ class CurrentUser extends User {
     private static function destroySession() {
         unset($_SESSION['educaskCurrentUser']);
     }
-    public function __construct($inUserID = 0, $inUserRole = GUEST_ROLE_ID, $inGivenIdentifier = 'anonymous', $inUserName = 'anonymous', $inFirstName = 'Anonymous', $inLastName = 'Guest', $inEmail = 'anon@anon.ca', Link $inProfilePictureLocation = null, DateTime $inBirthday = null, $isLoggedIn = false) {
+    public function __construct($inUserID = 0, $inUserRole = GUEST_ROLE_ID, $inGivenIdentifier = 'anonymous', $inUserName = 'anonymous', $inFirstName = 'Anonymous', $inLastName = 'Guest', $inEmail = 'anon@anon.ca', Link $inProfilePictureLocation = null, DateTime $inBirthday = null, $isActive = true, $isExternalAuthentication = false, $isLoggedIn = false) {
         if($inProfilePictureLocation === null) {
             $inProfilePictureLocation = new Link('images/defaultUserPicture.png');
         }
@@ -28,7 +28,7 @@ class CurrentUser extends User {
             return;
         }
         $this->isLoggedIn = $isLoggedIn;
-        parent::__construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, $inProfilePictureLocation, $inBirthday);
+        parent::__construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, $inProfilePictureLocation, $inBirthday, $isActive, $isExternalAuthentication);
     }
     public function isLoggedIn() {
         if($this->getUserID() == 0) {
@@ -55,7 +55,7 @@ class CurrentUser extends User {
             return false;
         }
         $userName = $database->escapeString(trim($userName));
-        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email, profilePictureLocation, birthday';
+        $column = 'userID, roleID, userName, givenIdentifier, password, firstName, lastName, email, profilePictureLocation, birthday, active, isExternalAuthentication';
         $table = 'user';
         $where = 'active=1 AND isExternalAuthentication=0 AND ((email = \'' . $userName . '\') OR (userName = \'' . $userName . '\') OR (givenIdentifier = \'' . $userName . '\'))';
         if ($database->isConnected()) {
@@ -74,7 +74,7 @@ class CurrentUser extends User {
         if (!Hasher::verifyHash($password, $dbPassword)) {
             return false;
         }
-        self::setUserSession(new CurrentUser($results[0]['userID'], $results[0]['roleID'], $results[0]['givenIdentifier'], $results[0]['userName'], $results[0]['firstName'], $results[0]['lastName'], $results[0]['email'], new Link($results[0]['profilePictureLocation'], true), new DateTime($results[0]['birthday']), true));
+        self::setUserSession(new CurrentUser($results[0]['userID'], $results[0]['roleID'], $results[0]['givenIdentifier'], $results[0]['userName'], $results[0]['firstName'], $results[0]['lastName'], $results[0]['email'], new Link($results[0]['profilePictureLocation'], true), new DateTime($results[0]['birthday']), true, false, true));
         $this->isLoggedIn = true;
         $userID = $database->escapeString($this->getUserID());
         $database->updateTable('user', 'lastAccess = CURRENT_TIMESTAMP', "userID={$userID}");

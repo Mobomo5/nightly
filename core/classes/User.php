@@ -15,7 +15,9 @@ class User {
     private $birthday;
     private $profilePictureLocation;
     private $email;
-    public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, Link $inProfilePictureLocation, DateTime $inBirthday = null) {
+    private $active;
+    private $isExternalAuthentication;
+    public function __construct($inUserID, $inUserRole, $inGivenIdentifier, $inUserName, $inFirstName, $inLastName, $inEmail, Link $inProfilePictureLocation, DateTime $inBirthday = null, $inActive = true, $inIsExternalAuthentication = false) {
         if (!is_numeric($inUserID)) {
             return;
         }
@@ -38,6 +40,12 @@ class User {
         if (!$validator->validate($inEmail)) {
             return;
         }
+        if(! is_bool($inActive)) {
+            return;
+        }
+        if(! is_bool($inIsExternalAuthentication)) {
+            return;
+        }
         $this->userID = $inUserID;
         $this->userRole = $inUserRole;
         $this->givenIdentifier = trim($inGivenIdentifier);
@@ -46,6 +54,8 @@ class User {
         $this->lastName = strip_tags(trim($inLastName));
         $this->email = $inEmail;
         $this->profilePictureLocation = $inProfilePictureLocation;
+        $this->active = $inActive;
+        $this->isExternalAuthentication = $inIsExternalAuthentication;
         if($inBirthday === null) {
             $this->birthday = new DateTime('June 23, 1912');
             return;
@@ -132,5 +142,23 @@ class User {
             return;
         }
         $this->email = $inEmail;
+    }
+    public function isActive() {
+        return $this->active;
+    }
+    public function setIsActive($inActive = false) {
+        if(! is_bool($inActive)) {
+            return;
+        }
+        $this->active = $inActive;
+    }
+    public function isExternalAuthentication() {
+        return $this->isExternalAuthentication;
+    }
+    public function setIsExternalAuthentication($inIsExternalAuthentication = false) {
+        if(! is_bool($inIsExternalAuthentication)) {
+            return;
+        }
+        $this->isExternalAuthentication = $inIsExternalAuthentication;
     }
 }
