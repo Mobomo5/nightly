@@ -18,6 +18,10 @@ class forgotPasswordForm implements IModule {
             $this->response = Response::fourOhFour();
             return;
         }
+        if(CurrentUser::getUserSession()->isLoggedIn()) {
+            $this->response = Response::fourOhFour();
+            return;
+        }
         $this->request = $request;
         $lockoutEngine = LockoutEngine::getInstance();
         if($lockoutEngine->isLockedOut($_SERVER['REMOTE_ADDR'])) {
@@ -31,10 +35,6 @@ class forgotPasswordForm implements IModule {
         $this->forgotPasswordContent();
     }
     public function forgotPasswordContent() {
-        if(currentUser::getUserSession()->isLoggedIn()) {
-            $this->response = Response::fourOhFour();
-            return;
-        }
         if($this->request->isPostRequest()) {
             $this->doForgotPassword();
             return;
@@ -68,6 +68,10 @@ class forgotPasswordForm implements IModule {
         }
         $user = UserEngine::getInstance()->getUserByUsername($username);
         if($user === false) {
+            return;
+        }
+        if($user->isExternalAuthentication()) {
+            $this->sendExternalAuthenticationEmail($user);
             return;
         }
         $this->addForgotPasswordToDatabase($user);
@@ -233,6 +237,21 @@ class forgotPasswordForm implements IModule {
         $forgotPasswordEngine->removeForgotPassword($forgotPassword1);
         $this->showSuccessMessageForForgotPasswordChange();
         $this->response = Response::redirect(new Link("users/login"));
+    }
+    private function sendExternalAuthenticationEmail(User $user) {
+        $mailTemplateEngine = MailTemplateEngine::getInstance();
+        $mail = $mailTemplateEngine->loadTemplate("forgotPasswordExternalAuthentication");
+        if($mail === false) {
+            $this->showErrorMessageForForgotPassword();
+            return;
+        }
+        $mail->addRecipient($user->getEmail());
+        $mail->setBulkMail(false);
+        $mail->addReplacementValue("[[name]]", $user->getEmail(), $user->getFirstName());
+        if(! $mail->sendMail()) {
+            $this->showErrorMessageForForgotPassword();
+            return;
+        }
     }
     private function showErrorMessageForForgotPassword() {
         NoticeEngine::getInstance()->addNotice(new Notice(noticeType::warning, "Sorry, something went wrong when I tried to generate a password reset token for you. If this keeps happening, please see an administrator."));

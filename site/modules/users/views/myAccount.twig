@@ -1,0 +1,12 @@
+<div class="userProfilePicture largeUserProfilePicture floatRight">
+    <img src="{{ model.getProfilePictureLocation() }}"/>
+    <p>{{ model.getFullName() }}</p>
+</div>
+<p>Welcome back, {{ model.getFirstName() }}. Nice to see you again.</p>
+<h2>My Details:</h2>
+<p>Username: {{ model.getUserName() }}</p>
+<p>First name: {{ model.getFirstName() }}</p>
+<p>Last name: {{ model.getLastName() }}</p>
+<p>Birthday: {{ model.getBirthday() | date("Y-m-d") }}</p>
+<p>Email: {{ model.getEmail() }}</p>
+<p>{{ Link("Change your password", "users/changePassword") }}.</p>

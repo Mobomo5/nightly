@@ -45,6 +45,7 @@ class CssBuilder {
         $minifiedSoFar .= $this->getRawCss();
         $objectCache = ObjectCache::getInstance();
         $objectCache->setObject('minifiedCSS', $minifiedSoFar, true);
+        $objectCache->saveInstance();
         $response = Response::fiveHundred();
         $response->setRawContent($minifiedSoFar);
         $response->setHeader('Content-Type', "text/css");
@@ -93,6 +94,7 @@ class CssBuilder {
         return $this->response;
     }
 }
+date_default_timezone_set("UTC");
 define('EDUCASK_ROOT', dirname(getcwd()));
 require_once(EDUCASK_ROOT . '/core/classes/Bootstrap.php');
 Bootstrap::registerAutoloader();

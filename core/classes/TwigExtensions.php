@@ -12,7 +12,9 @@ class TwigExtensions extends Twig_Extension {
             new Twig_SimpleFunction('AntiForgeryToken', array($this, 'AntiForgeryToken'), array('is_safe' => array('html'))),
             new Twig_SimpleFunction('Honeypot', array($this, 'Honeypot'), array('is_safe' => array('html'))),
             new Twig_SimpleFunction('Href', array($this, 'Href')),
+            new Twig_SimpleFunction('HrefIfHasPermission', array($this, 'HrefIfHasPermission')),
             new Twig_SimpleFunction('Link', array($this, 'Link'), array('is_safe' => array('html'))),
+            new Twig_SimpleFunction('LinkIfHasPermission', array($this, 'LinkIfHasPermission'), array('is_safe' => array('html'))),
         );
     }
     public function AntiForgeryToken() {
@@ -23,6 +25,16 @@ class TwigExtensions extends Twig_Extension {
     }
     public function Href($inHref, $isPhysicalFile = false, $forceCleanURLS = false, $localLinkOnly = false, $fullLocalURL = false) {
         return new Link($inHref, $isPhysicalFile, $forceCleanURLS, $localLinkOnly, $fullLocalURL);
+    }
+    public function HrefIfHasPermission($permissionName, $inHref, $isPhysicalFile = false, $forceCleanURLS = false, $localLinkOnly = false, $fullLocalURL = false) {
+        if(! is_string($permissionName)) {
+            return "";
+        }
+        $permissionEngine = PermissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo($permissionName)) {
+            return "";
+        }
+        return $this->Href($inHref, $isPhysicalFile, $forceCleanURLS, $localLinkOnly, $fullLocalURL);
     }
     public function Link($text, $inHref, array $attributes = array()) {
         if(! is_string($text)) {
@@ -54,6 +66,16 @@ class TwigExtensions extends Twig_Extension {
             $attributeString .= " {$attributeName}='{$attributeValue}'";
         }
         return "<a href='{$link}'{$attributeString}>{$text}</a>";
+    }
+    public function LinkIfHasPermission($permissionName, $text, $inHref, array $attributes = array()) {
+        if(! is_string($permissionName)) {
+            return "";
+        }
+        $permissionEngine = PermissionEngine::getInstance();
+        if(! $permissionEngine->currentUserCanDo($permissionName)) {
+            return "";
+        }
+        return $this->Link($text, $inHref, $attributes);
     }
     public function getName() {
         return 'EducaskCoreTwigExtensions';

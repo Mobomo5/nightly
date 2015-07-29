@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'Pacifico';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Pacifico Regular'), local('Pacifico-Regular'), url(fonts/pacifico/pacifico.woff2) format('woff2'), url(fonts/pacifico/pacifico.woff) format('woff');
+}
 html, body {
     margin: 0;
     height: 100%;
@@ -105,4 +111,33 @@ input[type="button"], input[type="submit"] {
 input[type="button"]:hover, input[type="submit"]:hover {
     cursor: pointer;
     background-color: #E6E6E6;
+}
+.floatRight {
+    float: right;
+}
+.userProfilePicture {
+    display: inline;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 2px;
+    box-shadow: 5px 5px 15px whitesmoke;
+    background-color: white;
+    border: 1px solid #f2ebeb;
+}
+.userProfilePicture img {
+    background-color: ghostwhite;
+    width: 100%;
+    height: 100%;
+}
+.userProfilePicture p {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-family: "Pacifico";
+    color: #3D3D3D;
+    display: block;
+}
+.largeUserProfilePicture {
+    width: 200px;
 }

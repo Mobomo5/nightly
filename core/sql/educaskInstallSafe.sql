@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `givenIdentifier` VARCHAR(100) NULL COMMENT 'The identifier given to the user by the institution.',
   `bio` VARCHAR(256) NULL COMMENT 'Optional information that the users give about themselves.',
   `birthday` DATE NULL DEFAULT '1993-04-30' COMMENT 'The date of birth of the user.',
-  `profilePictureLocation` VARCHAR(60) NOT NULL DEFAULT 'includes/images/defaultUserPicture.png',
+  `profilePictureLocation` VARCHAR(60) NOT NULL DEFAULT 'images/defaultUserPicture.png',
   `password` LONGTEXT NOT NULL COMMENT 'The users chosen pass phrase to enter Educask. It is encrypted.',
   `accountCreationDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The time in history when the user was added to Educask.',
   `lastAccess` DATETIME NOT NULL COMMENT 'The last time that the user accessed Educask.',
