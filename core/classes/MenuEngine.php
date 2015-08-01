@@ -23,7 +23,7 @@ class MenuEngine {
     }
     //region Get
     public function getMenu($inMenuID) {
-        //get a single menu from the database based off of ID
+        //get a single menus from the database based off of ID
         if (!is_numeric($inMenuID)) {
             return false;
         }
@@ -35,7 +35,7 @@ class MenuEngine {
             return false;
         }
         $inMenuID = $database->escapeString($inMenuID);
-        // get the menu specified
+        // get the menus specified
         $results = $database->getData("*", "menu", "menuID = {$inMenuID}");
         if ($results === false) {
             return false;
@@ -47,10 +47,11 @@ class MenuEngine {
             return false;
         }
         $menuID = $results[0]['menuID'];
-        $menuName = $results[0]['menuName'];
+        $computerName = $results[0]['computerName'];
+        $humanName = $results[0]['humanName'];
         $menuRegion = $results[0]['themeRegion'];
         $menuEnabled = !!$results[0]['enabled']; // convert to bool
-        // get all top level menu items for that menu
+        // get all top level menus items for that menus
         $itemResults = $database->getData("*", "menuItem", "menuID = {$menuID} AND parent = 0 ORDER BY weight");
         // turn each top level into a menuItem object
         $menuItems = array();
@@ -65,9 +66,28 @@ class MenuEngine {
             }
             $menuItems[] = $menuItem;
         }
-        $menu = new Menu($menuID, $menuName, $menuRegion, $menuItems, $menuEnabled);
+        $menu = new Menu($menuID, $computerName, $humanName, $menuRegion, $menuItems, $menuEnabled);
         $this->foundMenus[$menuID] = $menu;
         return $menu;
+    }
+    public function getMenuByName($inMenuComputerName) {
+        if(! is_string($inMenuComputerName)) {
+            return false;
+        }
+        $inMenuComputerName = str_replace(' ', '', $inMenuComputerName);
+        $database = Database::getInstance();
+        if(! $database->isConnected()) {
+            return false;
+        }
+        $inMenuComputerName = $database->escapeString($inMenuComputerName);
+        $result = $database->getData("menuID", "menu", "computerName='{$inMenuComputerName}'");
+        if(! $result) {
+            return false;
+        }
+        if(count($result) > 1) {
+            return false;
+        }
+        return $this->getMenu($result[0]['menuID']);
     }
     public function getMenuItem($inMenuItemID) {
         //get a single menuItem from DB based off of ID
@@ -85,7 +105,7 @@ class MenuEngine {
             return false;
         }
         $inMenuItemID = $database->escapeString($inMenuItemID);
-        // get all menu items for this menu
+        // get all menus items for this menus
         $results = $database->getData("*", "menuItem", "menuItemID = {$inMenuItemID} ORDER BY weight");
         if ($results === false) {
             return false;
@@ -146,9 +166,9 @@ class MenuEngine {
         return $children;
     }
     public function setMenu(Menu $inMenu) {
-        //takes in a menu object and updates DB
+        //takes in a menus object and updates DB
         $permissionEngine = PermissionEngine::getInstance();
-        if (!$permissionEngine->checkPermission("userCanEditMenus")) {
+        if (!$permissionEngine->currentUserCanDo("userCanEditMenus")) {
             return false;
         }
         $database = Database::getInstance();
@@ -156,7 +176,8 @@ class MenuEngine {
             return false;
         }
         $menuID = $database->escapeString($inMenu->getID());
-        $menuName = $database->escapeString($inMenu->getName());
+        $computerName = $database->escapeString($inMenu->getComputerName());
+        $humanName = $database->escapeString($inMenu->getHumanName());
         $themeRegion = $database->escapeString($inMenu->getThemeRegion());
         $enabled = $inMenu->isEnabled();
         if($enabled === true) {
@@ -164,7 +185,7 @@ class MenuEngine {
         } else {
             $enabled = 0;
         }
-        $results = $database->updateTable("menu", "menuName = '{$menuName}', themeRegion = '{$themeRegion}', enabled = {$enabled}", "menuID = {$menuID}");
+        $results = $database->updateTable("menu", "computerName = '{$computerName}', humanName='{$humanName}', themeRegion = '{$themeRegion}', enabled = {$enabled}", "menuID = {$menuID}");
         if($results === false) {
             return false;
         }
@@ -172,7 +193,7 @@ class MenuEngine {
     }
     public function setMenuItem(MenuItem $inMenuItem) {
         $permissionEngine = PermissionEngine::getInstance();
-        if (!$permissionEngine->checkPermission("userCanEditMenuItems")) {
+        if (!$permissionEngine->currentUserCanDo("userCanEditMenuItems")) {
             return false;
         }
         $database = Database::getInstance();
@@ -210,14 +231,15 @@ class MenuEngine {
         if(! $database->isConnected()) {
             return false;
         }
-        $menuName = $database->escapeString($inMenu->getName());
+        $computerName = $database->escapeString($inMenu->getComputerName());
+        $humanName = $database->escapeString($inMenu->getHumanName());
         $themeRegion = $database->escapeString($inMenu->getThemeRegion());
         if($inMenu->isEnabled()) {
             $enabled = 1;
         } else {
             $enabled = 0;
         }
-        $results = $database->insertData("menu", "'menuName', 'themeRegion', 'enabled'", "'{$menuName}', '{$themeRegion}', {$enabled}");
+        $results = $database->insertData("menu", "'computerName', 'humanName', 'themeRegion', 'enabled'", "'{$computerName}', '{$humanName}', '{$themeRegion}', {$enabled}");
         if($results === false) {
             return false;
         }
@@ -305,11 +327,11 @@ class MenuEngine {
         $menuItemID = $database->escapeString($menuItemID);
         // check to see if it's in the visibility table
         $results = $database->getData('*', 'menuItemVisibility', 'menuItemID = ' . $menuItemID);
-        //Default is to display the menu item unless specified.
+        //Default is to display the menus item unless specified.
         if ($results === null) {
             return true;
         }
-        //Query failed. Play it safe and don't display the menu item.
+        //Query failed. Play it safe and don't display the menus item.
         if ($results === false) {
             return false;
         }

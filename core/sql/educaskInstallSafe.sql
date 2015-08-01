@@ -124,7 +124,6 @@ CREATE TABLE IF NOT EXISTS `status` (
   `posterID` INT NOT NULL COMMENT 'The author of the status.',
   `parentStatus` INT NOT NULL DEFAULT 0 COMMENT 'The status this status may be a comment on.',
   `supporterCount` INT NOT NULL DEFAULT 0 COMMENT 'The amount of people who \"liked\" the comment.',
-  `nodeID` INT NOT NULL DEFAULT 0 COMMENT 'The node that the status/comment was posted on.',
   PRIMARY KEY (`statusID`),
   CONSTRAINT `fk_status_status1`
     FOREIGN KEY (`parentStatus`)
@@ -137,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `status` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-COMMENT = 'Status or comments posted to nodes.';
+COMMENT = 'Status or comments posted to pages.';
 
 CREATE UNIQUE INDEX `statusID_UNIQUE` ON `status` (`statusID` ASC);
 
@@ -299,11 +298,12 @@ CREATE UNIQUE INDEX `aliasID_UNIQUE` ON `urlAlias` (`aliasID` ASC);
 
 
 -- -----------------------------------------------------
--- Table `menu`
+-- Table `menus`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `menu` (
   `menuID` INT NOT NULL AUTO_INCREMENT COMMENT 'The unique identifier for the row.',
-  `menuName` VARCHAR(64) NOT NULL COMMENT 'The human readable name for the menu. Example: \"Main Menu\"',
+  `computerName` VARCHAR(64) NOT NULL COMMENT 'The computer name from the menu. Example: \"mainMenu\"',
+  `humanName` VARCHAR(64) NOT NULL COMMENT 'The human readable name for the menu. Example: \"Main Menu\"',
   `themeRegion` VARCHAR(64) NOT NULL COMMENT 'The place in the theme where the menu belongs to.',
   `enabled` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Flag to indicate if the menu is in use or not.',
   PRIMARY KEY (`menuID`))
@@ -311,28 +311,6 @@ ENGINE = InnoDB
 COMMENT = 'Information about possible menus.';
 
 CREATE UNIQUE INDEX `menuID_UNIQUE` ON `menu` (`menuID` ASC);
-
-
--- -----------------------------------------------------
--- Table `activeDirectory`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `activeDirectory` (
-  `adUsername` VARCHAR(50) NOT NULL COMMENT 'The user-name that the user uses to log in via Active Directory.',
-  `userID` INT NOT NULL COMMENT 'The user that the Active Directory username is for.',
-  PRIMARY KEY (`adUsername`),
-  CONSTRAINT `fk_activeDirectory_user1`
-    FOREIGN KEY (`userID`)
-    REFERENCES `user` (`userID`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-COMMENT = 'A table that caches users from Active Directory.';
-
-CREATE UNIQUE INDEX `adUsername_UNIQUE` ON `activeDirectory` (`adUsername` ASC);
-
-CREATE INDEX `fk_activeDirectory_user1_idx` ON `activeDirectory` (`userID` ASC);
-
-CREATE UNIQUE INDEX `userID_UNIQUE` ON `activeDirectory` (`userID` ASC);
 
 
 -- -----------------------------------------------------
@@ -346,7 +324,7 @@ CREATE TABLE IF NOT EXISTS `menuItem` (
   `weight` INT NOT NULL DEFAULT 0 COMMENT 'Sort the item.',
   `hasChildren` TINYINT(1) NOT NULL COMMENT 'Flag to indicate if the menu item has children or not.',
   `enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'A flag to indicate if the menu item is used or not.',
-  `parent` INT NOT NULL DEFAULT 0 COMMENT 'The menu item that this menu item is a child of.',
+  `parent` INT NULL DEFAULT 0 COMMENT 'The menu item that this menu item is a child of.',
   PRIMARY KEY (`menuItemID`),
   CONSTRAINT `fk_menuItem_menu1`
     FOREIGN KEY (`menuID`)
@@ -376,7 +354,7 @@ CREATE TABLE IF NOT EXISTS `menuItemVisibility` (
   `menuItemID` INT NOT NULL COMMENT 'The menu item the rule is for.',
   `referenceID` VARCHAR(50) NOT NULL COMMENT 'The unique identifier for the object being referenced.',
   `referenceType` VARCHAR(50) NOT NULL COMMENT 'The type of the object being referenced. Example: user.',
-  `visible` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'The flag that determines if the node is visible in the rule.',
+  `visible` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'The flag that determines if the Menu Item is visible in the rule.',
   PRIMARY KEY (`ruleID`),
   CONSTRAINT `fk_menuItemVisibility_menuItem1`
     FOREIGN KEY (`menuItemID`)
@@ -441,7 +419,7 @@ CREATE TABLE IF NOT EXISTS `blockVisibility` (
   `ruleID` INT NOT NULL COMMENT 'A unique identifier for the rule',
   `referenceID` VARCHAR(50) NOT NULL COMMENT 'The unique identifier for the object being referenced.',
   `referenceType` VARCHAR(50) NOT NULL COMMENT 'The type of the object being referenced. Example: user.',
-  `visible` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'The flag that determines if the node is visible in the rule.',
+  `visible` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'The flag that determines if the block is visible in the rule.',
   `blockID` INT NOT NULL COMMENT 'The block that the rule is for.',
   PRIMARY KEY (`ruleID`),
   CONSTRAINT `fk_blockVisibility_block1`
@@ -450,7 +428,7 @@ CREATE TABLE IF NOT EXISTS `blockVisibility` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-COMMENT = 'Holds information the visibility rules for nodes.';
+COMMENT = 'Holds information the visibility rules for blocks.';
 
 CREATE UNIQUE INDEX `ruleID_UNIQUE` ON `blockVisibility` (`ruleID` ASC);
 
@@ -497,7 +475,6 @@ CREATE TABLE IF NOT EXISTS `file` (
   `mimeType` VARCHAR(50) NOT NULL COMMENT 'The type of the file uploaded.',
   `size` INT NOT NULL DEFAULT 0 COMMENT 'The size of the file uploaded.',
   `location` VARCHAR(75) NOT NULL COMMENT 'The location to where the file was uploaded on the server.',
-  `nodeID` INT NOT NULL COMMENT 'The node the file was uploaded to.',
   `uploader` INT NOT NULL COMMENT 'The user who uploaded the file.',
   `folderID` INT NOT NULL COMMENT 'The folder that the file was uploaded to.',
   PRIMARY KEY (`fileID`),

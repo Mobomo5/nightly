@@ -5,7 +5,7 @@
  * Date: 15/05/14
  * Time: 10:47 AM
  *
- * menu DB
+ * menus DB
  * -------
  *
  * menuID
@@ -14,18 +14,22 @@
  * enabled
  */
 class Menu {
-    //vars for the menu based of db schema
+    //vars for the menus based of db schema
     private $menuID;
-    private $menuName;
+    private $computerName;
+    private $humanName;
     private $themeRegion;
     private $enabled;
     private $menuItems = array();
-    public function __construct($inID, $inName, $inThemeRegion, array $inMenuItems, $inEnabled) {
+    public function __construct($inID, $inComputerName, $inHumanName, $inThemeRegion, array $inMenuItems, $inEnabled) {
         //region checks
         if (!is_numeric($inID)) {
             return;
         }
-        if (!is_string($inName)) {
+        if(! is_string($inComputerName)) {
+            return;
+        }
+        if (!is_string($inHumanName)) {
             return;
         }
         if (!is_string($inThemeRegion)) {
@@ -36,7 +40,8 @@ class Menu {
         }
         //endregion
         $this->menuID = $inID;
-        $this->menuName = $inName;
+        $this->computerName = str_replace(' ', '', $inComputerName);
+        $this->humanName = $inHumanName;
         $this->themeRegion = $inThemeRegion;
         $this->enabled = $inEnabled;
         $this->menuItems = $inMenuItems;
@@ -45,8 +50,11 @@ class Menu {
     public function getID() {
         return $this->menuID;
     }
-    public function getName() {
-        return $this->menuName;
+    public function getComputerName() {
+        return $this->computerName;
+    }
+    public function getHumanName() {
+        return $this->humanName;
     }
     public function getThemeRegion() {
         return $this->themeRegion;
@@ -67,10 +75,22 @@ class Menu {
     }
     //endregion
     //region set
-    public function setName($inName) {
-        $this->menuName = $inName;
+    public function setComputerName($inComputerName) {
+        if(! is_string($inComputerName)) {
+            return;
+        }
+        $this->computerName = str_replace(' ', '', $inComputerName);
+    }
+    public function setHumanName($inHumanName) {
+        if(! is_string($inHumanName)) {
+            return;
+        }
+        $this->humanName = $inHumanName;
     }
     public function setThemeRegion($inThemeRegion) {
+        if(! is_string($inThemeRegion)) {
+            return;
+        }
         $this->themeRegion = $inThemeRegion;
     }
     public function setEnabled($inSetEnabled) {
@@ -81,7 +101,7 @@ class Menu {
     }
     //endregion
     public function __toString() {
-        //loop through it's menu items and put them in a HTML list
+        //loop through it's menus items and put them in a HTML list
         return $this->getHTML();
     }
 }

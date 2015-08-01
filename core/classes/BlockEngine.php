@@ -76,7 +76,7 @@ class blockEngine {
         if ($interfacesThatClassImplements === false) {
             return false;
         }
-        if (!in_array('block', $interfacesThatClassImplements)) {
+        if (!in_array('IBlock', $interfacesThatClassImplements)) {
             return false;
         }
         return true;
@@ -84,7 +84,7 @@ class blockEngine {
     private function getPathToBlock($blockName, $moduleName) {
         $moduleName = str_replace('..', '', $moduleName);
         $blockName = str_replace('..', '', $blockName);
-        return EDUCASK_ROOT . '/includes/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
+        return EDUCASK_ROOT . '/site/modules/' . $moduleName . '/blocks/' . $blockName . '.php';
     }
     private function blockVisible($blockID, $pageType, $roleID) {
         if (!is_numeric($blockID)) {
