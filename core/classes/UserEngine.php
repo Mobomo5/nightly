@@ -100,9 +100,6 @@ class UserEngine {
         return $this->getUser($results[0]['userID']);
     }
     public function setUser(User $inUser) {
-        if (!PermissionEngine::getInstance()->currentUserCanDo('userCanModifyUsers')) {
-            return false;
-        }
         $db = Database::getInstance();
         if(! $db->isConnected()) {
             return false;
@@ -112,10 +109,15 @@ class UserEngine {
         $firstName = $db->escapeString($inUser->getFirstName());
         $lastName = $db->escapeString($inUser->getLastName());
         $userName = $db->escapeString($inUser->getUserName());
-        $givenID = $db->escapeString($inUser->getGivenIdentifier());
         $birthday = $inUser->getBirthday();
         $birthday = $db->escapeString($birthday->format("Y-m-d H:i:s"));
         $profilePictureLocation = $db->escapeString($inUser->getProfilePictureLocation()->getRawHref());
+        $givenID = $inUser->getGivenIdentifier();
+        if($givenID === null) {
+            $givenID = "NULL";
+        } else {
+            $givenID = "'{$db->escapeString($givenID)}'";
+        }
         if($inUser->isActive()) {
             $active = 1;
         } else {
@@ -126,7 +128,7 @@ class UserEngine {
         } else {
             $isExternalAuthentication = 0;
         }
-        $results = $db->updateTable('user', "roleID={$roleID}, firstName='{$firstName}', lastName='{$lastName}', userName='{$userName}', givenIdentifier='{$givenID}', birthday='{$birthday}', profilePictureLocation='{$profilePictureLocation}', active={$active}, isExternalAuthentication={$isExternalAuthentication}", "userID={$userID}");
+        $results = $db->updateTable('user', "roleID={$roleID}, firstName='{$firstName}', lastName='{$lastName}', userName='{$userName}', givenIdentifier={$givenID}, birthday='{$birthday}', profilePictureLocation='{$profilePictureLocation}', active={$active}, isExternalAuthentication={$isExternalAuthentication}", "userID={$userID}");
         if (!$results) {
             return false;
         }
@@ -138,9 +140,6 @@ class UserEngine {
      * @return bool | int returns new user ID on success
      */
     public function addUser(User $inUser, $password) {
-        if (!PermissionEngine::getInstance()->currentUserCanDo('userCanAddUsers')) {
-            return false;
-        }
         $db = Database::getInstance();
         if(! $db->isConnected()) {
             return false;
@@ -151,11 +150,16 @@ class UserEngine {
         $lastName = $db->escapeString($inUser->getLastName());
         $userName = $db->escapeString($inUser->getUserName());
         $email = $db->escapeString($inUser->getEmail());
-        $givenID = $db->escapeString($inUser->getGivenIdentifier());
         $birthday = $inUser->getBirthday();
         $birthday = $db->escapeString($birthday->format("Y-m-d H:i:s"));
         $picture = $db->escapeString($inUser->getProfilePictureLocation()->getRawHref());
         $password = $db->escapeString($pass);
+        $givenID = $inUser->getGivenIdentifier();
+        if($givenID === null) {
+            $givenID = "NULL";
+        } else {
+            $givenID = "'{$db->escapeString($givenID)}'";
+        }
         if($inUser->isActive()) {
             $active = 1;
         } else {
@@ -167,7 +171,7 @@ class UserEngine {
             $isExternalAuthentication = 0;
         }
         $results = $db->insertData('user', 'roleID, firstName,lastName, userName, email, givenIdentifier, birthday, profilePictureLocation, password, active, isExternalAuthentication',
-            "$roleID, '$firstName','$lastName', '$userName','$email', '$givenID', '$birthday', '$picture', '$password', $active, $isExternalAuthentication");
+            "$roleID, '$firstName','$lastName', '$userName','$email', $givenID, '$birthday', '$picture', '$password', $active, $isExternalAuthentication");
         if (!$results) {
             return false;
         }

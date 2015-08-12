@@ -187,7 +187,7 @@ CREATE UNIQUE INDEX `variableName_UNIQUE` ON `variable` (`variableName` ASC);
 -- Table `systemLog`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `systemLog` (
-  `eventID` INT NOT NULL COMMENT 'The unique identifier for the log entry.',
+  `eventID` INT NOT NULL AUTO_INCREMENT COMMENT 'The unique identifier for the log entry.',
   `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The time in history when the log entry was made.',
   `message` VARCHAR(500) NOT NULL COMMENT 'The log message recorded.',
   `type` VARCHAR(45) NOT NULL,

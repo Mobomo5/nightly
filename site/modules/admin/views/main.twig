@@ -1,0 +1,12 @@
+<div id="group">
+    {% for item in model.getMenuItems() %}
+        <div class="groupItem">
+            <p>{{ item.getLinkText() }}</p>
+            <ul>
+            {% for child in item.getChildren() %}
+                <li>{{ child | raw }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>

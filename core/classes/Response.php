@@ -156,4 +156,7 @@ class Response {
         //Defaults to a 500 if the redirect didn't work.
         return new Response(500, "@httpErrors/fiveHundred.twig", "500: Internal Server Error", "fiveHundred", null, $to);
     }
+    public static function raw($rawText) {
+        return new Response(200, "", "", "", null, null, $rawText);
+    }
 }

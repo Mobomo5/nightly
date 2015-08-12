@@ -23,9 +23,21 @@ class secureSession implements SessionHandlerInterface, ISession {
         $randomStringGenerator = new generateRandomString(30, true, 50, 300);
         $randomString = $randomStringGenerator->run();
         $this->key = Hasher::generateHmacHash($randomString) . " # " . $randomString;
-        $aSingleDay = 24 * 60 * 60;
-        $cookieExpireTime = time() + $aSingleDay;
-        setcookie("educaskS", $this->key, $cookieExpireTime, null, null, null, true);
+        $database = Database::getInstance();
+        $baseDirectory = $database->getData("variableValue", "variable", "variableName='siteWebDirectory'");
+        if(!$baseDirectory) {
+            setcookie("educaskS", $this->key, 0);
+            return;
+        }
+        $webAddress = $database->getData("variableValue", "variable", "variableName='siteWebAddress'");
+        if(! $webAddress) {
+            setcookie("educaskS", $this->key, 0, $baseDirectory[0]['variableValue']);
+            return;
+        }
+        $webAddress = str_replace("https://", "", $webAddress[0]['variableValue']);
+        $webAddress = str_replace("http://", "", $webAddress);
+        $webAddress = preg_replace("(:[0-9]{0,5})", "", $webAddress);
+        setcookie("educaskS", $this->key, 0, $baseDirectory[0]['variableValue'], $webAddress, false, true);
     }
     public function open($savePath, $sessionName) {
         return true;

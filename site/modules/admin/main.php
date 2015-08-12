@@ -13,9 +13,16 @@ class admin implements IModule {
             $this->response = Response::fourOhFour();
             return;
         }
-        if(isset($request[1])) {
+        if(! PermissionEngine::getInstance()->currentUserCanDo("canAccessAdministration")) {
+            $this->response = Response::fourOhThree();
+            return;
+        }
+        if(isset($request->getParameters(true)[1])) {
             $this->response = $this->handleSecondParameter();
             return;
+        }
+        if(! defined("PAGE_TYPE")){
+            define("PAGE_TYPE", "administration");
         }
         $menuEngine = MenuEngine::getInstance();
         $menu = $menuEngine->getMenuByName("adminMenu");

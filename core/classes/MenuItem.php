@@ -142,4 +142,7 @@ class MenuItem {
     public function setParent(MenuItem $inParent) {
         $this->parent = $inParent->getID();
     }
+    public function __toString() {
+        return '' . $this->getHTML();
+    }
 }

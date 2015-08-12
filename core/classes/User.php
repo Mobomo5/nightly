@@ -21,7 +21,7 @@ class User {
         if (!is_numeric($inUserID)) {
             return;
         }
-        if ($inUserID < 1) {
+        if ($inUserID < 0) {
             return;
         }
         if (!is_numeric($inUserRole)) {
@@ -81,6 +81,10 @@ class User {
         return $this->givenIdentifier;
     }
     public function setGivenIdentifier($inGivenIdentifier) {
+        if($inGivenIdentifier === null) {
+            $this->givenIdentifier = null;
+            return;
+        }
         if(! is_string($inGivenIdentifier)) {
             return;
         }

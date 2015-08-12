@@ -1,0 +1,59 @@
+<form action="{{ model.postLink }}" method="post" enctype="multipart/form-data">
+    <div class="userProfilePicture largeUserProfilePicture floatRight">
+        <img src="{{ model.user.getProfilePictureLocation() }}"/>
+        <p id="userProfilePictureName">{{ model.user.getFullName() }}</p>
+    </div>
+    <fieldset>
+        <legend>Essential information:</legend>
+        {{ AntiForgeryToken() }}
+        {{ Honeypot() }}
+        <label for="firstName">First name:</label>
+        <input type="text" id="firstName" name="firstName" value="{{ model.user.getFirstName() }}">
+        <label for="lastName">Last name:</label>
+        <input type="text" id="lastName" name="lastName" value="{{ model.user.getLastName() }}">
+        <label for="userName">Username:</label>
+        <input type="text" id="userName" name="userName" value="{{ model.user.getUserName() }}">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ model.user.getEmail() }}">
+        <label for="userRole">Role:</label>
+        <select id="userRole" name="userRole">
+            {% for role in model.roles %}
+                {% if role.roleID == model.user.getRoleID() %}
+                    <option value="{{ role.roleID }}" selected>{{ role.roleName }}</option>
+                {% else %}
+                    <option value="{{ role.roleID }}">{{ role.roleName }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        {% if model.showPasswordFields %}
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+            <label for="passwordConfirmation">Password confirmation:</label>
+            <input type="password" id="passwordConfirmation" name="passwordConfirmation">
+        {% endif %}
+        <label for="active">Active:</label>
+        {% if model.user.isActive() %}
+            <input type="checkbox" id="active" name="active" checked value="1">
+        {% else %}
+            <input type="checkbox" id="active" name="active" value="1">
+        {% endif %}
+    </fieldset>
+    <fieldset>
+        <legend>Other information:</legend>
+        <label for="givenIdentifier">Given identifier:</label>
+        <input type="text" id="givenIdentifier" name="givenIdentifier" value="{{ model.user.getGivenIdentifier() }}">
+        <label for="birthday">Birthday:</label>
+        <input type="date" id="birthday" name="birthday" value="{{ model.user.getBirthday() | date("Y-m-d") }}">
+        <label for="profilePictureUpload">Profile picture:</label>
+        <input type="file" id="profilePictureUpload" name="profilePictureUpload" accept="image/*">
+    </fieldset>
+    <input type="hidden" id="profilePictureDefault" name="profilePictureDefault" value="{{ model.user.getProfilePictureLocation().getRawHref() }}">
+    <input type="submit" value="Save User">
+</form>
+<script type="text/javascript">
+    var changeTextFunction = function() {
+        $("#userProfilePictureName").text($("#firstName").val() + " " + $("#lastName").val());
+    }
+    $("#firstName").on('input', changeTextFunction);
+    $("#lastName").on('input', changeTextFunction);
+</script>

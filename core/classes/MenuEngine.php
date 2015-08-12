@@ -53,6 +53,9 @@ class MenuEngine {
         $menuEnabled = !!$results[0]['enabled']; // convert to bool
         // get all top level menus items for that menus
         $itemResults = $database->getData("*", "menuItem", "menuID = {$menuID} AND parent = 0 ORDER BY weight");
+        if(! $itemResults) {
+            $itemResults = array();
+        }
         // turn each top level into a menuItem object
         $menuItems = array();
         foreach ($itemResults as $item) {

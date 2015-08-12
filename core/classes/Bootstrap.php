@@ -94,7 +94,9 @@ class Bootstrap {
         foreach($headers as $header => $value) {
             header($header . ": " . $value, true);
         }
-        define('PAGE_TYPE', $response->getPageType());
+        if(! defined('PAGE_TYPE')) {
+            define('PAGE_TYPE', $response->getPageType());
+        }
         $blocks = $blockEngine->getBlocks($site->getTheme(), PAGE_TYPE, $user->getRoleID());
         if($blocks === null) {
             $blocks = array();

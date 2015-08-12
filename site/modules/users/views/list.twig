@@ -1,0 +1,10 @@
+<div id="group">
+    {% for user in model %}
+        <div class="groupItem">
+            <div class="userProfilePicture smallUserProfilePicture floatLeft">
+                <img src="{{ user.getProfilePictureLocation() }}"/>
+            </div>
+            <p>{{ Link(user.getFullName(), "users/view/"~user.getUserID()) }}</p>
+        </div>
+    {% endfor %}
+</div>
