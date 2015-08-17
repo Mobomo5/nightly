@@ -31,13 +31,14 @@ class profilePicture {
         if($extension === false) {
             return $default;
         }
+        $randomStringGenerator = new generateRandomString(25, true, 1, 30);
         do {
-            $guid = uniqid() . uniqid("-");
-            $fileLocation = $profilePicturesLocation . $guid . '.' . $extension;
+            $name = $randomStringGenerator->run();
+            $fileLocation = $profilePicturesLocation . $name . '.' . $extension;
         } while (file_exists($fileLocation));
         if(! move_uploaded_file($tempFile['tmp_name'], $fileLocation)) {
             return $default;
         }
-        return new Link("images/profilePictures/{$guid}.{$extension}", true);
+        return new Link("images/profilePictures/{$name}.{$extension}", true);
     }
 }
