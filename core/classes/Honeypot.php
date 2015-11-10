@@ -99,7 +99,7 @@ class honeyPotField {
         return $this->labelText;
     }
     public function getHtmlElement() {
-        return "<label for='{$this->postName}'>{$this->labelText}</label><input type='text' name='{$this->postName}' id='{$this->postName}' />";
+        return "<label for='{$this->postName}'>{$this->labelText}</label><input type='text' name='{$this->postName}' id='{$this->postName}' autocomplete='off'/>";
     }
     public function __toString() {
         return '' . $this->getHtmlElement();
