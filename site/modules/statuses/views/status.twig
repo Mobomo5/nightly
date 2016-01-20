@@ -1,0 +1,10 @@
+{% set revision=timelineEntry.getRevision() %}
+{% set poster=timelineEntry.getPoster() %}
+<div class="statusPostInfo">
+    <div class="userProfilePicture mediumUserProfilePicture floatLeft">
+        <img src="{{ poster.getProfilePictureLocation() }}"/>
+        <p>{{ poster.getFullName() }}</p>
+    </div>
+    <div class="itemTitle">Posted on {{ revision.getTimePosted() | date("Y-m-d") }}</div>
+</div>
+<p>{{ revision.getMessage() }}</p>

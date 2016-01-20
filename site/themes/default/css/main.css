@@ -164,3 +164,15 @@ input[type="button"]:hover, input[type="submit"]:hover, input[type="checkbox"]:h
     border: 1px solid #f2ebeb;
     flex-grow: 1;
 }
+.groupItem .itemTitle {
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #EBE6E6;
+    padding: 5px;
+    font-size: 12px;
+    margin-top: -5px;
+    margin-left: -5px;
+    margin-right: -5px;
+}
+.groupItem p {
+    margin: 2px;
+}

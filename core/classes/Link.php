@@ -50,16 +50,16 @@ class Link {
             return $this->fullLocalURL();
         }
         if($this->physicalFile) {
-            return EDUCASK_WEB_ROOT . '/' . $this->href;
+            return EDUCASK_WEB_ROOT . $this->href;
         }
         if ($this->cleanURLEnabled === false) {
-            return EDUCASK_WEB_ROOT . '/?p=' . $this->href;
+            return EDUCASK_WEB_ROOT . '?p=' . $this->href;
         }
-        return EDUCASK_WEB_ROOT . '/' . $this->href;
+        return EDUCASK_WEB_ROOT . $this->href;
     }
     private function externalLink() {
         if($this->localLinkOnly) {
-            return EDUCASK_WEB_ROOT . '/home';
+            return EDUCASK_WEB_ROOT . '';
         }
         return $this->href;
     }

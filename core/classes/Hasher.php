@@ -31,7 +31,7 @@ class Hasher {
         }
         return password_needs_rehash($hash, PASSWORD_DEFAULT);
     }
-    public static function generateHmacHash($toHash, $secretKey = null) {
+    public static function generateHmacHash($toHash, $secretKey = null, $hashingAlgorithm="sha512") {
         if(! is_string($toHash)) {
             return "";
         }
@@ -41,9 +41,12 @@ class Hasher {
         if(! is_string($secretKey)) {
             return "";
         }
-        return hash_hmac("sha512", $toHash, $secretKey);
+        if(! is_string($hashingAlgorithm)) {
+            return "";
+        }
+        return hash_hmac($hashingAlgorithm, $toHash, $secretKey);
     }
-    public static function hmacVerify($nonHashed, $hashed, $secretKey = null) {
+    public static function hmacVerify($nonHashed, $hashed, $secretKey = null, $hashingAlgorithm="sha512") {
         if(! is_string($nonHashed)) {
             return false;
         }
@@ -56,7 +59,10 @@ class Hasher {
         if(! is_string($secretKey)) {
             return false;
         }
-        $nonHashedHashed = hash_hmac("sha512", $nonHashed, $secretKey);
+        if(! is_string($hashingAlgorithm)) {
+            return "";
+        }
+        $nonHashedHashed = hash_hmac($hashingAlgorithm, $nonHashed, $secretKey);
         if($nonHashedHashed !== $hashed) {
             return false;
         }

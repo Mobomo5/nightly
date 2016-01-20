@@ -110,11 +110,11 @@ class Bootstrap {
             return Response::fourOhFour();
         }
         $module = new $moduleInCharge(Request::getInstance());
-        $response = $module->getResponse();
-        if(! is_object($response)) {
+        if(! ($module instanceof IModule)) {
             return Response::fiveHundred();
         }
-        if(get_class($response) !== "Response") {
+        $response = $module->getResponse();
+        if(! ($response instanceof Response)) {
             return Response::fiveHundred();
         }
         return $response;
@@ -124,9 +124,15 @@ class Bootstrap {
         if(! $config->cronIsEnabled()) {
             return;
         }
-        require_once(EDUCASK_ROOT . "/public_html/cron.php");
-        $cron = new Cron(Config::getInstance()->getCronToken());
-        $cron->run();
+        $site = Site::getInstance();
+        if(! $site->doesCronNeedToRun()) {
+            return;
+        }
+        if($site->isCronRunning()) {
+            return;
+        }
+        $cronLink = new Link("cron/run/{$config->getCronToken()}", false, false, true, true);
+        http_get($cronLink->getHref());
     }
     private static function render(Site $site, Response $response, array $blocks) {
         $redirectTo = $response->getRedirectTo();

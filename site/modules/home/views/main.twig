@@ -1,1 +1,8 @@
-<p>You're logged in, {{ model.getFullName() }}. Eventually your timeline will be located here.</p>
+{{ include("@statuses/statusForm.twig", {action:'add'}, with_context=false) }}
+<div id="group">
+    {% for timelineEntry in model.timeline %}
+        <div class="timeLineEntry groupItem">
+            {{ include(timelineEntry.getSubView(), {timelineEntry:timelineEntry}, with_context=false) }}
+        </div>
+    {% endfor %}
+</div>

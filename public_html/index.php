@@ -16,7 +16,11 @@ ini_set('session.use_only_cookies', true);
 ini_set('session.cookie_httponly', true);
 
 define('EDUCASK_ROOT', dirname(getcwd()));
-define('EDUCASK_WEB_ROOT', dirname($_SERVER['SCRIPT_NAME']));
+$webRoot = dirname($_SERVER['SCRIPT_NAME']);
+if(substr($webRoot, -1) !== "/") {
+    $webRoot .= "/";
+}
+define('EDUCASK_WEB_ROOT', $webRoot);
 
 //Start Educask
 require_once(EDUCASK_ROOT . '/core/classes/Bootstrap.php');

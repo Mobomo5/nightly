@@ -1,12 +1,12 @@
 <?php
-class Status {
+class Status implements ITimelineObject {
     private $id;
     private $posterID;
+    private $poster;
     private $parentStatusID;
     private $supporterCount;
-    private $nodeID;
     private $revision;
-    public function __construct($inID, $inPosterID, $inParentStatusID, $inSupporterCount, $inNodeID, StatusRevision $inStatusRevision) {
+    public function __construct($inID, $inPosterID, $inParentStatusID, $inSupporterCount, StatusRevision $inStatusRevision) {
         if(! is_numeric($inID)) {
             return;
         }
@@ -31,18 +31,13 @@ class Status {
         if($inSupporterCount < 0) {
             return;
         }
-        if(! is_numeric($inNodeID)) {
-            return;
-        }
-        if($inNodeID < 0) {
-            return;
-        }
         $this->id = $inID;
         $this->posterID = $inPosterID;
+        $this->poster = null;
         $this->parentStatusID = $inParentStatusID;
         $this->supporterCount = $inSupporterCount;
-        $this->nodeID = $inNodeID;
         $this->revision = $inStatusRevision;
+        $this->children = array();
     }
     public function getID() {
         return $this->id;
@@ -65,19 +60,40 @@ class Status {
     public function getSupporterCount() {
         return $this->supporterCount;
     }
-    public function getNodeID() {
-        return $this->nodeID;
-    }
-    public function setNodeID($inNodeID) {
-        if(! is_numeric($inNodeID)) {
-            return;
-        }
-        if($inNodeID < 0) {
-            return;
-        }
-        $this->nodeID = $inNodeID;
-    }
     public function getRevision() {
         return $this->revision;
+    }
+    public function getPoster() {
+        return $this->poster;
+    }
+    public function setPoster(User $poster) {
+        if($poster->getUserID() != $this->posterID) {
+            return;
+        }
+        $this->poster = $poster;
+    }
+    public function getDate() {
+        return $this->revision->getTimePosted();
+    }
+    public function getPriority() {
+        return 1;
+    }
+    public function getSubView() {
+        return "@statuses/status.twig";
+    }
+    public function compareTo(ITimelineObject $other) {
+        $myDate = $this->getDate();
+        $othersDate = $other->getDate();
+        if($myDate > $othersDate) {
+            return 1;
+        }
+        if($myDate < $othersDate) {
+            return -1;
+        }
+        $othersPriority = $other->getPriority();
+        if(! is_numeric($othersPriority)) {
+            return 1;
+        }
+        return ($this->getPriority() - $othersPriority);
     }
 }

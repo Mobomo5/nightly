@@ -1,0 +1,8 @@
+{% if HasPermission("canUseStatusForm") %}
+    <form action="{{ Href("statuses/"~action) }}" method="post">
+        {{ AntiForgeryToken() }}
+        {{ Honeypot() }}
+        <input type="text" placeholder="Type something..." name="statusMessage" id="statusMessage" value="{{ status.getMessage() }}" required>
+        <input type="submit" value="Post">
+    </form>
+{% endif %}

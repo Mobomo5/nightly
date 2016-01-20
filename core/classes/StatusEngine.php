@@ -17,10 +17,6 @@ class StatusEngine {
         if(! is_numeric($inID)) {
             return false;
         }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canViewStatuses")) {
-            return false;
-        }
         if(isset($this->foundStatuses[$inID])) {
             return $this->foundStatuses[$inID];
         }
@@ -29,7 +25,7 @@ class StatusEngine {
             return false;
         }
         $inID = $database->escapeString($inID);
-        $results = $database->getData('statusID, posterID, parentStatus, supporterCount, nodeID', 'status', "statusID={$inID}");
+        $results = $database->getData('statusID, posterID, parentStatus, supporterCount', 'status', "statusID={$inID}");
         if($results === false) {
             return false;
         }
@@ -47,58 +43,12 @@ class StatusEngine {
         $posterID = $results[0]['postedID'];
         $parentStatus = $results[0]['parentStatus'];
         $supporterCount = $results[0]['supporterCount'];
-        $nodeID = $results[0]['nodeID'];
-        $toReturn = new Status($statusID, $posterID, $parentStatus, $supporterCount, $nodeID, $statusRevision);
+        $toReturn = new Status($statusID, $posterID, $parentStatus, $supporterCount, $statusRevision);
         $this->foundStatuses[$inID] = $toReturn;
-        return $toReturn;
-    }
-    public function getStatusesOnNode($inNodeID) {
-        if(! $inNodeID) {
-            return false;
-        }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canViewStatuses")) {
-            return false;
-        }
-        $database = Database::getInstance();
-        if(! $database->isConnected()) {
-            return false;
-        }
-        $inNodeID = $database->escapeString($inNodeID);
-        $results = $database->getData('statusID, posterID, parentStatus, supporterCount, nodeID', 'status', "nodeID={$inNodeID}");
-        if($results === false) {
-            return false;
-        }
-        if($results === null) {
-            return false;
-        }
-        $toReturn = array();
-        foreach($results as $result) {
-            if(isset($this->foundStatuses[$result['statusID']])) {
-                $toReturn[] = $this->foundStatuses[$result['statusID']];
-                continue;
-            }
-            $statusRevision = $this->getCurrentStatusRevisionForStatus($result['statusID']);
-            if($statusRevision === false) {
-                continue;
-            }
-            $statusID = $result['statusID'];
-            $posterID = $result['postedID'];
-            $parentStatus = $result['parentStatus'];
-            $supporterCount = $result['supporterCount'];
-            $nodeID = $result['nodeID'];
-            $toAdd = new Status($statusID, $posterID, $parentStatus, $supporterCount, $nodeID, $statusRevision);
-            $this->foundStatuses[$result['statusID']];
-            $toReturn[] = $toAdd;
-        }
         return $toReturn;
     }
     public function getStatusesByUser($inUserID) {
         if(! $inUserID) {
-            return false;
-        }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canViewStatuses")) {
             return false;
         }
         $database = Database::getInstance();
@@ -106,7 +56,7 @@ class StatusEngine {
             return false;
         }
         $inUserID = $database->escapeString($inUserID);
-        $results = $database->getData('statusID, posterID, parentStatus, supporterCount, nodeID', 'status', "posterID={$inUserID} AND parentStatus=0");
+        $results = $database->getData('statusID, posterID, parentStatus, supporterCount', 'status', "posterID={$inUserID} AND parentStatus=0");
         if($results === false) {
             return false;
         }
@@ -124,11 +74,10 @@ class StatusEngine {
                 continue;
             }
             $statusID = $result['statusID'];
-            $posterID = $result['postedID'];
+            $posterID = $result['posterID'];
             $parentStatus = $result['parentStatus'];
             $supporterCount = $result['supporterCount'];
-            $nodeID = $result['nodeID'];
-            $toAdd = new Status($statusID, $posterID, $parentStatus, $supporterCount, $nodeID, $statusRevision);
+            $toAdd = new Status($statusID, $posterID, $parentStatus, $supporterCount, $statusRevision);
             $this->foundStatuses[$result['statusID']] = $toAdd;
             $toReturn[] = $toAdd;
         }
@@ -136,10 +85,6 @@ class StatusEngine {
     }
     public function getCurrentStatusRevisionForStatus($inStatusID) {
         if(! is_numeric($inStatusID)) {
-            return false;
-        }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canViewStatuses")) {
             return false;
         }
         $database = Database::getInstance();
@@ -161,10 +106,6 @@ class StatusEngine {
     }
     public function getStatusRevision($revisionID) {
         if(! is_numeric($revisionID)) {
-            return false;
-        }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canViewStatuses")) {
             return false;
         }
         if(isset($this->foundStatusRevisions[$revisionID])) {
@@ -201,10 +142,6 @@ class StatusEngine {
     }
     public function getStatusRevisionsForStatus($statusID) {
         if(! is_numeric($statusID)) {
-            return false;
-        }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canViewStatuses")) {
             return false;
         }
         $database = Database::getInstance();
@@ -246,10 +183,6 @@ class StatusEngine {
         if(! is_numeric(($id))) {
             return false;
         }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canRemoveStatuses")) {
-            return false;
-        }
         $database = Database::getInstance();
         if(! $database->isConnected()) {
             return false;
@@ -288,10 +221,6 @@ class StatusEngine {
         if(! is_numeric($id)) {
             return false;
         }
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canRemoveStatusRevisions")) {
-            return false;
-        }
         $database = Database::getInstance();
         if(! $database->isConnected()) {
             return false;
@@ -304,10 +233,6 @@ class StatusEngine {
         return true;
     }
     public function addStatus(Status $toAdd) {
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canAddStatuses")) {
-            return false;
-        }
         $database = Database::getInstance();
         if(! $database->isConnected()) {
             return false;
@@ -315,8 +240,7 @@ class StatusEngine {
         $posterID = $database->escapeString($toAdd->getPosterID());
         $parentStatus = $database->escapeString($toAdd->getParentStatusID());
         $supporterCount = 0;
-        $nodeID = $database->escapeString($toAdd->getNodeID());
-        $result = $database->insertData("status", "posterID, parentStatus, supporterCount, nodeID", "{$posterID}, {$parentStatus}, {$supporterCount}, {$nodeID}");
+        $result = $database->insertData("status", "posterID, parentStatus, supporterCount", "{$posterID}, {$parentStatus}, {$supporterCount}");
         if($result === false) {
             return false;
         }
@@ -356,17 +280,9 @@ class StatusEngine {
         return true;
     }
     public function addStatusRevision(StatusRevision $toAdd) {
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canReviseStatuses")) {
-            return false;
-        }
         return $this->addStatusRevisionInternal($toAdd, $toAdd->getStatusID());
     }
     public function toggleCurrentUserSupportForStatus(Status $toSupport) {
-        $permissionEngine = PermissionEngine::getInstance();
-        if(! $permissionEngine->currentUserCanDo("canSupportStatuses")) {
-            return false;
-        }
         $database = Database::getInstance();
         if(! $database->isConnected()) {
             return false;

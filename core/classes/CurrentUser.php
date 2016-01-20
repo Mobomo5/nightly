@@ -5,12 +5,18 @@ class CurrentUser extends User {
         if(! isset($_SESSION['educaskCurrentUser'])) {
             return false;
         }
+        if(! ($_SESSION['educaskCurrentUser'] instanceof CurrentUser)) {
+            return false;
+        }
         return true;
     }
     static function getUserSession() {
         //if the user's object hasn't been created yet, create it
         if (!self::userIsInSession()) {
             self::setUserSession(new CurrentUser());
+        }
+        if(! ($_SESSION['educaskCurrentUser'] instanceof CurrentUser)) {
+            return new CurrentUser();
         }
         return $_SESSION['educaskCurrentUser'];
     }

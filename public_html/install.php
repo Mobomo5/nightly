@@ -608,7 +608,7 @@ function doConfigureContent() {
     } else {
         $smtpEncryption = 'false';
     }
-    if($webDirectory !== "/") {
+    if(substr($webDirectory, -1) !== "/") {
         $webDirectory .= '/';
     }
     $variables = array(

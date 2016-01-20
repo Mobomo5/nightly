@@ -20,11 +20,8 @@ class HookEngine {
         $this->filterEvents = array();
         $this->failed = array();
     }
-    public function addAction($inEventName, $plugin) {
-        if (!is_object($plugin)) {
-            return false;
-        }
-        if (!in_array('IPlugin', class_implements($plugin))) {
+    public function addAction($inEventName, IPlugin $plugin) {
+        if(! is_string($inEventName)) {
             return false;
         }
         $this->actionEvents[$inEventName][] = $plugin;
@@ -39,17 +36,17 @@ class HookEngine {
             $plugin::run();
         }
     }
-    public function  addFilter($inEventName, $plugin) {
-        if (!is_object($plugin)) {
-            return false;
-        }
-        if (!in_array('IPlugin', class_implements($plugin))) {
+    public function  addFilter($inEventName, IPlugin $plugin) {
+        if(! is_string($inEventName)) {
             return false;
         }
         $this->filterEvents[$inEventName][] = $plugin;
         return true;
     }
     public function runFilter($inEventName, $inContent) {
+        if(! is_string($inEventName)) {
+            return null;
+        }
         if (!isset($this->filterEvents[$inEventName])) {
             return null;
         }
@@ -61,6 +58,9 @@ class HookEngine {
         return $content;
     }
     public function runAddToFilter($inEventName, $inContent) {
+        if(! is_string($inEventName)) {
+            return null;
+        }
         if (!isset($this->filterEvents[$inEventName])) {
             return null;
         }
