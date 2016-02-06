@@ -24,7 +24,6 @@ class Bootstrap {
         Session::start();
         self::initializePlugins();
         self::getVariables();
-        self::cron();
         Router::moveCurrentParametersToPrevious();
         Session::close();
         Database::getInstance()->bootstrapDisconnect();
@@ -118,21 +117,6 @@ class Bootstrap {
             return Response::fiveHundred();
         }
         return $response;
-    }
-    private static function cron() {
-        $config = Config::getInstance();
-        if(! $config->cronIsEnabled()) {
-            return;
-        }
-        $site = Site::getInstance();
-        if(! $site->doesCronNeedToRun()) {
-            return;
-        }
-        if($site->isCronRunning()) {
-            return;
-        }
-        $cronLink = new Link("cron/run/{$config->getCronToken()}", false, false, true, true);
-        http_get($cronLink->getHref());
     }
     private static function render(Site $site, Response $response, array $blocks) {
         $redirectTo = $response->getRedirectTo();

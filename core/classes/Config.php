@@ -59,19 +59,4 @@ class Config {
         }
         return $this->configXml->config[0]['appkey']->__toString();
     }
-    public function getCronToken() {
-        if($this->configXml === false) {
-            return "";
-        }
-        return $this->configXml->config[0]->cron[0]['token']->__toString();
-    }
-    public function cronIsEnabled() {
-        if($this->configXml === false) {
-            return false;
-        }
-        if($this->configXml->config[0]->cron[0]['enabled']->__toString() === "false") {
-            return false;
-        }
-        return true;
-    }
 }

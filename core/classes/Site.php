@@ -18,6 +18,8 @@ class Site {
     private $cleanURLs;
     private $timeZone;
     private $maintenanceMode;
+    private $cronToken;
+    private $cronEnabled;
     private $cronRunning;
     private $lastCronRun;
     private $cronFrequency;
@@ -55,6 +57,8 @@ class Site {
         $variablesWanted[] = 'cleanURLsEnabled';
         $variablesWanted[] = 'siteTimeZone';
         $variablesWanted[] = 'maintenanceMode';
+        $variablesWanted[] = 'cronToken';
+        $variablesWanted[] = 'cronEnabled';
         $variablesWanted[] = 'cronRunning';
         $variablesWanted[] = 'cronFrequency';
         $variablesWanted[] = 'lastCronRun';
@@ -71,6 +75,8 @@ class Site {
         $this->cleanURLs = $variables['cleanURLsEnabled'];
         $this->timeZone = $variables['siteTimeZone'];
         $this->maintenanceMode = $variables['maintenanceMode'];
+        $this->cronToken = $variables['cronToken'];
+        $this->cronEnabled = $variables['cronEnabled'];
         $this->cronRunning = $variables['cronRunning'];
         $this->cronFrequency = $variables['cronFrequency'];
         $this->lastCronRun = $variables['lastCronRun'];
@@ -265,6 +271,45 @@ class Site {
         self::setInstance($this);
         return true;
     }
+    public function getCronToken() {
+        return $this->cronToken;
+    }
+    public function setCronToken($newToken) {
+        if(! is_string($newToken)) {
+            return false;
+        }
+        $this->cronToken->setValue($newToken);
+        if(!$this->cronToken->save()) {
+            return false;
+        }
+        self::setInstance($this);
+        return true;
+    }
+    public function isCronEnabled() {
+        if($this->cronEnabled->getValue() == 'false') {
+            return false;
+        }
+        return true;
+    }
+    public function setCronEnabled($isEnabled = false) {
+        if(! is_bool($isEnabled)) {
+            return false;
+        }
+        if($isEnabled === false) {
+            $this->cronRunning->setValue('false');
+            if(! $this->cronEnabled->save()) {
+                return false;
+            }
+            self::setInstance($this);
+            return true;
+        }
+        $this->cronRunning->setValue('true');
+        if(! $this->cronEnabled->save()) {
+            return false;
+        }
+        self::setInstance($this);
+        return true;
+    }
     public function isCronRunning() {
         if($this->cronRunning->getValue() == 'false') {
             return false;
@@ -313,6 +358,12 @@ class Site {
         return true;
     }
     public function doesCronNeedToRun() {
+        if(! $this->isCronEnabled()) {
+            return false;
+        }
+        if($this->isCronRunning()) {
+            return false;
+        }
         $lastCronRun = $this->getLastCronRun();
         $currentTime = new DateTime();
         $cronFrequency = DateInterval::createFromDateString($this->cronFrequency);

@@ -256,14 +256,8 @@ function doDatabaseContent() {
     $file = EDUCASK_ROOT . '/site/config.xml';
     $general = new generateRandomString(25);
     $appKey = $general->run();
-    $cronToken = $general->run();
     if($appKey === false) {
         $_SESSION['errors'][] = 'I couldn\'t generate an app key. Please try again by refreshing the page. If this problem persists, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: Make this link to actual help.
-        header('Location: install.php?action=database');
-        return;
-    }
-    if($cronToken === false) {
-        $_SESSION['errors'][] = 'I couldn\'t generate a cron token. Please try again by refreshing the page. If this problem persists, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: Make this link to actual help.
         header('Location: install.php?action=database');
         return;
     }
@@ -279,9 +273,6 @@ function doDatabaseContent() {
     $databaseTag->addAttribute("type", $engine);
     $sessionTag = $configTag->addChild("session");
     $sessionTag->addAttribute("provider", "secureSession");
-    $cronTag = $configTag->addChild("cron");
-    $cronTag->addAttribute("token", $cronToken);
-    $cronTag->addAttribute("enabled", "true");
     $dom = dom_import_simplexml($xml)->ownerDocument;
     $dom->formatOutput = TRUE;
     if (($dom->save($file)) === false) {
@@ -611,6 +602,13 @@ function doConfigureContent() {
     if(substr($webDirectory, -1) !== "/") {
         $webDirectory .= '/';
     }
+    $general = new generateRandomString(25);
+    $cronToken = $general->run();
+    if($cronToken === false) {
+        $_SESSION['errors'][] = 'I couldn\'t generate a cron token. Please try again. If this problem persists, please see <a href="https://www.educask.com" target="_blank">this page</a>.'; //@ToDo: Make this link to actual help.
+        header('Location: install.php?action=configure');
+        return;
+    }
     $variables = array(
         'cleanURLsEnabled'     => 'false',
         'educaskVersion'       => EDUCASK_VERSION,
@@ -628,6 +626,8 @@ function doConfigureContent() {
         'smtpUserName'         => $smtpUserName,
         'smtpPassword'         => $smtpPassword,
         'smtpUseEncryption'    => $smtpEncryption,
+        'cronEnabled'          => 'true',
+        'cronToken'            => $cronToken,
         'lastCronRun'          => '2015-01-01 21:15:53',
         'cronRunning'          => 'false',
         'cronFrequency'        => '10 minutes',

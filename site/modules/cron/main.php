@@ -15,16 +15,13 @@ class cron extends Controller {
         if(count($parameters) !== 3) {
             return Response::fourOhFour();
         }
+        $site = Site::getInstance();
         $cronToken = $parameters[2];
-        if($cronToken !== Config::getInstance()->getCronToken()) {
+        if($cronToken !== Site::getInstance()->getCronToken()->getValue()) {
             return Response::fourOhFour();
         }
         $response = Response::raw("", 204);
-        $site = Site::getInstance();
         if(! $site->doesCronNeedToRun()) {
-            return $response;
-        }
-        if($site->isCronRunning()) {
             return $response;
         }
         $site->setCronRunning(true);
